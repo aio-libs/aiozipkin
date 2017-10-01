@@ -1,0 +1,4 @@
+[run]
+branch = True
+source = aiozipkin
+omit = site-packages, .tox
