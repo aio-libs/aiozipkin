@@ -13,8 +13,8 @@ aiozipkin
     :target: https://gitter.im/aio-libs/Lobby
     :alt: Chat on Gitter
 
-**aiozipkin** is Python 3.5+ module that adds http://zipkin.io/ insturementation
-from asyncio applications
+**aiozipkin** is Python 3.5+ module that adds distributed tracing capabilities
+from asyncio applications with Zipkin (http://zipkin.io) server insturementation.
 
 
 Installation
@@ -34,8 +34,6 @@ Requirements
 
 .. _PEP492: https://www.python.org/dev/peps/pep-0492/
 .. _Python: https://www.python.org
-.. _aioconsole: https://github.com/vxgmichel/aioconsole
 .. _aiohttp: https://github.com/KeepSafe/aiohttp
 .. _asyncio: http://docs.python.org/3.5/library/asyncio.html
-.. _curio: https://github.com/dabeaz/curio
 .. _uvloop: https://github.com/MagicStack/uvloop
