@@ -13,7 +13,8 @@ aiozipkin
     :target: https://gitter.im/aio-libs/Lobby
     :alt: Chat on Gitter
 
-**aiozipkin** is Python 3.5+ module that adds monitor and cli capabilities
+**aiozipkin** is Python 3.5+ module that adds http://zipkin.io/ insturementation
+from asyncio applications
 
 
 Installation
@@ -28,8 +29,7 @@ Requirements
 ------------
 
 * Python_ 3.5+
-* aioconsole_
-* uvloop_ (optional)
+* aiohttp_
 
 
 .. _PEP492: https://www.python.org/dev/peps/pep-0492/
