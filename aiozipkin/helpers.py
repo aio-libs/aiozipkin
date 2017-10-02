@@ -64,7 +64,8 @@ def _parse_sampled(headers):
     sampled = headers.get(SAMPLED_ID_HEADER, None)
     if sampled is None or sampled == "":
         return None
-    return bool(sampled)
+    # TODO: add more test cases
+    return True if sampled == '1' else False
 
 
 def make_context(headers):
