@@ -21,7 +21,7 @@ FLAGS_HEADER = 'X-B3-Flags'
 SAMPLED_ID_HEADER = 'X-B3-Sampled'
 
 
-TraceContext = namedtuple(
+_TraceContext = namedtuple(
     'TraceContext', [
         "trace_id",
         "parent_id",
@@ -31,6 +31,13 @@ TraceContext = namedtuple(
         "shared",
         ]
 )
+
+
+class TraceContext(_TraceContext):
+
+    def make_headers(self):
+        return make_headers(self)
+
 
 Endpoint = namedtuple(
     'Endpoint', ["serviceName", "ipv4", "ipv6", "port"]

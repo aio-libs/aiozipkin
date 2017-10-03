@@ -22,7 +22,8 @@ def test_make_headers(trace_context):
         'X-B3-Sampled': '1',
         'X-B3-SpanId': '41baf1be2fb9bfc5',
         'X-B3-TraceId': '6f9a20b5092fa5e144fd15cc31141cd4'}
-    assert headers == expected
+    headers2 = trace_context.make_headers()
+    assert headers == expected == headers2
 
 
 def test_make_context(trace_context):
