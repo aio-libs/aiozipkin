@@ -1,4 +1,4 @@
-from .helpers import  make_context, SERVER
+from .helpers import make_context, SERVER
 
 
 APP_AIOZIPKIN_KEY = "aiozipkin_tracer"

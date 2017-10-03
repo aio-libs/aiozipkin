@@ -50,10 +50,11 @@ def make_headers(context):
     headers = {
         TRACE_ID_HEADER: context.trace_id,
         SPAN_ID_HEADER: context.span_id,
-        PARENT_ID_HEADER: "" if context.parent_id is None else context.parent_id,
         FLAGS_HEADER: '0',
         SAMPLED_ID_HEADER: '1' if context.sampled else '0',
     }
+    if context.parent_id is not None:
+        headers[PARENT_ID_HEADER] = context.parent_id
     return headers
 
 
