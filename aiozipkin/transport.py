@@ -2,6 +2,7 @@ import json
 import requests
 
 
+# TODO: make transport async
 class Transport:
 
     def __init__(self, address):

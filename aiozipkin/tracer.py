@@ -35,6 +35,12 @@ class Tracer:
         new_context = self._next_context(context)
         return self.to_span(new_context)
 
+    def join_or_create(self, context=None):
+        if context is not None:
+            return self.join_span(context)
+        new_context = self._next_context(context)
+        return self.to_span(new_context)
+
     def to_span(self, context):
         record = Record(context, self._local_endpoint)
         self._records[context] = record

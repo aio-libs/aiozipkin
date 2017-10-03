@@ -19,7 +19,6 @@ def test_make_headers(trace_context):
     headers = make_headers(trace_context)
     expected = {
         'X-B3-Flags': '0',
-        'X-B3-ParentSpanId': None,
         'X-B3-Sampled': '1',
         'X-B3-SpanId': '41baf1be2fb9bfc5',
         'X-B3-TraceId': '6f9a20b5092fa5e144fd15cc31141cd4'}
