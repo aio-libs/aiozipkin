@@ -50,14 +50,14 @@ def make_headers(context):
     headers = {
         TRACE_ID_HEADER: context.trace_id,
         SPAN_ID_HEADER: context.span_id,
-        PARENT_ID_HEADER: context.parent_id,
+        PARENT_ID_HEADER: "" if context.parent_id is None else context.parent_id,
         FLAGS_HEADER: '0',
         SAMPLED_ID_HEADER: '1' if context.sampled else '0',
     }
     return headers
 
 
-_required_headers = (TRACE_ID_HEADER, PARENT_ID_HEADER, SPAN_ID_HEADER)
+_required_headers = (TRACE_ID_HEADER, SPAN_ID_HEADER)
 
 
 def _parse_sampled(headers):
@@ -76,7 +76,7 @@ def make_context(headers):
 
     context = TraceContext(
         trace_id=headers.get(TRACE_ID_HEADER),
-        parent_id=headers.get(PARENT_ID_HEADER),
+        parent_id=headers.get(PARENT_ID_HEADER, None),
         span_id=headers.get(SPAN_ID_HEADER),
         sampled=_parse_sampled(headers),
         shared=True,
