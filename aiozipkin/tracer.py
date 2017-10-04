@@ -33,9 +33,9 @@ class Tracer:
         return self.to_span(new_context)
 
     def new_child(self, context):
-        if not context.sampled:
-            return NoopSpan(context)
         new_context = self._next_context(context)
+        if not context.sampled:
+            return NoopSpan(new_context)
         return self.to_span(new_context)
 
     def join_or_create(self, context=None):
