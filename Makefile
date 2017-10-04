@@ -4,7 +4,7 @@ FLAGS=
 
 
 flake: checkrst
-	flake8 aiozipkin tests examples setup.py
+	flake8 aiozipkin tests examples setup.py demos
 
 test: flake
 	py.test -s -v $(FLAGS) ./tests/
