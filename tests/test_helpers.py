@@ -1,6 +1,8 @@
+import time
 import pytest
 
-from aiozipkin.helpers import TraceContext, make_headers, make_context
+from aiozipkin.helpers import (
+    TraceContext, make_headers, make_context, make_timestamp)
 
 
 @pytest.fixture
@@ -34,5 +36,16 @@ def test_make_context(trace_context):
         'X-B3-Sampled': '1',
         'X-B3-SpanId': '41baf1be2fb9bfc5',
         'X-B3-TraceId': '6f9a20b5092fa5e144fd15cc31141cd4'}
-    expected = make_context(headers)
-    assert trace_context == expected
+    context = make_context(headers)
+    assert trace_context == context
+
+    context = make_context({})
+    assert context is None
+
+
+def test_make_timestamp():
+    ts = make_timestamp()
+    assert len(str(ts)) == 16
+
+    ts = make_timestamp(time.time())
+    assert len(str(ts)) == 16

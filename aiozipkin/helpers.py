@@ -65,9 +65,6 @@ def make_headers(context):
     return headers
 
 
-_required_headers = (TRACE_ID_HEADER, SPAN_ID_HEADER)
-
-
 def _parse_sampled(headers):
     sampled = headers.get(SAMPLED_ID_HEADER, None)
     if sampled is None or sampled == "":
@@ -79,7 +76,7 @@ def _parse_sampled(headers):
 def make_context(headers):
     # TODO: add validation for trace_id/span_id/parent_id
 
-    if not all(h in headers for h in _required_headers):
+    if not all(h in headers for h in (TRACE_ID_HEADER, SPAN_ID_HEADER)):
         return None
 
     context = TraceContext(
