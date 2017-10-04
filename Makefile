@@ -44,6 +44,17 @@ clean:
 	rm -rf dist
 	rm -rf node_modules
 
+docker_clean:
+	-@docker rmi $$(docker images -q --filter "dangling=true")
+	-@docker rm $$(docker ps -q -f status=exited)
+	-@docker volume ls -qf dangling=true | xargs -r docker volume rm
+
+zipkin_start:
+	docker run -d --rm  –name zipkin -p 9411:9411 openzipkin/zipkin
+
+zipkin_stop:
+	docker stop zipkin
+
 doc:
 	make -C docs html
 	@echo "open file://`pwd`/docs/_build/html/index.html"
