@@ -35,6 +35,7 @@ class NoopSpan:
         return self
 
     def __exit__(self, exception_type, exception_value, traceback):
+        self.tag("error", str(exception_value))
         self.finish()
 
 

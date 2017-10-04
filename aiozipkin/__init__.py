@@ -1,5 +1,5 @@
-from .aiohttp_helpers import setup, get_tracer, middleware_maker
-from .helpers import create_endpoint
+from .aiohttp_helpers import setup, get_tracer, middleware_maker, request_span
+from .helpers import create_endpoint, CLIENT, SERVER, PRODUCER, CONSUMER
 from .sampler import Sampler
 from .tracer import create, Tracer
 
@@ -12,4 +12,9 @@ __all__ = ("Tracer",
            "setup",
            "get_tracer",
            "request_span",
-           "middleware_maker")
+           "middleware_maker",
+           "CLIENT",
+           "SERVER",
+           "PRODUCER",
+           "CONSUMER"
+           )
