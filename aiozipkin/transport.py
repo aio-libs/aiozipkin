@@ -1,23 +1,45 @@
-import json
-import requests
+import asyncio
+
+import aiohttp
 
 
-# TODO: make transport async
 class Transport:
 
-    def __init__(self, address):
-        self._address = address or 'http://localhost:9411/api/v2/spans'
+    def __init__(self, address, send_inteval=10, loop=None):
+        self._address = address
+        self._session = aiohttp.ClientSession(loop=loop)
+        self._queue = []
+        self._closing = False
+        self._send_interval = send_inteval
+        self._loop = loop
+        self._sender_task = asyncio.ensure_future(
+            self._sender_loop(), loop=loop)
 
     def send(self, record):
-        data = [record.asdict()]
-        self.http_transport(data)
+        print(record)
+        data = record.asdict()
+        self._queue.append(data)
+        # self.http_transport(data)
 
-    def http_transport(self, body):
-        data = json.dumps(body, indent=True)
+    async def _sender_loop(self):
+        while not self._closing:
+            if len(self._queue) != 0:
+                payload = self._queue[:]
+                self._queue = []
+                await self._send(payload)
+            await asyncio.sleep(self._send_interval, loop=self._loop)
+
+    async def _send(self, data):
+        # TODO: add retries
         print(data)
-        resp = requests.post(
-            self._address,
-            data=data,
-            headers={'Content-Type': 'application/json'})
-        print(resp)
-        print(resp.content)
+        async with self._session.post(self._address, json=data) as resp:
+            await resp.read()
+
+    async def close(self):
+        self._closing = True
+        self._sender_task.cancel()
+        try:
+            await self._sender_task
+        except asyncio.CanceledError:
+            pass
+        await self._session.close()

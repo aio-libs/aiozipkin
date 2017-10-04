@@ -80,3 +80,6 @@ class Tracer:
             debug=False,
             shared=False)
         return new_context
+
+    async def close(self):
+        await self._transport.close()
