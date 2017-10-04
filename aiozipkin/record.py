@@ -45,10 +45,10 @@ class Record:
     def annotate(self, value, ts):
         if value == CLIENT_SEND:
             self.kind(CLIENT)
-            self.timestamp(ts)
+            self._timestamp = ts
         elif value == SERVER_RECEIVED:
             self.kind(SERVER)
-            self.timestamp(ts)
+            self._timestamp = ts
         elif value == CLIENT_RECEIVED:
             self.kind(CLIENT)
             self.finish(ts)

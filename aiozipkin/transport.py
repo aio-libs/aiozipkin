@@ -1,5 +1,4 @@
 import asyncio
-
 import aiohttp
 
 
@@ -40,6 +39,6 @@ class Transport:
         self._sender_task.cancel()
         try:
             await self._sender_task
-        except asyncio.CanceledError:
+        except asyncio.CancelledError:
             pass
         await self._session.close()
