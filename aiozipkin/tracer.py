@@ -19,8 +19,8 @@ class Tracer:
         self._sampler = sampler
         self._local_endpoint = local_endpoint
 
-    def new_trace(self):
-        context = self._next_context(None, None)
+    def new_trace(self, sampled=None, debug=False):
+        context = self._next_context(None, sampled=None, debug=False)
         return self.to_span(context)
 
     def join_span(self, context):
@@ -38,17 +38,6 @@ class Tracer:
             return NoopSpan(new_context)
         return self.to_span(new_context)
 
-    def join_or_create(self, context=None):
-        if context is not None:
-            return self.join_span(context)
-        new_context = self._next_context(context)
-        return self.to_span(new_context)
-
-    def child_or_create(self, context=None):
-        if context is None:
-            return self.new_trace()
-        return self.new_child(context)
-
     def to_span(self, context):
         if not context.sampled:
             return NoopSpan(context)
@@ -61,14 +50,16 @@ class Tracer:
         self._records.pop(record._context, None)
         self._transport.send(record)
 
-    def _next_context(self, context=None, sampled=None):
+    def _next_context(self, context=None, sampled=None, debug=False):
         span_id = generate_random_64bit_string()
         if context is not None:
             new_context = context._replace(
-                span_id=span_id, parent_id=context.span_id, shared=False)
+                span_id=span_id,
+                parent_id=context.span_id,
+                shared=False)
             return new_context
-        trace_id = generate_random_128bit_string()
 
+        trace_id = generate_random_128bit_string()
         if sampled is None:
             sampled = self._sampler.is_sampled(trace_id)
 
@@ -77,7 +68,7 @@ class Tracer:
             parent_id=None,
             span_id=span_id,
             sampled=sampled,
-            debug=False,
+            debug=debug,
             shared=False)
         return new_context
 
