@@ -1,4 +1,4 @@
-from .helpers import make_context, SERVER
+from .helpers import make_context, SERVER, parse_debug, parse_sampled
 
 
 APP_AIOZIPKIN_KEY = "aiozipkin_tracer"
@@ -14,7 +14,15 @@ def middleware_maker(tracer_key=APP_AIOZIPKIN_KEY,
         async def aiozipkin_middleware(request):
             context = make_context(request.headers)
             tracer = app[tracer_key]
-            with tracer.child_or_create(context) as span:
+
+            if context is None:
+                sampled = parse_sampled(request.headers)
+                debug = parse_debug(request.headers)
+                span = tracer.new_trace(sampled=sampled, debug=debug)
+            else:
+                span = tracer.join_span(context)
+
+            with span:
                 span_name = '{0} {1}'.format(request.method, request.path)
                 span.kind(SERVER)
                 span.name(span_name)
