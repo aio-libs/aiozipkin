@@ -50,7 +50,7 @@ docker_clean:
 	-@docker volume ls -qf dangling=true | xargs -r docker volume rm
 
 zipkin_start:
-	docker run -d --rm  –name zipkin -p 9411:9411 openzipkin/zipkin
+	docker run --name zipkin -d --rm  -p 9411:9411 openzipkin/zipkin
 
 zipkin_stop:
 	docker stop zipkin
