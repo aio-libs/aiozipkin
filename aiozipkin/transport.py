@@ -35,6 +35,7 @@ class Transport:
             await resp.read()
 
     async def close(self):
+        # TODO: make sure queue is empty before closing
         self._closing = True
         self._sender_task.cancel()
         try:
