@@ -65,12 +65,16 @@ def make_headers(context):
     return headers
 
 
-def _parse_sampled(headers):
+def parse_sampled(headers):
     sampled = headers.get(SAMPLED_ID_HEADER, None)
     if sampled is None or sampled == "":
         return None
     # TODO: add more test cases
     return True if sampled == '1' else False
+
+
+def parse_debug(headers):
+    return True if headers.get(FLAGS_HEADER, '0') == '1' else False
 
 
 def make_context(headers):
@@ -83,8 +87,8 @@ def make_context(headers):
         trace_id=headers.get(TRACE_ID_HEADER),
         parent_id=headers.get(PARENT_ID_HEADER, None),
         span_id=headers.get(SPAN_ID_HEADER),
-        sampled=_parse_sampled(headers),
-        shared=True,
-        debug=True if headers.get(FLAGS_HEADER, '0') == '1' else False
+        sampled=parse_sampled(headers),
+        shared=False,
+        debug=parse_debug(headers),
     )
     return context

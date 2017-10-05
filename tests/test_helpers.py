@@ -13,7 +13,7 @@ def trace_context():
         span_id="41baf1be2fb9bfc5",
         sampled=True,
         debug=False,
-        shared=True)
+        shared=False)
     return new_context
 
 
