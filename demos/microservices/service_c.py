@@ -1,5 +1,4 @@
 import asyncio
-import aiohttp
 import aiozipkin
 
 from aiohttp import web
@@ -14,9 +13,6 @@ async def handler(request):
 def make_app():
     app = web.Application()
     app.router.add_get('/api/v1/data', handler)
-
-    session = aiohttp.ClientSession()
-    app["session"] = session
 
     zipkin_address = "http://localhost:9411/api/v2/spans"
     endpoint = aiozipkin.create_endpoint("service_c")
