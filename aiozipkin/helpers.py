@@ -66,7 +66,7 @@ def make_headers(context):
 
 
 def parse_sampled(headers):
-    sampled = headers.get(SAMPLED_ID_HEADER, None)
+    sampled = headers.get(SAMPLED_ID_HEADER.lower(), None)
     if sampled is None or sampled == "":
         return None
     # TODO: add more test cases
@@ -80,13 +80,18 @@ def parse_debug(headers):
 def make_context(headers):
     # TODO: add validation for trace_id/span_id/parent_id
 
-    if not all(h in headers for h in (TRACE_ID_HEADER, SPAN_ID_HEADER)):
+    # normalize header names just in case someone passed regular dict
+    # instead dict with case insensitive keys
+    headers = {k.lower(): v for k, v in headers.items()}
+
+    if not all(h in headers for h in (
+            TRACE_ID_HEADER.lower(), SPAN_ID_HEADER.lower())):
         return None
 
     context = TraceContext(
-        trace_id=headers.get(TRACE_ID_HEADER),
-        parent_id=headers.get(PARENT_ID_HEADER, None),
-        span_id=headers.get(SPAN_ID_HEADER),
+        trace_id=headers.get(TRACE_ID_HEADER.lower()),
+        parent_id=headers.get(PARENT_ID_HEADER.lower(), None),
+        span_id=headers.get(SPAN_ID_HEADER.lower()),
         sampled=parse_sampled(headers),
         shared=False,
         debug=parse_debug(headers),
