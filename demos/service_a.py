@@ -9,26 +9,46 @@ service_b_api = "http://127.0.0.1:9002/api/v1/data"
 service_e_api = "http://127.0.0.1:9005/api/v1/data"
 
 
+async def index(request):
+    body = """
+    <html lang="en">
+    <head>
+        <title>aiohttp microservices</title>
+    </head>
+    <body>
+    <a href="http://127.0.0.1:9001/api/v1/data">Call API</a>
+    </body>
+    </html>
+    """
+    return web.Response(text=body, content_type="text/html")
+
+
 async def handler(request):
     span = aiozipkin.request_span(request)
-    headers = span.context.make_headers()
+    tracer = aiozipkin.get_tracer(request.app)
 
     await asyncio.sleep(0.01)
     session = request.app["session"]
 
-    resp = await session.get(service_b_api, headers=headers)
-    data_b = await resp.text()
+    with tracer.new_child(span.context) as span_b:
+        headers = span_b.context.make_headers()
+        resp = await session.get(service_b_api, headers=headers)
+        data_b = await resp.text()
 
-    resp = await session.get(service_e_api, headers=headers)
+    with tracer.new_child(span.context) as span_e:
+        headers = span_e.context.make_headers()
+        resp = await session.get(service_e_api, headers=headers)
+
     data_e = await resp.text()
 
-    body = data_b + " " + data_e
+    body = "service_a " + data_b + " " + data_e
     return web.Response(text=body)
 
 
 def make_app():
     app = web.Application()
     app.router.add_get('/api/v1/data', handler)
+    app.router.add_get('/', index)
 
     session = aiohttp.ClientSession()
     app["session"] = session
