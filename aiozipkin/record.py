@@ -30,7 +30,7 @@ class Record:
     def finish(self, ts):
         if self._finished:
             return self
-        if ts is not None:
+        if ts is not None and self._kind not in (PRODUCER, CONSUMER):
             self._duration = max(ts - self._timestamp, 1)
         return self
 
