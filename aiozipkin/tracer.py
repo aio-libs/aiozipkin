@@ -35,12 +35,12 @@ class Tracer:
     def new_child(self, context):
         new_context = self._next_context(context)
         if not context.sampled:
-            return NoopSpan(new_context)
+            return NoopSpan(self, new_context)
         return self.to_span(new_context)
 
     def to_span(self, context):
         if not context.sampled:
-            return NoopSpan(context)
+            return NoopSpan(self, context)
 
         record = Record(context, self._local_endpoint)
         self._records[context] = record

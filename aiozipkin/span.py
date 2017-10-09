@@ -2,12 +2,16 @@ from .helpers import Endpoint, make_timestamp
 
 
 class NoopSpan:
-    def __init__(self, context):
+    def __init__(self, tracer, context):
         self._context = context
 
     @property
     def context(self):
         return self._context
+
+    @property
+    def tracer(self):
+        return self._tracer
 
     def start(self, ts=None):
         return self
@@ -48,6 +52,10 @@ class Span(NoopSpan):
     @property
     def context(self):
         return self._context
+
+    @property
+    def tracer(self):
+        return self._tracer
 
     def start(self, ts=None):
         ts = make_timestamp(ts)
