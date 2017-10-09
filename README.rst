@@ -17,6 +17,7 @@ aiozipkin
 from asyncio applications with Zipkin (http://zipkin.io) server insturementation.
 
 .. image:: https://raw.githubusercontent.com/aio-libs/aiozipkin/master/docs/zipkin_animation2.gif
+    :align: cetner
 
 Installation
 ------------
