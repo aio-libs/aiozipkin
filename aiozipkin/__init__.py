@@ -1,4 +1,5 @@
-from .aiohttp_helpers import setup, get_tracer, middleware_maker, request_span
+from .aiohttp_helpers import (setup, get_tracer, middleware_maker,
+                              request_span, make_context)
 from .helpers import create_endpoint, CLIENT, SERVER, PRODUCER, CONSUMER
 from .sampler import Sampler
 from .tracer import create, Tracer

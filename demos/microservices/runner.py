@@ -26,7 +26,7 @@ def run():
     try:
         loop.run_forever()
     except KeyboardInterrupt:
-        for hander in handlers:
+        for handler in handlers:
             loop.run_until_complete(handler.finish_connections())
 
 

@@ -5,6 +5,8 @@ from .helpers import (
     SERVER,
     SERVER_RECEIVED,
     SERVER_SEND,
+    PRODUCER,
+    CONSUMER,
 )
 
 
