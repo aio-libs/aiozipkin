@@ -16,7 +16,7 @@ aiozipkin
 **aiozipkin** is Python 3.5+ module that adds distributed tracing capabilities
 from asyncio applications with Zipkin (http://zipkin.io) server insturementation.
 
-.. image:: https://raw.githubusercontent.com/aio-libs/aiozipkin/master/docs/zipkin_ui.png
+.. image:: https://raw.githubusercontent.com/aio-libs/aiozipkin/master/docs/zipkin_animation2.gif
 
 Installation
 ------------
