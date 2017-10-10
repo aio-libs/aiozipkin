@@ -1,33 +1,7 @@
-import pytest
 from unittest import mock
 
-from aiozipkin.helpers import create_endpoint, TraceContext
-from aiozipkin.sampler import Sampler
+from aiozipkin.helpers import TraceContext
 from aiozipkin.tracer import NoopSpan, Span
-from aiozipkin.tracer import Tracer
-from aiozipkin.transport import Transport
-
-
-class FakeTransport(Transport):
-
-    def __init__(self):
-        self.records = []
-
-    def send(self, record):
-        self.records.append(record)
-
-
-@pytest.fixture
-def fake_transport():
-    transport = FakeTransport()
-    return transport
-
-
-@pytest.fixture(name="tracer")
-def tracer_fixture(fake_transport):
-    sampler = Sampler(sample_rate=1.0)
-    endpoint = create_endpoint("test_service", ipv4="127.0.0.1", port=8080)
-    return Tracer(fake_transport, sampler, endpoint)
 
 
 def test_basic(tracer, fake_transport):
@@ -91,3 +65,29 @@ def test_noop_span_methods(tracer):
 
     span = tracer.to_span(context)
     assert isinstance(span, NoopSpan)
+
+
+def test_trace_join_span(tracer, context):
+
+    with tracer.join_span(context) as span:
+        span.name("name")
+
+    assert span.context.trace_id == context.trace_id
+    assert span.context.span_id == context.span_id
+    assert span.context.parent_id is None
+
+    new_context = context._replace(sampled=None)
+    with tracer.join_span(new_context) as span:
+        span.name("name")
+
+    assert span.context.sampled is not None
+
+
+def test_trace_new_child(tracer, context):
+
+    with tracer.new_child(context) as span:
+        span.name("name")
+
+    assert span.context.trace_id == context.trace_id
+    assert span.context.parent_id == context.span_id
+    assert span.context.span_id is not None
