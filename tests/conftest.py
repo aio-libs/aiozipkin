@@ -1,37 +1,33 @@
-import asyncio
-import gc
-import socket
+from aiozipkin.helpers import create_endpoint
+from aiozipkin.sampler import Sampler
+from aiozipkin.tracer import Tracer
+from aiozipkin.transport import Transport
 
 import pytest
 
 
-@pytest.fixture(scope='session')
-def unused_port():
-    def f():
-        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-            s.bind(('127.0.0.1', 0))
-            return s.getsockname()[1]
-    return f
+@pytest.fixture
+def loop(event_loop):
+    return event_loop
 
 
-def pytest_generate_tests(metafunc):
-    if 'loop_type' in metafunc.fixturenames:
-        loop_type = ['asyncio', 'uvloop']
-        metafunc.parametrize("loop_type", loop_type)
+class FakeTransport(Transport):
+
+    def __init__(self):
+        self.records = []
+
+    def send(self, record):
+        self.records.append(record)
 
 
-@pytest.yield_fixture
-def loop(request, loop_type):
-    old_loop = asyncio.get_event_loop()
-    asyncio.set_event_loop(None)
-    if loop_type == 'uvloop':
-        import uvloop
-        loop = uvloop.new_event_loop()
-    else:
-        loop = asyncio.new_event_loop()
+@pytest.fixture
+def fake_transport():
+    transport = FakeTransport()
+    return transport
 
-    yield loop
 
-    loop.close()
-    asyncio.set_event_loop(old_loop)
-    gc.collect()
+@pytest.fixture(name="tracer")
+def tracer_fixture(fake_transport):
+    sampler = Sampler(sample_rate=1.0)
+    endpoint = create_endpoint("test_service", ipv4="127.0.0.1", port=8080)
+    return Tracer(fake_transport, sampler, endpoint)
