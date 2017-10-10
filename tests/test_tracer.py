@@ -65,3 +65,29 @@ def test_noop_span_methods(tracer):
 
     span = tracer.to_span(context)
     assert isinstance(span, NoopSpan)
+
+
+def test_trace_join_span(tracer, context):
+
+    with tracer.join_span(context) as span:
+        span.name("name")
+
+    assert span.context.trace_id == context.trace_id
+    assert span.context.span_id == context.span_id
+    assert span.context.parent_id is None
+
+    new_context = context._replace(sampled=None)
+    with tracer.join_span(new_context) as span:
+        span.name("name")
+
+    assert span.context.sampled is not None
+
+
+def test_trace_new_child(tracer, context):
+
+    with tracer.new_child(context) as span:
+        span.name("name")
+
+    assert span.context.trace_id == context.trace_id
+    assert span.context.parent_id == context.span_id
+    assert span.context.span_id is not None
