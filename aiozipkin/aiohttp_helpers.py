@@ -23,7 +23,8 @@ def middleware_maker(tracer_key=APP_AIOZIPKIN_KEY,
                 span = tracer.join_span(context)
 
             with span:
-                span_name = '{0} {1}'.format(request.method, request.path)
+                span_name = '{0} {1}'.format(request.method.upper(),
+                                             request.path)
                 span.kind(SERVER)
                 span.name(span_name)
                 span.tag(PATH_TAG, request.path)
