@@ -36,8 +36,6 @@ async def index(request):
             "headers": headers}
         resp = await session.post(backend_service, json=message)
         resp = await resp.text()
-        print("-" * 100)
-        print(resp)
         assert resp == "ok"
 
     await asyncio.sleep(0.01)
