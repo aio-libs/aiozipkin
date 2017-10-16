@@ -16,32 +16,46 @@ class Transport:
         self._sender_task = asyncio.ensure_future(
             self._sender_loop(), loop=loop)
 
+        self._ender = loop.create_future()
+        self._timer = None
+
     def send(self, record):
-        print(record)
         data = record.asdict()
         self._queue.append(data)
-        # self.http_transport(data)
 
     async def _sender_loop(self):
-        while not self._closing:
+        while self._ender.done():
             if len(self._queue) != 0:
-                payload = self._queue[:]
-                self._queue = []
-                await self._send(payload)
-            await asyncio.sleep(self._send_interval, loop=self._loop)
+                await self._send()
 
-    async def _send(self, data):
+            self._timer = asyncio.ensure_future(
+                asyncio.sleep(self._send_interval, loop=self._loop))
+            await next(asyncio.as_completed([self._timer, self._ender]))
+
+    async def _send(self):
         # TODO: add retries
-        print(data)
+        data = self._queue[:]
+        self._queue = []
+
+        # TODO: add status code check
         async with self._session.post(self._address, json=data) as resp:
             await resp.read()
 
     async def close(self):
         # TODO: make sure queue is empty before closing
+        if self._closing:
+            return
+
         self._closing = True
-        self._sender_task.cancel()
-        try:
-            await self._sender_task
-        except asyncio.CancelledError:
-            pass
+        self._ender.set_result(None)
+
+        await self._sender_task
+        await self._send()
         await self._session.close()
+
+        if self._timer is not None:
+            self._timer.cancel()
+            try:
+                await self._timer
+            except asyncio.CancelledError:
+                pass
