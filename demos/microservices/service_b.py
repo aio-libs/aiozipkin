@@ -37,7 +37,7 @@ def make_app():
     session = aiohttp.ClientSession()
     app["session"] = session
 
-    zipkin_address = "http://localhost:9411/api/v2/spans"
+    zipkin_address = "http://127.0.0.1:9411"
     endpoint = aiozipkin.create_endpoint("service_b")
     tracer = aiozipkin.create(zipkin_address, endpoint)
     aiozipkin.setup(app, tracer)

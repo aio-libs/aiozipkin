@@ -1,16 +1,18 @@
 import asyncio
 import aiohttp
 
+from yarl import URL
+
 
 class Transport:
 
-    def __init__(self, address, send_inteval=10, loop=None):
-        self._address = address
+    def __init__(self, address, send_inteval=5, loop=None):
+        self._address = URL(address).with_path("/api/v2/spans")
         self._session = aiohttp.ClientSession(loop=loop)
         self._queue = []
         self._closing = False
         self._send_interval = send_inteval
-        self._loop = loop
+        self._loop = loop or asyncio.get_event_loop()
         self._sender_task = asyncio.ensure_future(
             self._sender_loop(), loop=loop)
 
