@@ -1,4 +1,5 @@
 -e .
+aiodocker==0.8.2
 aiohttp==2.2.5
 docutils==0.14
 flake8==3.4.1
