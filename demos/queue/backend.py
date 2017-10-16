@@ -35,7 +35,7 @@ def make_app(host, port):
     app.router.add_post('/consume', handler)
     aiojobs.aiohttp.setup(app)
 
-    zipkin_address = "http://localhost:9411/api/v2/spans"
+    zipkin_address = "http://127.0.0.1:9411"
     endpoint = az.create_endpoint(
         "backend_broker", ipv4=host, port=port)
     tracer = az.create(zipkin_address, endpoint)

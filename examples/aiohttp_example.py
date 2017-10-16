@@ -6,7 +6,7 @@ import aiozipkin
 from aiohttp import web
 
 
-zipkin_address = "http://localhost:9411/api/v2/spans"
+zipkin_address = "http://127.0.0.1:9411"
 
 
 async def handle(request):

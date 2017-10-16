@@ -6,9 +6,9 @@ from .transport import Transport
 from .utils import generate_random_64bit_string, generate_random_128bit_string
 
 
-def create(zipkin_address, local_endpoint):
+def create(zipkin_address, local_endpoint, *, send_inteval=5, loop=None):
     sampler = Sampler()
-    transport = Transport(zipkin_address)
+    transport = Transport(zipkin_address, send_inteval=send_inteval, loop=loop)
     return Tracer(transport, sampler, local_endpoint)
 
 
