@@ -37,7 +37,7 @@ Example
 
     async def run():
         # setup zipkin client
-        zipkin_address = "http://localhost:9411/api/v2/spans"
+        zipkin_address = "http://127.0.0.1:9411"
         endpoint = az.create_endpoint(
             "simple_service", ipv4="127.0.0.1", port=8080)
         tracer = az.create(zipkin_address, endpoint)
@@ -50,7 +50,7 @@ Example
             span.annotate("SELECT * FROM")
             # imitate long SQL query
             await asyncio.sleep(0.1)
-            span.annotate("start end sql")
+            span.annotate("END SQL")
 
             # create child span
             with tracer.new_child(span.context) as nested_span:
