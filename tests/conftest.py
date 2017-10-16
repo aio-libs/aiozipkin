@@ -1,3 +1,6 @@
+import asyncio
+import gc
+
 from aiozipkin.helpers import create_endpoint, TraceContext
 from aiozipkin.sampler import Sampler
 from aiozipkin.tracer import Tracer
@@ -6,7 +9,16 @@ from aiozipkin.transport import Transport
 import pytest
 
 
-@pytest.fixture
+@pytest.fixture(scope='session')
+def event_loop():
+    asyncio.set_event_loop_policy(asyncio.DefaultEventLoopPolicy())
+    loop = asyncio.get_event_loop_policy().new_event_loop()
+    yield loop
+    gc.collect()
+    loop.close()
+
+
+@pytest.fixture(scope='session')
 def loop(event_loop):
     return event_loop
 
@@ -43,3 +55,6 @@ def context():
         debug=False,
         shared=True)
     return context
+
+
+pytest_plugins = ['docker_fixtures']
