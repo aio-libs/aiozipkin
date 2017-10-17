@@ -17,9 +17,10 @@ def docker_pull(request):
 
 
 @pytest.fixture(scope='session')
+@async_generator
 async def docker():
     client = Docker()
-    yield client
+    await yield_(client)
     await client.close()
 
 
