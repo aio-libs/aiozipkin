@@ -15,8 +15,7 @@ class Transport:
         self._loop = loop or asyncio.get_event_loop()
         self._sender_task = asyncio.ensure_future(
             self._sender_loop(), loop=loop)
-
-        self._ender = loop.create_future()
+        self._ender = self._loop.create_future()
         self._timer = None
 
     def send(self, record):
