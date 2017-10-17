@@ -3,6 +3,7 @@ import asyncio
 import aiohttp
 import pytest
 from aiodocker import Docker
+from async_generator import yield_, async_generator
 
 
 def pytest_addoption(parser):
@@ -23,6 +24,7 @@ async def docker():
 
 
 @pytest.fixture(scope='session')
+@async_generator
 async def zipkin_server(docker, docker_pull):
     tag = '2'
     image = 'openzipkin/zipkin:{}'.format(tag)
@@ -65,7 +67,7 @@ async def zipkin_server(docker, docker_pull):
         else:
             pytest.fail("Cannot start postgres server: {}".format(last_error))
 
-    yield params
+    await yield_(params)
 
     await container.kill()
     await container.delete(force=True)
