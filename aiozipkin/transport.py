@@ -23,7 +23,7 @@ class Transport:
         self._queue.append(data)
 
     async def _sender_loop(self):
-        while self._ender.done():
+        while not self._ender.done():
             if len(self._queue) != 0:
                 await self._send()
 
