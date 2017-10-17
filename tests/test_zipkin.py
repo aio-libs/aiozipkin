@@ -18,7 +18,8 @@ async def client(loop):
 @pytest.mark.asyncio
 async def test_basic(zipkin_url, client, loop):
     endpoint = az.create_endpoint('simple_service', ipv4='127.0.0.1', port=80)
-    tracer = az.create(zipkin_url, endpoint, send_inteval=0.5, loop=loop)
+    interval = 50
+    tracer = az.create(zipkin_url, endpoint, send_inteval=interval, loop=loop)
 
     with tracer.new_trace(sampled=True) as span:
         span.name('root_span')
@@ -28,6 +29,7 @@ async def test_basic(zipkin_url, client, loop):
         await asyncio.sleep(0.1)
         span.annotate('start end sql')
 
+    # close forced sending data to server regardless of send interval
     await tracer.close()
 
     trace_id = span.context.trace_id
