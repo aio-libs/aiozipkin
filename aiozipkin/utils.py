@@ -3,6 +3,8 @@ import os
 import struct
 
 
+# https://github.com/Yelp/py_zipkin/blob/
+# 7937ca859f8ae1f1009ab69fd1ddcd8fc33f1dad/py_zipkin/util.py#L1-L54
 def generate_random_64bit_string():
     """Returns a 64 bit UTF-8 encoded string. In the interests of simplicity,
     this is always cast to a `str` instead of (in py2 land) a unicode string.
