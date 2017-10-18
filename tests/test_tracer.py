@@ -1,5 +1,6 @@
 from unittest import mock
 
+import pytest
 from aiozipkin.helpers import TraceContext
 from aiozipkin.tracer import NoopSpan, Span
 
@@ -91,3 +92,19 @@ def test_trace_new_child(tracer, context):
     assert span.context.trace_id == context.trace_id
     assert span.context.parent_id == context.span_id
     assert span.context.span_id is not None
+
+
+def test_error(tracer, fake_transport):
+    def func():
+        with tracer.new_trace() as span:
+            span.name("root_span")
+            raise RuntimeError("boom")
+
+    with pytest.raises(RuntimeError):
+        func()
+
+    assert len(fake_transport.records) == 1
+    record = fake_transport.records[0]
+
+    data = record.asdict()
+    assert data['tags'] == {"error": "boom"}

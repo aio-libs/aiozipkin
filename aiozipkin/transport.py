@@ -15,8 +15,7 @@ class Transport:
         self._loop = loop or asyncio.get_event_loop()
         self._sender_task = asyncio.ensure_future(
             self._sender_loop(), loop=loop)
-
-        self._ender = loop.create_future()
+        self._ender = self._loop.create_future()
         self._timer = None
 
     def send(self, record):
@@ -24,7 +23,7 @@ class Transport:
         self._queue.append(data)
 
     async def _sender_loop(self):
-        while self._ender.done():
+        while not self._ender.done():
             if len(self._queue) != 0:
                 await self._send()
 

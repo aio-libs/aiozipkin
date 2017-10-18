@@ -1,3 +1,4 @@
+from .constants import ERROR
 from .helpers import Endpoint, make_timestamp
 
 
@@ -39,7 +40,6 @@ class NoopSpan:
         return self
 
     def __exit__(self, exception_type, exception_value, traceback):
-        self.tag("error", str(exception_value))
         self.finish()
 
 
@@ -95,4 +95,6 @@ class Span(NoopSpan):
         return self
 
     def __exit__(self, exception_type, exception_value, traceback):
+        if exception_value is not None:
+            self.tag(ERROR, str(exception_value))
         self.finish()

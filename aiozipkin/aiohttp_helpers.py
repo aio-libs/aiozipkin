@@ -1,11 +1,11 @@
+from aiohttp.web import HTTPException
+
 from .helpers import make_context, SERVER, parse_debug, parse_sampled
+from .constants import HTTP_PATH, HTTP_STATUS_CODE, HTTP_METHOD
 
 
 APP_AIOZIPKIN_KEY = "aiozipkin_tracer"
 REQUEST_AIOZIPKIN_KEY = "aiozipkin_span"
-
-PATH_TAG = 'path'
-STATUS_CODE_TAG = 'status_code'
 
 
 def middleware_maker(tracer_key=APP_AIOZIPKIN_KEY,
@@ -25,13 +25,19 @@ def middleware_maker(tracer_key=APP_AIOZIPKIN_KEY,
             with span:
                 span_name = '{0} {1}'.format(request.method.upper(),
                                              request.path)
-                span.kind(SERVER)
                 span.name(span_name)
-                span.tag(PATH_TAG, request.path)
-                request[request_key] = span
+                span.kind(SERVER)
+                span.tag(HTTP_PATH, request.path)
+                span.tag(HTTP_METHOD, request.method.upper())
 
-                resp = await handler(request)
-                span.tag(STATUS_CODE_TAG, resp.status)
+                request[request_key] = span
+                try:
+                    resp = await handler(request)
+                except HTTPException as e:
+                    span.tag(HTTP_STATUS_CODE, e.status)
+                    raise
+
+                span.tag(HTTP_STATUS_CODE, resp.status)
                 return resp
 
         return aiozipkin_middleware
