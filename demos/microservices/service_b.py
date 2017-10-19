@@ -1,6 +1,6 @@
 import asyncio
 import aiohttp
-import aiozipkin
+import aiozipkin as az
 
 from aiohttp import web
 
@@ -10,8 +10,8 @@ service_d_api = "http://127.0.0.1:9004/api/v1/data"
 
 
 async def handler(request):
-    span = aiozipkin.request_span(request)
-    tracer = aiozipkin.get_tracer(request.app)
+    span = az.request_span(request)
+    tracer = az.get_tracer(request.app)
 
     await asyncio.sleep(0.01)
     session = request.app["session"]
@@ -38,9 +38,9 @@ def make_app():
     app["session"] = session
 
     zipkin_address = "http://127.0.0.1:9411"
-    endpoint = aiozipkin.create_endpoint("service_b")
-    tracer = aiozipkin.create(zipkin_address, endpoint)
-    aiozipkin.setup(app, tracer)
+    endpoint = az.create_endpoint("service_b")
+    tracer = az.create(zipkin_address, endpoint)
+    az.setup(app, tracer)
     return app
 
 

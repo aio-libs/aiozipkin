@@ -1,5 +1,5 @@
 import asyncio
-import aiozipkin
+import aiozipkin as az
 
 from aiohttp import web
 
@@ -15,9 +15,9 @@ def make_app():
     app.router.add_get('/api/v1/data', handler)
 
     zipkin_address = "http://127.0.0.1:9411"
-    endpoint = aiozipkin.create_endpoint("service_e")
-    tracer = aiozipkin.create(zipkin_address, endpoint)
-    aiozipkin.setup(app, tracer)
+    endpoint = az.create_endpoint("service_e")
+    tracer = az.create(zipkin_address, endpoint)
+    az.setup(app, tracer)
     return app
 
 
