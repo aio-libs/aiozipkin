@@ -5,8 +5,8 @@ import aiozipkin as az
 from aiohttp import web
 
 
-service_b_api = "http://127.0.0.1:9002/api/v1/data"
-service_e_api = "http://127.0.0.1:9005/api/v1/data"
+service_b_api = 'http://127.0.0.1:9002/api/v1/data'
+service_e_api = 'http://127.0.0.1:9005/api/v1/data'
 
 
 async def index(request):
@@ -20,7 +20,7 @@ async def index(request):
     </body>
     </html>
     """
-    return web.Response(text=body, content_type="text/html")
+    return web.Response(text=body, content_type='text/html')
 
 
 async def handler(request):
@@ -28,7 +28,7 @@ async def handler(request):
     tracer = az.get_tracer(request.app)
 
     await asyncio.sleep(0.01)
-    session = request.app["session"]
+    session = request.app['session']
 
     with tracer.new_child(span.context) as span_b:
         headers = span_b.context.make_headers()
@@ -41,7 +41,7 @@ async def handler(request):
 
     data_e = await resp.text()
 
-    body = "service_a " + data_b + " " + data_e
+    body = 'service_a ' + data_b + ' ' + data_e
     return web.Response(text=body)
 
 
@@ -51,17 +51,17 @@ def make_app():
     app.router.add_get('/', index)
 
     session = aiohttp.ClientSession()
-    app["session"] = session
+    app['session'] = session
 
-    zipkin_address = "http://127.0.0.1:9411"
-    endpoint = az.create_endpoint("service_a")
+    zipkin_address = 'http://127.0.0.1:9411'
+    endpoint = az.create_endpoint('service_a')
     tracer = az.create(zipkin_address, endpoint)
     az.setup(app, tracer)
     return app
 
 
-if __name__ == "__main__":
-    host = "127.0.0.1"
+if __name__ == '__main__':
+    host = '127.0.0.1'
     port = 9001
     app = make_app()
     web.run_app(app, host=host, port=port)

@@ -7,13 +7,13 @@ from async_generator import yield_, async_generator
 
 
 def pytest_addoption(parser):
-    parser.addoption("--no-pull", action="store_true", default=False,
-                     help=("Force docker pull"))
+    parser.addoption('--no-pull', action='store_true', default=False,
+                     help=('Force docker pull'))
 
 
 @pytest.fixture(scope='session')
 def docker_pull(request):
-    return not request.config.getoption("--no-pull")
+    return not request.config.getoption('--no-pull')
 
 
 @pytest.fixture(scope='session')
@@ -29,10 +29,10 @@ async def docker():
 async def zipkin_server(docker, docker_pull):
     tag = '2'
     image = 'openzipkin/zipkin:{}'.format(tag)
-    host = "127.0.0.1"
+    host = '127.0.0.1'
 
     if docker_pull:
-        print("Pulling {} image".format(image))
+        print('Pulling {} image'.format(image))
         await docker.pull(image)
 
     container = await docker.containers.create_or_replace(
@@ -53,7 +53,7 @@ async def zipkin_server(docker, docker_pull):
 
     delay = 0.001
     last_error = None
-    url = "http://{}:{}".format(host, port)
+    url = 'http://{}:{}'.format(host, port)
 
     async with aiohttp.ClientSession() as session:
         for i in range(100):
@@ -66,7 +66,7 @@ async def zipkin_server(docker, docker_pull):
                 await asyncio.sleep(delay)
                 delay *= 2
         else:
-            pytest.fail("Cannot start postgres server: {}".format(last_error))
+            pytest.fail('Cannot start postgres server: {}'.format(last_error))
 
     await yield_(params)
 

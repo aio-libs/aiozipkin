@@ -33,7 +33,7 @@ async def test_basic(zipkin_url, client, loop):
     await tracer.close()
 
     trace_id = span.context.trace_id
-    url = URL(zipkin_url).with_path("/zipkin/api/v1/traces")
+    url = URL(zipkin_url).with_path('/zipkin/api/v1/traces')
     resp = await client.get(url)
     data = await resp.json()
-    assert any(s["traceId"] == trace_id for trace in data for s in trace)
+    assert any(s['traceId'] == trace_id for trace in data for s in trace)

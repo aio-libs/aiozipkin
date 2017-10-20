@@ -7,7 +7,7 @@ from yarl import URL
 class Transport:
 
     def __init__(self, address, send_inteval=5, loop=None):
-        self._address = URL(address).with_path("/api/v2/spans")
+        self._address = URL(address).with_path('/api/v2/spans')
         self._session = aiohttp.ClientSession(loop=loop)
         self._queue = []
         self._closing = False

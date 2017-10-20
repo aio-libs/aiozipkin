@@ -2,16 +2,16 @@ import time
 from collections import namedtuple
 
 
-CLIENT = "CLIENT"
-SERVER = "SERVER"
-PRODUCER = "PRODUCER"
-CONSUMER = "CONSUMER"
+CLIENT = 'CLIENT'
+SERVER = 'SERVER'
+PRODUCER = 'PRODUCER'
+CONSUMER = 'CONSUMER'
 
 
-CLIENT_SEND = "cs"
-SERVER_SEND = "ss"
-CLIENT_RECEIVED = "cr"
-SERVER_RECEIVED = "sr"
+CLIENT_SEND = 'cs'
+SERVER_SEND = 'ss'
+CLIENT_RECEIVED = 'cr'
+SERVER_RECEIVED = 'sr'
 
 
 TRACE_ID_HEADER = 'X-B3-TraceId'
@@ -23,12 +23,12 @@ SAMPLED_ID_HEADER = 'X-B3-Sampled'
 
 _TraceContext = namedtuple(
     'TraceContext', [
-        "trace_id",
-        "parent_id",
-        "span_id",
-        "sampled",
-        "debug",
-        "shared",
+        'trace_id',
+        'parent_id',
+        'span_id',
+        'sampled',
+        'debug',
+        'shared',
         ]
 )
 
@@ -40,7 +40,7 @@ class TraceContext(_TraceContext):
 
 
 Endpoint = namedtuple(
-    'Endpoint', ["serviceName", "ipv4", "ipv6", "port"]
+    'Endpoint', ['serviceName', 'ipv4', 'ipv6', 'port']
 )
 
 
@@ -67,7 +67,7 @@ def make_headers(context):
 
 def parse_sampled(headers):
     sampled = headers.get(SAMPLED_ID_HEADER.lower(), None)
-    if sampled is None or sampled == "":
+    if sampled is None or sampled == '':
         return None
     # TODO: add more test cases
     return True if sampled == '1' else False
