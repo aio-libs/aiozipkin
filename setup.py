@@ -46,8 +46,8 @@ classifiers = [
 
 setup(name='aiozipkin',
       version=read_version(),
-      description=('aiozipkin '
-                   'capabilities for asyncio application'),
+      description=('Distributed tracing instrumentation '
+                   'for asyncio application with zipkin'),
       long_description='\n\n'.join((read('README.rst'), read('CHANGES.txt'))),
       classifiers=classifiers,
       platforms=['POSIX'],

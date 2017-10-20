@@ -18,5 +18,5 @@ __all__ = ('Tracer',
            'CLIENT',
            'SERVER',
            'PRODUCER',
-           'CONSUMER'
+           'CONSUMER',
            )
