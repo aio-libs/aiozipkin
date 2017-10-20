@@ -4,8 +4,8 @@ from .helpers import make_context, SERVER, parse_debug, parse_sampled
 from .constants import HTTP_PATH, HTTP_STATUS_CODE, HTTP_METHOD
 
 
-APP_AIOZIPKIN_KEY = "aiozipkin_tracer"
-REQUEST_AIOZIPKIN_KEY = "aiozipkin_span"
+APP_AIOZIPKIN_KEY = 'aiozipkin_tracer'
+REQUEST_AIOZIPKIN_KEY = 'aiozipkin_span'
 
 
 def middleware_maker(tracer_key=APP_AIOZIPKIN_KEY,

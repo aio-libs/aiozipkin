@@ -7,12 +7,12 @@ from aiozipkin.tracer import NoopSpan, Span
 
 def test_basic(tracer, fake_transport):
     with tracer.new_trace() as span:
-        span.name("root_span")
-        span.tag("span_type", "root")
-        span.kind("CLIENT")
-        span.annotate("start:sql", ts=1506970524)
-        span.annotate("end:sql", ts=1506970524)
-        span.remote_endpoint("service_a", ipv4="127.0.0.1", port=8080)
+        span.name('root_span')
+        span.tag('span_type', 'root')
+        span.kind('CLIENT')
+        span.annotate('start:sql', ts=1506970524)
+        span.annotate('end:sql', ts=1506970524)
+        span.remote_endpoint('service_a', ipv4='127.0.0.1', port=8080)
 
     assert span.context.parent_id is None
     assert isinstance(span, Span)
@@ -45,20 +45,20 @@ def test_basic(tracer, fake_transport):
 
 def test_noop_span_methods(tracer):
     context = TraceContext(
-        trace_id="6f9a20b5092fa5e144fd15cc31141cd4",
+        trace_id='6f9a20b5092fa5e144fd15cc31141cd4',
         parent_id=None,
-        span_id="41baf1be2fb9bfc5",
+        span_id='41baf1be2fb9bfc5',
         sampled=False,
         debug=False,
         shared=True)
 
     with tracer.new_child(context) as span:
-        span.name("root_span")
-        span.tag("span_type", "root")
-        span.kind("CLIENT")
-        span.annotate("start:sql", ts=1506970524)
-        span.annotate("end:sql", ts=1506970524)
-        span.remote_endpoint("service_a", ipv4="127.0.0.1", port=8080)
+        span.name('root_span')
+        span.tag('span_type', 'root')
+        span.kind('CLIENT')
+        span.annotate('start:sql', ts=1506970524)
+        span.annotate('end:sql', ts=1506970524)
+        span.remote_endpoint('service_a', ipv4='127.0.0.1', port=8080)
 
     assert isinstance(span, NoopSpan)
     assert span.context.parent_id is not None
@@ -71,7 +71,7 @@ def test_noop_span_methods(tracer):
 def test_trace_join_span(tracer, context):
 
     with tracer.join_span(context) as span:
-        span.name("name")
+        span.name('name')
 
     assert span.context.trace_id == context.trace_id
     assert span.context.span_id == context.span_id
@@ -79,7 +79,7 @@ def test_trace_join_span(tracer, context):
 
     new_context = context._replace(sampled=None)
     with tracer.join_span(new_context) as span:
-        span.name("name")
+        span.name('name')
 
     assert span.context.sampled is not None
 
@@ -87,7 +87,7 @@ def test_trace_join_span(tracer, context):
 def test_trace_new_child(tracer, context):
 
     with tracer.new_child(context) as span:
-        span.name("name")
+        span.name('name')
 
     assert span.context.trace_id == context.trace_id
     assert span.context.parent_id == context.span_id
@@ -97,8 +97,8 @@ def test_trace_new_child(tracer, context):
 def test_error(tracer, fake_transport):
     def func():
         with tracer.new_trace() as span:
-            span.name("root_span")
-            raise RuntimeError("boom")
+            span.name('root_span')
+            raise RuntimeError('boom')
 
     with pytest.raises(RuntimeError):
         func()
@@ -107,4 +107,4 @@ def test_error(tracer, fake_transport):
     record = fake_transport.records[0]
 
     data = record.asdict()
-    assert data['tags'] == {"error": "boom"}
+    assert data['tags'] == {'error': 'boom'}

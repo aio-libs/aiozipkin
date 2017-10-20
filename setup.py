@@ -7,7 +7,7 @@ from setuptools import setup, find_packages
 PY_VER = sys.version_info
 
 if not PY_VER >= (3, 5):
-    raise RuntimeError("aiozipkin doesn't support Python earlier than 3.5")
+    raise RuntimeError('aiozipkin does not support Python earlier than 3.5')
 
 
 def read(f):
@@ -51,8 +51,8 @@ setup(name='aiozipkin',
       long_description='\n\n'.join((read('README.rst'), read('CHANGES.txt'))),
       classifiers=classifiers,
       platforms=['POSIX'],
-      author="Nikolay Novik",
-      author_email="nickolainovik@gmail.com",
+      author='Nikolay Novik',
+      author_email='nickolainovik@gmail.com',
       url='https://github.com/aio-libs/aiozipkin',
       download_url='https://pypi.python.org/pypi/aiozipkin',
       license='Apache 2',

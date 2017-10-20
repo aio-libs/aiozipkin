@@ -6,7 +6,7 @@ import aiozipkin as az
 from aiohttp import web
 
 
-zipkin_address = "http://127.0.0.1:9411"
+zipkin_address = 'http://127.0.0.1:9411'
 
 
 async def handle(request):
@@ -14,17 +14,17 @@ async def handle(request):
     span = az.request_span(request)
 
     with tracer.new_child(span.context) as child_span:
-        child_span.name("mysql:select")
+        child_span.name('mysql:select')
         await asyncio.sleep(0.01)
 
-    text = "Hello"
+    text = 'Hello'
     return web.Response(text=text)
 
 
 def make_app(host, port, loop):
     app = web.Application()
     endpoint = az.create_endpoint(
-        "aiohttp_server", ipv4=host, port=port)
+        'aiohttp_server', ipv4=host, port=port)
     tracer = az.create(zipkin_address, endpoint)
     az.setup(app, tracer)
 
@@ -34,7 +34,7 @@ def make_app(host, port, loop):
 
 
 async def run_server(loop):
-    host = "127.0.0.1"
+    host = '127.0.0.1'
     port = 8080
     app = make_app(host, port, loop)
     handler = app.make_handler()
@@ -43,7 +43,7 @@ async def run_server(loop):
 
 
 async def run_client(loop):
-    endpoint = az.create_endpoint("aiohttp_client")
+    endpoint = az.create_endpoint('aiohttp_client')
     tracer = az.create(zipkin_address, endpoint)
     session = aiohttp.ClientSession(loop=loop)
 
@@ -51,7 +51,7 @@ async def run_client(loop):
         with tracer.new_trace() as span:
             span.kind(az.CLIENT)
             headers = span.context.make_headers()
-            host = "http://127.0.0.1:8080/api/v1/posts/{}".format(i)
+            host = 'http://127.0.0.1:8080/api/v1/posts/{}'.format(i)
             resp = await session.get(host, headers=headers)
             await resp.text()
         await asyncio.sleep(5, loop=loop)
@@ -66,5 +66,5 @@ def run():
         loop.run_until_complete(handler.finish_connections())
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     run()

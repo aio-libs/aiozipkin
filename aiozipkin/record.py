@@ -17,7 +17,7 @@ class Record:
         self._local_endpoint = local_endpoint._asdict()
         self._finished = False
 
-        self._name = "unknown"
+        self._name = 'unknown'
         self._kind = None
         self._timestamp = None
         self._duration = None
@@ -58,7 +58,7 @@ class Record:
             self.kind(SERVER)
             self.finish(ts)
         else:
-            v = {"value": value, "timestamp": int(ts)}
+            v = {'value': value, 'timestamp': int(ts)}
             self._annotations.append(v)
         return self
 
@@ -73,18 +73,18 @@ class Record:
     def asdict(self):
         c = self._context
         rec = {
-            "traceId": c.trace_id,
-            "name": self._name,
-            "parentId": c.parent_id,
-            "id": c.span_id,
-            "kind": self._kind,
-            "timestamp": self._timestamp,
-            "duration": self._duration,
-            "debug": c.debug,
-            "shared": c.shared,
-            "localEndpoint": self._local_endpoint,
-            "remoteEndpoint": self._remote_endpoint,
-            "annotations": self._annotations,
-            "tags": self._tags,
+            'traceId': c.trace_id,
+            'name': self._name,
+            'parentId': c.parent_id,
+            'id': c.span_id,
+            'kind': self._kind,
+            'timestamp': self._timestamp,
+            'duration': self._duration,
+            'debug': c.debug,
+            'shared': c.shared,
+            'localEndpoint': self._local_endpoint,
+            'remoteEndpoint': self._remote_endpoint,
+            'annotations': self._annotations,
+            'tags': self._tags,
         }
         return rec

@@ -6,7 +6,7 @@ import backend
 
 def run():
     loop = asyncio.get_event_loop()
-    host = "127.0.0.1"
+    host = '127.0.0.1'
     fe_port = 9010
     be_port = 9011
 
@@ -31,5 +31,5 @@ def run():
             loop_run(handler.finish_connections())
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     run()

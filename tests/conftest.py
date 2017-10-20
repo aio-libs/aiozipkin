@@ -38,19 +38,19 @@ def fake_transport():
     return transport
 
 
-@pytest.fixture(name="tracer")
+@pytest.fixture(name='tracer')
 def tracer_fixture(fake_transport):
     sampler = Sampler(sample_rate=1.0)
-    endpoint = create_endpoint("test_service", ipv4="127.0.0.1", port=8080)
+    endpoint = create_endpoint('test_service', ipv4='127.0.0.1', port=8080)
     return Tracer(fake_transport, sampler, endpoint)
 
 
 @pytest.fixture
 def context():
     context = TraceContext(
-        trace_id="6f9a20b5092fa5e144fd15cc31141cd4",
+        trace_id='6f9a20b5092fa5e144fd15cc31141cd4',
         parent_id=None,
-        span_id="41baf1be2fb9bfc5",
+        span_id='41baf1be2fb9bfc5',
         sampled=True,
         debug=False,
         shared=True)

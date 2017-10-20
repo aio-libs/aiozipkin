@@ -21,7 +21,7 @@ def run():
         handler = app.make_handler()
         handlers.append(handler)
         loop.run_until_complete(loop.create_server(
-            handler, "127.0.0.1", 9001 + i))
+            handler, '127.0.0.1', 9001 + i))
 
     try:
         loop.run_forever()
@@ -30,5 +30,5 @@ def run():
             loop.run_until_complete(handler.finish_connections())
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     run()
