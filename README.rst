@@ -26,8 +26,8 @@ the Google Dapper paper.
     :alt: zipkin ui animation
 
 
-Example
--------
+Simple example
+--------------
 
 .. code:: python
 
@@ -44,36 +44,62 @@ Example
 
         # create and setup new trace
         with tracer.new_trace(sampled=True) as span:
-            span.name("root_span")
+            # give a name for the span
+            span.name("Slow SQL")
+            # tag with relevant information
             span.tag("span_type", "root")
+            # indicate that this is client span
             span.kind(az.CLIENT)
-            span.annotate("SELECT * FROM")
+            # make timestamp and name it with START SQL query
+            span.annotate("START SQL SELECT * FROM")
             # imitate long SQL query
             await asyncio.sleep(0.1)
+            # make other timestamp and name it "END SQL"
             span.annotate("END SQL")
 
-            # create child span
-            with tracer.new_child(span.context) as nested_span:
-                nested_span.name("nested_span_1")
-                nested_span.kind(az.CLIENT)
-                nested_span.tag("span_type", "inner1")
-                nested_span.remote_endpoint("remote_service_1")
-                await asyncio.sleep(0.01)
-
-            # create other child span
-            with tracer.new_child(span.context) as nested_span:
-                nested_span.name("nested_span_2")
-                nested_span.kind(az.CLIENT)
-                nested_span.remote_endpoint("remote_service_2")
-                nested_span.tag("span_type", "inner2")
-                await asyncio.sleep(0.01)
-
-            await asyncio.sleep(30)
-            await tracer.close()
+        await tracer.close()
 
     if __name__ == "__main__":
         loop = asyncio.get_event_loop()
         loop.run_until_complete(run())
+
+
+aiohttp example
+---------------
+
+*aiozipkin* includes *aiohttp* server instumentaiton, for this create
+`web.Application()` as usual and install aiozipkin plugin:
+
+
+.. code:: python
+
+    import aiozipkin as az
+
+    def init_app():
+        host, port = "127.0.0.1", 8080
+        app = web.Application()
+        endpoint = aiozipkin.create_endpoint(
+            "AIOHTTP_SERVER", ipv4=host, port=port)
+        tracer = aiozipkin.create(zipkin_address, endpoint)
+        aiozipkin.setup(app, tracer)
+
+
+That is it, plugin adds middleware that tries to fetch context from headers,
+and create/join new trace. Optionally on client side you can add propagation
+headers in order to force tracing and to see network latency between client and
+server.
+
+.. code:: python
+
+    endpoint = aiozipkin.create_endpoint("AIOHTTP_CLIENT")
+    tracer = aiozipkin.create(zipkin_address, endpoint)
+
+    with tracer.new_trace() as span:
+        span.kind(aiozipkin.CLIENT)
+        headers = span.context.make_headers()
+        host = "http://127.0.0.1:8080/api/v1/posts/{}".format(i)
+        resp = await session.get(host, headers=headers)
+        await resp.text()
 
 
 Installation
