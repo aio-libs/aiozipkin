@@ -5,6 +5,11 @@ from .helpers import Endpoint, make_timestamp
 class NoopSpan:
     def __init__(self, tracer, context):
         self._context = context
+        self._tracer = tracer
+
+    @property
+    def is_noop(self):
+        return True
 
     @property
     def context(self):
@@ -48,6 +53,10 @@ class Span(NoopSpan):
         self._context = context
         self._record = record
         self._tracer = tracer
+
+    @property
+    def is_noop(self):
+        return False
 
     @property
     def context(self):
