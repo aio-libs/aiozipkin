@@ -13,6 +13,16 @@ install:
     - pip install -r requirements-dev.txt
 
 script:
-    make cov
+    make ci
+
+stages:
+    - lint
+    - test
+
+jobs:
+    include:
+        - stage: lint
+          script: make flake
+
 after_success:
     codecov
