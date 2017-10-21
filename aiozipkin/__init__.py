@@ -1,6 +1,21 @@
-from .aiohttp_helpers import (setup, get_tracer, middleware_maker,
-                              request_span, make_context)
-from .helpers import create_endpoint, CLIENT, SERVER, PRODUCER, CONSUMER
+from .aiohttp_helpers import (
+    get_tracer,
+    make_context,
+    middleware_maker,
+    request_span,
+    setup,
+)
+from .helpers import (
+    create_endpoint,
+    CLIENT,
+    SERVER,
+    PRODUCER,
+    CONSUMER,
+    CLIENT_SEND,
+    SERVER_SEND,
+    CLIENT_RECEIVED,
+    SERVER_RECEIVED,
+)
 from .sampler import Sampler
 from .tracer import create, Tracer
 
@@ -10,13 +25,20 @@ __all__ = ('Tracer',
            'Sampler',
            'create',
            'create_endpoint',
+           'make_context',
+           # aiohttp helpers
            'setup',
            'get_tracer',
            'request_span',
            'middleware_maker',
-           'make_context',
+           # possible span kinds
            'CLIENT',
            'SERVER',
            'PRODUCER',
            'CONSUMER',
+           # possible span kinds
+           'CLIENT_SEND',
+           'SERVER_SEND',
+           'CLIENT_RECEIVED',
+           'SERVER_RECEIVED',
            )
