@@ -1,7 +1,15 @@
 from unittest import mock
 
 import pytest
-from aiozipkin.helpers import TraceContext
+from aiozipkin.helpers import (
+    TraceContext,
+    CLIENT,
+    CLIENT_RECEIVED,
+    CLIENT_SEND,
+    SERVER,
+    SERVER_RECEIVED,
+    SERVER_SEND,
+)
 from aiozipkin.tracer import NoopSpan, Span
 
 
@@ -14,6 +22,8 @@ def test_basic(tracer, fake_transport):
         span.annotate('end:sql', ts=1506970524)
         span.remote_endpoint('service_a', ipv4='127.0.0.1', port=8080)
 
+    assert not span.is_noop
+    assert span.tracer is tracer
     assert span.context.parent_id is None
     assert isinstance(span, Span)
     assert len(fake_transport.records) == 1
@@ -41,6 +51,8 @@ def test_basic(tracer, fake_transport):
         'traceId': mock.ANY}
     assert record.asdict() == expected
     span.finish()
+    # make sure double finish does not error
+    span.finish()
 
 
 def test_noop_span_methods(tracer):
@@ -63,9 +75,11 @@ def test_noop_span_methods(tracer):
     assert isinstance(span, NoopSpan)
     assert span.context.parent_id is not None
     assert not span.context.sampled
+    assert span.is_noop
 
     span = tracer.to_span(context)
     assert isinstance(span, NoopSpan)
+    assert span.tracer is tracer
 
 
 def test_trace_join_span(tracer, context):
@@ -108,3 +122,39 @@ def test_error(tracer, fake_transport):
 
     data = record.asdict()
     assert data['tags'] == {'error': 'boom'}
+
+
+def test_cs_annotation(tracer, fake_transport):
+    with tracer.new_trace() as span:
+        span.annotate(CLIENT_SEND, ts=1506970524)
+
+    assert len(fake_transport.records) == 1
+    record = fake_transport.records[0]
+    assert record.asdict()['kind'] == CLIENT
+
+
+def test_sr_annotation(tracer, fake_transport):
+    with tracer.new_trace() as span:
+        span.annotate(SERVER_RECEIVED, ts=1506970524)
+
+    assert len(fake_transport.records) == 1
+    record = fake_transport.records[0]
+    assert record.asdict()['kind'] == SERVER
+
+
+def test_cr_annotation(tracer, fake_transport):
+    with tracer.new_trace() as span:
+        span.annotate(CLIENT_RECEIVED, ts=1506970524)
+
+    assert len(fake_transport.records) == 1
+    record = fake_transport.records[0]
+    assert record.asdict()['kind'] == CLIENT
+
+
+def test_ss_annotation(tracer, fake_transport):
+    with tracer.new_trace() as span:
+        span.annotate(SERVER_SEND, ts=1506970524)
+
+    assert len(fake_transport.records) == 1
+    record = fake_transport.records[0]
+    assert record.asdict()['kind'] == SERVER

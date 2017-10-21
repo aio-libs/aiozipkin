@@ -1,13 +1,13 @@
 import time
 from collections import namedtuple
 
-
+# possible span kinds
 CLIENT = 'CLIENT'
 SERVER = 'SERVER'
 PRODUCER = 'PRODUCER'
 CONSUMER = 'CONSUMER'
 
-
+# reserved annotation names
 CLIENT_SEND = 'cs'
 SERVER_SEND = 'ss'
 CLIENT_RECEIVED = 'cr'
