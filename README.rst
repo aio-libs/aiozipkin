@@ -40,7 +40,7 @@ Simple example
         zipkin_address = "http://127.0.0.1:9411"
         endpoint = az.create_endpoint(
             "simple_service", ipv4="127.0.0.1", port=8080)
-        tracer = az.create(zipkin_address, endpoint)
+        tracer = az.create(zipkin_address, endpoint, sample_rate=1.0)
 
         # create and setup new trace
         with tracer.new_trace(sampled=True) as span:
@@ -67,7 +67,7 @@ Simple example
 aiohttp example
 ---------------
 
-*aiozipkin* includes *aiohttp* server instumentaiton, for this create
+*aiozipkin* includes *aiohttp* server instrumentation, for this create
 `web.Application()` as usual and install aiozipkin plugin:
 
 
@@ -80,7 +80,7 @@ aiohttp example
         app = web.Application()
         endpoint = aiozipkin.create_endpoint(
             "AIOHTTP_SERVER", ipv4=host, port=port)
-        tracer = aiozipkin.create(zipkin_address, endpoint)
+        tracer = aiozipkin.create(zipkin_address, endpoint, sample_rate=1.0)
         aiozipkin.setup(app, tracer)
 
 

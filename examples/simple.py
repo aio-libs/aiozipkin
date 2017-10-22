@@ -7,7 +7,7 @@ async def run():
     zipkin_address = 'http://127.0.0.1:9411'
     endpoint = az.create_endpoint(
         'simple_service', ipv4='127.0.0.1', port=8080)
-    tracer = az.create(zipkin_address, endpoint)
+    tracer = az.create(zipkin_address, endpoint, sample_rate=1.0)
 
     # create and setup new trace
     with tracer.new_trace(sampled=True) as span:
