@@ -21,24 +21,25 @@ from .tracer import create, Tracer
 
 
 __version__ = '0.0.1a1'
-__all__ = ('Tracer',
-           'Sampler',
-           'create',
-           'create_endpoint',
-           'make_context',
-           # aiohttp helpers
-           'setup',
-           'get_tracer',
-           'request_span',
-           'middleware_maker',
-           # possible span kinds
-           'CLIENT',
-           'SERVER',
-           'PRODUCER',
-           'CONSUMER',
-           # possible span kinds
-           'CLIENT_SEND',
-           'SERVER_SEND',
-           'CLIENT_RECEIVED',
-           'SERVER_RECEIVED',
-           )
+__all__ = (
+    'Tracer',
+    'Sampler',
+    'create',
+    'create_endpoint',
+    'make_context',
+    # aiohttp helpers
+    'setup',
+    'get_tracer',
+    'request_span',
+    'middleware_maker',
+    # possible span kinds
+    'CLIENT',
+    'SERVER',
+    'PRODUCER',
+    'CONSUMER',
+    # possible span annotations
+    'CLIENT_SEND',
+    'SERVER_SEND',
+    'CLIENT_RECEIVED',
+    'SERVER_RECEIVED',
+)
