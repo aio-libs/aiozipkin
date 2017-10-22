@@ -31,3 +31,11 @@ async def test_middleware(tracer, fake_transport):
     span = az.request_span(req)
     assert span
     assert len(fake_transport.records) == 1
+
+    # noop span does not produce records
+    headers = {'X-B3-Sampled': '0'}
+    req_noop = make_mocked_request('GET', '/', headers=headers)
+    await middleware(req_noop)
+    span = az.request_span(req_noop)
+    assert span
+    assert len(fake_transport.records) == 1

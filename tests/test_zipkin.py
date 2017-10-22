@@ -19,7 +19,8 @@ async def client(loop):
 async def test_basic(zipkin_url, client, loop):
     endpoint = az.create_endpoint('simple_service', ipv4='127.0.0.1', port=80)
     interval = 50
-    tracer = az.create(zipkin_url, endpoint, send_inteval=interval, loop=loop)
+    tracer = az.create(zipkin_url, endpoint, sample_rate=1.0,
+                       send_inteval=interval, loop=loop)
 
     with tracer.new_trace(sampled=True) as span:
         span.name('root_span')

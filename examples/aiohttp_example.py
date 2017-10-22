@@ -25,7 +25,7 @@ def make_app(host, port, loop):
     app = web.Application()
     endpoint = az.create_endpoint(
         'aiohttp_server', ipv4=host, port=port)
-    tracer = az.create(zipkin_address, endpoint)
+    tracer = az.create(zipkin_address, endpoint, sample_rate=1.0)
     az.setup(app, tracer)
 
     app.router.add_get('/', handle)
@@ -44,7 +44,7 @@ async def run_server(loop):
 
 async def run_client(loop):
     endpoint = az.create_endpoint('aiohttp_client')
-    tracer = az.create(zipkin_address, endpoint)
+    tracer = az.create(zipkin_address, endpoint, sample_rate=1.0)
     session = aiohttp.ClientSession(loop=loop)
 
     for i in range(1000):

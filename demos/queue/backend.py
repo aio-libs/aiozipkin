@@ -38,7 +38,7 @@ def make_app(host, port):
     zipkin_address = 'http://127.0.0.1:9411'
     endpoint = az.create_endpoint(
         'backend_broker', ipv4=host, port=port)
-    tracer = az.create(zipkin_address, endpoint)
+    tracer = az.create(zipkin_address, endpoint, sample_rate=1.0)
     az.setup(app, tracer)
     return app
 

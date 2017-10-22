@@ -16,7 +16,7 @@ def make_app():
 
     zipkin_address = 'http://127.0.0.1:9411'
     endpoint = az.create_endpoint('service_e')
-    tracer = az.create(zipkin_address, endpoint)
+    tracer = az.create(zipkin_address, endpoint, sample_rate=1.0)
     az.setup(app, tracer)
     return app
 
