@@ -50,9 +50,8 @@ class NoopSpan:
 
 class Span(NoopSpan):
     def __init__(self, tracer, context, record):
-        self._context = context
+        super().__init__(tracer, context)
         self._record = record
-        self._tracer = tracer
 
     @property
     def is_noop(self):

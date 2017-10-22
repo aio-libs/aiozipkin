@@ -21,7 +21,7 @@ class Tracer:
         self._local_endpoint = local_endpoint
 
     def new_trace(self, sampled=None, debug=False):
-        context = self._next_context(None, sampled=None, debug=False)
+        context = self._next_context(None, sampled=sampled, debug=debug)
         return self.to_span(context)
 
     def join_span(self, context):
