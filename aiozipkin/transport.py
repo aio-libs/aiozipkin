@@ -2,6 +2,7 @@ import asyncio
 import aiohttp
 
 from yarl import URL
+from .log import logger
 
 
 class Transport:
@@ -24,7 +25,7 @@ class Transport:
 
     async def _sender_loop(self):
         while not self._ender.done():
-            if len(self._queue) != 0:
+            if self._queue:
                 await self._send()
 
             self._timer = asyncio.ensure_future(
@@ -37,8 +38,17 @@ class Transport:
         self._queue = []
 
         # TODO: add status code check
-        async with self._session.post(self._address, json=data) as resp:
-            await resp.read()
+        try:
+            async with self._session.post(self._address, json=data) as resp:
+                await resp.read()
+                if resp.status >= 300:
+                    msg = 'Remote zipkin responded with {} code'.format(
+                        resp.status)
+                    raise RuntimeError(msg)
+
+        except Exception as exc:
+            # that code should never fail
+            logger.error('Can not send spans to zipking', exc_info=exc)
 
     async def close(self):
         # TODO: make sure queue is empty before closing
