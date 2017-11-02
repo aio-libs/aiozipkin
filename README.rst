@@ -14,9 +14,9 @@ aiozipkin
     :alt: Chat on Gitter
 
 **aiozipkin** is Python 3.5+ module that adds distributed tracing capabilities
-from asyncio applications with Zipkin (http://zipkin.io) server instrumentation.
+from asyncio_ applications with zipkin (http://zipkin.io) server instrumentation.
 
-Zipkin is a distributed tracing system. It helps gather timing data needed
+zipkin_ is a distributed tracing system. It helps gather timing data needed
 to troubleshoot latency problems in microservice architectures. It manages
 both the collection and lookup of this data. Zipkin’s design is based on
 the Google Dapper paper.
@@ -78,10 +78,9 @@ aiohttp example
     def init_app():
         host, port = "127.0.0.1", 8080
         app = web.Application()
-        endpoint = aiozipkin.create_endpoint(
-            "AIOHTTP_SERVER", ipv4=host, port=port)
-        tracer = aiozipkin.create(zipkin_address, endpoint, sample_rate=1.0)
-        aiozipkin.setup(app, tracer)
+        endpoint = az.create_endpoint("AIOHTTP_SERVER", ipv4=host, port=port)
+        tracer = az.create(zipkin_address, endpoint, sample_rate=1.0)
+        az.setup(app, tracer)
 
 
 That is it, plugin adds middleware that tries to fetch context from headers,
@@ -91,11 +90,13 @@ server.
 
 .. code:: python
 
-    endpoint = aiozipkin.create_endpoint("AIOHTTP_CLIENT")
-    tracer = aiozipkin.create(zipkin_address, endpoint)
+    import aiozipkin as az
+
+    endpoint = az.create_endpoint("AIOHTTP_CLIENT")
+    tracer = az.create(zipkin_address, endpoint)
 
     with tracer.new_trace() as span:
-        span.kind(aiozipkin.CLIENT)
+        span.kind(az.CLIENT)
         headers = span.context.make_headers()
         host = "http://127.0.0.1:8080/api/v1/posts/{}".format(i)
         resp = await session.get(host, headers=headers)
@@ -121,3 +122,4 @@ Requirements
 .. _aiohttp: https://github.com/KeepSafe/aiohttp
 .. _asyncio: http://docs.python.org/3.5/library/asyncio.html
 .. _uvloop: https://github.com/MagicStack/uvloop
+.. _zipkin: http://zipkin.io
