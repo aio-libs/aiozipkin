@@ -19,7 +19,6 @@ class Tracer:
         self._transport = transport
         self._sampler = sampler
         self._local_endpoint = local_endpoint
-        self.current_span = None
 
     def new_trace(self, sampled=None, debug=False):
         context = self._next_context(None, sampled=sampled, debug=debug)
@@ -46,9 +45,7 @@ class Tracer:
 
         record = Record(context, self._local_endpoint)
         self._records[context] = record
-        span = Span(self, context, record)
-        self.current_span = span
-        return span
+        return Span(self, context, record)
 
     def _send(self, record):
         self._records.pop(record._context, None)
