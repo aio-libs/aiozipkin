@@ -70,7 +70,9 @@ class Span(NoopSpan):
         self._record.start(ts)
         return self
 
-    def finish(self, ts=None):
+    def finish(self, ts=None, exception=None):
+        if exception is not None:
+            self.tag(ERROR, str(exception))
         ts = make_timestamp(ts)
         self._record.finish(ts)
         self._tracer._send(self._record)
@@ -103,6 +105,4 @@ class Span(NoopSpan):
         return self
 
     def __exit__(self, exception_type, exception_value, traceback):
-        if exception_value is not None:
-            self.tag(ERROR, str(exception_value))
-        self.finish()
+        self.finish(exception=exception_value)
