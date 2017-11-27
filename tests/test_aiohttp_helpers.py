@@ -24,10 +24,12 @@ async def test_middleware(tracer, fake_transport):
     # Fake transport, with IPv4
     transp = mock.Mock()
     transp.get_extra_info.return_value = ('127.0.0.1', '0')
-   
+
     async def handler(request):
         return web.Response(body=b'data')
-    req = make_mocked_request('GET', '/', headers={'token': 'x'}, transport=transp)
+    req = make_mocked_request('GET', '/',
+                              headers={'token': 'x'},
+                              transport=transp)
 
     middleware_factory = middleware_maker()
 
@@ -40,7 +42,9 @@ async def test_middleware(tracer, fake_transport):
 
     # Same with IPv6
     transp.get_extra_info.return_value = ('::1', '0')
-    req = make_mocked_request('GET', '/', headers={'token': 'x'}, transport=transp)
+    req = make_mocked_request('GET', '/',
+                              headers={'token': 'x'},
+                              transport=transp)
     middleware = await middleware_factory(app, handler)
     await middleware(req)
     span = az.request_span(req)
