@@ -6,6 +6,8 @@ HTTP_REQUEST_SIZE = 'http.request.size'
 HTTP_RESPONSE_SIZE = 'http.response.size'
 HTTP_STATUS_CODE = 'http.status_code'
 HTTP_URL = 'http.url'
+HTTP_PEER_ADDRESS = 'peer.address'
+HTTP_PEER_PORT = 'peer.port'
 
 ERROR = 'error'
 LOCAL_COMPONENT = 'lc'

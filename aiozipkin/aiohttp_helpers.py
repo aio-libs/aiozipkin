@@ -1,6 +1,6 @@
 from aiohttp.web import HTTPException
 
-from .constants import HTTP_PATH, HTTP_STATUS_CODE, HTTP_METHOD
+from .constants import HTTP_PATH, HTTP_STATUS_CODE, HTTP_METHOD, HTTP_PEER_ADDRESS, HTTP_PEER_PORT
 from .helpers import make_context, SERVER, parse_debug, parse_sampled
 
 
@@ -35,6 +35,12 @@ def middleware_maker(tracer_key=APP_AIOZIPKIN_KEY,
                 span.kind(SERVER)
                 span.tag(HTTP_PATH, request.path)
                 span.tag(HTTP_METHOD, request.method.upper())
+
+                peername = request.transport.get_extra_info('peername')
+                if peername is not None:
+                    host, port = peername
+                    span.tag(HTTP_PEER_ADDRESS, host)
+                    span.tag(HTTP_PEER_PORT, port)
 
                 try:
                     resp = await handler(request)
