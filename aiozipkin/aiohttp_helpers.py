@@ -38,16 +38,18 @@ def middleware_maker(tracer_key=APP_AIOZIPKIN_KEY,
 
                 peername = request.remote
                 if peername is not None:
+                    kwargs = {}
                     try:
-                        kwargs = {}
                         peer_ipaddress = ipaddress.ip_address(peername)
+                    except ValueError:
+                        pass
+                    else:
                         if isinstance(peer_ipaddress, ipaddress.IPv4Address):
                             kwargs['ipv4'] = str(peer_ipaddress)
-                        elif isinstance(peer_ipaddress, ipaddress.IPv6Address):
+                        else:
                             kwargs['ipv6'] = str(peer_ipaddress)
+                    if kwargs:
                         span.remote_endpoint(None, **kwargs)
-                    except ipaddress.AddressValueError:
-                        pass
 
                 try:
                     resp = await handler(request)
