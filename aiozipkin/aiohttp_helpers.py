@@ -1,8 +1,12 @@
 import ipaddress
+
+import aiohttp
 from aiohttp.web import HTTPException
 
 from .constants import HTTP_PATH, HTTP_STATUS_CODE, HTTP_METHOD
 from .helpers import make_context, SERVER, parse_debug, parse_sampled
+from .task_local import get_task_ctx, set_task_ctx
+
 
 APP_AIOZIPKIN_KEY = 'aiozipkin_tracer'
 REQUEST_AIOZIPKIN_KEY = 'aiozipkin_span'
@@ -45,6 +49,7 @@ def middleware_maker(tracer_key=APP_AIOZIPKIN_KEY,
                 resp = await handler(request)
                 return resp
 
+            set_task_ctx('request_span_ctx', span.context)
             with span:
                 span_name = '{0} {1}'.format(request.method.upper(),
                                              request.path)
@@ -89,3 +94,39 @@ def get_tracer(app, tracer_key=APP_AIOZIPKIN_KEY):
 
 def request_span(request, request_key=REQUEST_AIOZIPKIN_KEY):
     return request[request_key]
+
+
+def make_trace_config(tracer):
+
+    trace_config = aiohttp.TraceConfig()
+
+    async def on_request_start(session, trace_config_ctx, method, url,
+                               headers, request_trace_config_ctx=None):
+        span_ctx = get_task_ctx('request_span_ctx')
+        span = tracer.new_span(span_ctx)
+        span.kind(SERVER)
+        span.tag(HTTP_METHOD, method.upper())
+
+        span_name = '{0} {1}'.format(method, '')
+        span.name(span_name)
+        span.start()
+        trace_config_ctx._span = span
+
+    async def on_request_end(session, trace_config_ctx, resp,
+                             request_trace_config_ctx=None):
+        span = trace_config_ctx._span
+        span.finish()
+
+    async def on_request_redirect(session, trace_config_ctx, *a, **kw):
+        span = trace_config_ctx._span
+        # span.annotate(HTTP_REDIRECT)
+
+    async def on_request_exception(session, trace_config_ctx, resp, error,
+                                   request_trace_config_ctx=None):
+        span = trace_config_ctx._span
+        span.finish(exception=error)
+
+    trace_config.on_request_start.append(on_request_start)
+    trace_config.on_request_end.append(on_request_end)
+    trace_config.on_request_end.append(on_request_exception)
+    return trace_config
