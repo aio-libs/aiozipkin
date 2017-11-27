@@ -1,7 +1,7 @@
 from aiohttp.web import HTTPException
 
 from .constants import HTTP_PATH, HTTP_STATUS_CODE, HTTP_METHOD, \
-    HTTP_PEER_ADDRESS, HTTP_PEER_PORT
+    HTTP_PEER_ADDRESS
 from .helpers import make_context, SERVER, parse_debug, parse_sampled
 
 
