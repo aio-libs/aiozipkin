@@ -39,7 +39,7 @@ def middleware_maker(tracer_key=APP_AIOZIPKIN_KEY,
 
                 peername = request.remote
                 if peername is not None:
-                    span.tag(HTTP_PEER_ADDRESS, peername)
+                    span.remote_endpoint(None, ipv4=peername)
 
                 try:
                     resp = await handler(request)
