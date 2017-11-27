@@ -14,7 +14,7 @@ def read(f):
     return open(os.path.join(os.path.dirname(__file__), f)).read().strip()
 
 
-install_requires = ['aiohttp']
+install_requires = ['aiohttp', 'ipaddress']
 extras_require = {}
 
 

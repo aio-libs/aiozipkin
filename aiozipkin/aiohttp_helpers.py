@@ -1,9 +1,8 @@
 from aiohttp.web import HTTPException
 
-from .constants import HTTP_PATH, HTTP_STATUS_CODE, HTTP_METHOD, \
-    HTTP_PEER_ADDRESS
+from .constants import HTTP_PATH, HTTP_STATUS_CODE, HTTP_METHOD
 from .helpers import make_context, SERVER, parse_debug, parse_sampled
-
+import ipaddress
 
 APP_AIOZIPKIN_KEY = 'aiozipkin_tracer'
 REQUEST_AIOZIPKIN_KEY = 'aiozipkin_span'
@@ -39,7 +38,12 @@ def middleware_maker(tracer_key=APP_AIOZIPKIN_KEY,
 
                 peername = request.remote
                 if peername is not None:
-                    span.remote_endpoint(None, ipv4=peername)
+                    if isinstance(ipaddress.ip_address(peername),
+                                  ipaddress.IPv4Address):
+                        span.remote_endpoint(None, ipv4=peername)
+                    elif isinstance(ipaddress.ip_address(peername),
+                                    ipaddress.IPv6Address):
+                        span.remote_endpoint(None, ipv6=peername)
 
                 try:
                     resp = await handler(request)
@@ -51,6 +55,7 @@ def middleware_maker(tracer_key=APP_AIOZIPKIN_KEY,
                 return resp
 
         return aiozipkin_middleware
+
     return middleware_factory
 
 
@@ -63,6 +68,7 @@ def setup(app, tracer,
     # register cleanup signal to close zipkin connections
     async def close_aiozipkin(app):
         await app[tracer_key].close()
+
     app.on_cleanup.append(close_aiozipkin)
 
     return app
