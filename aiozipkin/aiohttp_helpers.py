@@ -56,8 +56,7 @@ def middleware_maker(tracer_key=APP_AIOZIPKIN_KEY,
 
 def setup(app, tracer,
           tracer_key=APP_AIOZIPKIN_KEY,
-          request_key=REQUEST_AIOZIPKIN_KEY,
-          ignored_urls=None):
+          request_key=REQUEST_AIOZIPKIN_KEY):
     app[tracer_key] = tracer
     app.middlewares.append(middleware_maker(tracer_key, request_key))
 
