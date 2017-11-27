@@ -37,11 +37,9 @@ def middleware_maker(tracer_key=APP_AIOZIPKIN_KEY,
                 span.tag(HTTP_PATH, request.path)
                 span.tag(HTTP_METHOD, request.method.upper())
 
-                peername = request.transport.get_extra_info('peername')
+                peername = request.remote
                 if peername is not None:
-                    host, port = peername
-                    span.tag(HTTP_PEER_ADDRESS, host)
-                    span.tag(HTTP_PEER_PORT, port)
+                    span.tag(HTTP_PEER_ADDRESS, peername)
 
                 try:
                     resp = await handler(request)
