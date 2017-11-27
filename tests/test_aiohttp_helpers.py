@@ -1,15 +1,12 @@
-from unittest.mock import patch, MagicMock
-
-from aiohttp.web_exceptions import HTTPNotFound, HTTPException
-from pytest import raises
-
 import aiozipkin as az
+
 from aiohttp import web
 from aiohttp.test_utils import make_mocked_request
+from aiohttp.web_exceptions import HTTPNotFound, HTTPException
 from aiozipkin.aiohttp_helpers import middleware_maker
-from unittest import mock
 
 import pytest
+from unittest.mock import patch, MagicMock, Mock
 
 
 class AsyncMock(MagicMock):
@@ -75,7 +72,7 @@ async def test_middleware_with_valid_ip(tracer, version,
     az.setup(app, tracer)
 
     # Fake transport
-    transp = mock.Mock()
+    transp = Mock()
     transp.get_extra_info.return_value = (address_in, '0')
 
     async def handler(request):
@@ -115,7 +112,7 @@ async def test_middleware_with_invalid_ip(tracer, version, address):
     az.setup(app, tracer)
 
     # Fake transport
-    transp = mock.Mock()
+    transp = Mock()
     transp.get_extra_info.return_value = (address, '0')
 
     async def handler(request):
@@ -146,7 +143,7 @@ async def test_middleware_with_handler_404(tracer):
     middleware_factory = middleware_maker()
     middleware = await middleware_factory(app, handler)
 
-    with raises(HTTPException):
+    with pytest.raises(HTTPException):
         await middleware(req)
 
 

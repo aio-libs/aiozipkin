@@ -1,8 +1,8 @@
+import ipaddress
 from aiohttp.web import HTTPException
 
 from .constants import HTTP_PATH, HTTP_STATUS_CODE, HTTP_METHOD
 from .helpers import make_context, SERVER, parse_debug, parse_sampled
-import ipaddress
 
 APP_AIOZIPKIN_KEY = 'aiozipkin_tracer'
 REQUEST_AIOZIPKIN_KEY = 'aiozipkin_span'
