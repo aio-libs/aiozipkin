@@ -1,6 +1,7 @@
 from aiohttp.web import HTTPException
 
-from .constants import HTTP_PATH, HTTP_STATUS_CODE, HTTP_METHOD, HTTP_PEER_ADDRESS, HTTP_PEER_PORT
+from .constants import HTTP_PATH, HTTP_STATUS_CODE, HTTP_METHOD, \
+    HTTP_PEER_ADDRESS, HTTP_PEER_PORT
 from .helpers import make_context, SERVER, parse_debug, parse_sampled
 
 
@@ -57,7 +58,8 @@ def middleware_maker(tracer_key=APP_AIOZIPKIN_KEY,
 
 def setup(app, tracer,
           tracer_key=APP_AIOZIPKIN_KEY,
-          request_key=REQUEST_AIOZIPKIN_KEY):
+          request_key=REQUEST_AIOZIPKIN_KEY,
+          ignored_urls=None):
     app[tracer_key] = tracer
     app.middlewares.append(middleware_maker(tracer_key, request_key))
 
