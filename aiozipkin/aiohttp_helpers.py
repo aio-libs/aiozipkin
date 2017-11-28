@@ -4,8 +4,8 @@ import aiohttp
 from aiohttp.web import HTTPException
 
 from .constants import HTTP_PATH, HTTP_STATUS_CODE, HTTP_METHOD
-from .helpers import make_context, SERVER, parse_debug, parse_sampled
-from .task_local import get_task_ctx, set_task_ctx
+from .helpers import make_context, SERVER, parse_debug, parse_sampled, CLIENT
+from .task_local import get_task_ctx, set_task_ctx, pop_task_ctx
 
 
 APP_AIOZIPKIN_KEY = 'aiozipkin_tracer'
@@ -44,29 +44,31 @@ def middleware_maker(tracer_key=APP_AIOZIPKIN_KEY,
                 span = tracer.join_span(context)
 
             request[request_key] = span
-
-            if span.is_noop:
-                resp = await handler(request)
-                return resp
-
             set_task_ctx('request_span_ctx', span.context)
-            with span:
-                span_name = '{0} {1}'.format(request.method.upper(),
-                                             request.path)
-                span.name(span_name)
-                span.kind(SERVER)
-                span.tag(HTTP_PATH, request.path)
-                span.tag(HTTP_METHOD, request.method.upper())
-                _set_remote_endpoint(span, request)
-
-                try:
+            try:
+                if span.is_noop:
                     resp = await handler(request)
-                except HTTPException as e:
-                    span.tag(HTTP_STATUS_CODE, e.status)
-                    raise
+                    return resp
 
-                span.tag(HTTP_STATUS_CODE, resp.status)
-                return resp
+                with span:
+                    span_name = '{0} {1}'.format(request.method.upper(),
+                                                 request.path)
+                    span.name(span_name)
+                    span.kind(SERVER)
+                    span.tag(HTTP_PATH, request.path)
+                    span.tag(HTTP_METHOD, request.method.upper())
+                    _set_remote_endpoint(span, request)
+
+                    try:
+                        resp = await handler(request)
+                    except HTTPException as e:
+                        span.tag(HTTP_STATUS_CODE, e.status)
+                        raise
+
+                    span.tag(HTTP_STATUS_CODE, resp.status)
+            finally:
+                pop_task_ctx('request_span_ctx')
+            return resp
 
         return aiozipkin_middleware
 
@@ -101,32 +103,31 @@ def make_trace_config(tracer):
     trace_config = aiohttp.TraceConfig()
 
     async def on_request_start(session, trace_config_ctx, method, url,
-                               headers, request_trace_config_ctx=None):
+                               headers, trace_request_ctx=None):
         span_ctx = get_task_ctx('request_span_ctx')
-        span = tracer.new_span(span_ctx)
-        span.kind(SERVER)
-        span.tag(HTTP_METHOD, method.upper())
-
-        span_name = '{0} {1}'.format(method, '')
-        span.name(span_name)
-        span.start()
+        span = tracer.new_child(span_ctx)
         trace_config_ctx._span = span
+        span.start()
+        span_name = 'client {0} {1}'.format(method.upper(), url.path)
+        span.name(span_name)
+        span.kind(CLIENT)
 
-    async def on_request_end(session, trace_config_ctx, resp,
-                             request_trace_config_ctx=None):
+        span_headers = span.context.make_headers()
+        headers.update(span_headers)
+
+    async def on_request_end(session, trace_config_ctx, method, url,
+                             headers, resp, trace_request_ctx=None):
+
         span = trace_config_ctx._span
         span.finish()
 
-    async def on_request_redirect(session, trace_config_ctx, *a, **kw):
-        span = trace_config_ctx._span
-        # span.annotate(HTTP_REDIRECT)
-
-    async def on_request_exception(session, trace_config_ctx, resp, error,
-                                   request_trace_config_ctx=None):
+    async def on_request_exception(session, trace_config_ctx, method, url,
+                                   headers, error, trace_request_ctx=None):
         span = trace_config_ctx._span
         span.finish(exception=error)
+        delattr(trace_config_ctx, '_span')
 
     trace_config.on_request_start.append(on_request_start)
     trace_config.on_request_end.append(on_request_end)
-    trace_config.on_request_end.append(on_request_exception)
+    trace_config.on_request_exception.append(on_request_exception)
     return trace_config

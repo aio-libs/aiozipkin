@@ -4,6 +4,7 @@ from .aiohttp_helpers import (
     middleware_maker,
     request_span,
     setup,
+    make_trace_config,
 )
 from .helpers import (
     create_endpoint,
@@ -32,6 +33,7 @@ __all__ = (
     'get_tracer',
     'request_span',
     'middleware_maker',
+    'make_trace_config',
     # possible span kinds
     'CLIENT',
     'SERVER',
