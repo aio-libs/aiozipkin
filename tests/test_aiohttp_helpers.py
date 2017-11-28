@@ -152,5 +152,6 @@ async def test_middleware_cleanup_app(tracer):
     tracer.close = AsyncMock()
     app = web.Application()
     az.setup(app, tracer)
+    app.freeze()
     await app.cleanup()
     assert tracer.close.call_count == 1
