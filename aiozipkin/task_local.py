@@ -24,25 +24,27 @@ class TaskLocalManager:
     def clear(self):
         self.stack[:] = []
 
-    @property
-    def top(self):
-        try:
-            return self.stack[-1]
-        except (AttributeError, IndexError):
-            return self.default
+
+def _get_or_create_stack(key):
+    t = asyncio.Task.current_task()
+    if not hasattr(t, key):
+        stack = TaskLocalManager()
+        setattr(t, key, stack)
+    else:
+        stack = getattr(t, key)
+    return stack
 
 
 def set_task_ctx(key, value):
-    # TODO: check current task is not none
-    t = asyncio.Task.current_task()
-    if not hasattr(t, '_context'):
-        t._context = TaskLocalManager()
-    t._context.push(key, value)
+    stack = _get_or_create_stack(key)
+    return stack.push(value)
 
 
 def get_task_ctx(key):
-    # TODO: check current task is not none
-    t = asyncio.Task.current_task()
-    if not hasattr(t, '_context'):
-        t._context = TaskLocalManager()
-    return t._context.pop(key)
+    stack = _get_or_create_stack(key)
+    return stack.get()
+
+
+def pop_task_ctx(key):
+    stack = _get_or_create_stack(key)
+    return stack.pop()
