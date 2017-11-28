@@ -8,6 +8,23 @@ APP_AIOZIPKIN_KEY = 'aiozipkin_tracer'
 REQUEST_AIOZIPKIN_KEY = 'aiozipkin_span'
 
 
+def _set_remote_endpoint(span, request):
+    peername = request.remote
+    if peername is not None:
+        kwargs = {}
+        try:
+            peer_ipaddress = ipaddress.ip_address(peername)
+        except ValueError:
+            pass
+        else:
+            if isinstance(peer_ipaddress, ipaddress.IPv4Address):
+                kwargs['ipv4'] = str(peer_ipaddress)
+            else:
+                kwargs['ipv6'] = str(peer_ipaddress)
+        if kwargs:
+            span.remote_endpoint(None, **kwargs)
+
+
 def middleware_maker(tracer_key=APP_AIOZIPKIN_KEY,
                      request_key=REQUEST_AIOZIPKIN_KEY):
     async def middleware_factory(app, handler):
@@ -35,21 +52,7 @@ def middleware_maker(tracer_key=APP_AIOZIPKIN_KEY,
                 span.kind(SERVER)
                 span.tag(HTTP_PATH, request.path)
                 span.tag(HTTP_METHOD, request.method.upper())
-
-                peername = request.remote
-                if peername is not None:
-                    kwargs = {}
-                    try:
-                        peer_ipaddress = ipaddress.ip_address(peername)
-                    except ValueError:
-                        pass
-                    else:
-                        if isinstance(peer_ipaddress, ipaddress.IPv4Address):
-                            kwargs['ipv4'] = str(peer_ipaddress)
-                        else:
-                            kwargs['ipv6'] = str(peer_ipaddress)
-                    if kwargs:
-                        span.remote_endpoint(None, **kwargs)
+                _set_remote_endpoint(span, request)
 
                 try:
                     resp = await handler(request)
