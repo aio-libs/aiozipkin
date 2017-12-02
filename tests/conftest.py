@@ -31,6 +31,9 @@ class FakeTransport(Transport):
     def send(self, record):
         self.records.append(record)
 
+    async def close(self):
+        pass
+
 
 @pytest.fixture
 def fake_transport():

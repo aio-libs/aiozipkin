@@ -66,7 +66,7 @@ async def zipkin_server(docker, docker_pull):
                 await asyncio.sleep(delay)
                 delay *= 2
         else:
-            pytest.fail('Cannot start postgres server: {}'.format(last_error))
+            pytest.fail('Cannot start zipkin server: {}'.format(last_error))
 
     await yield_(params)
 
