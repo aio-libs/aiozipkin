@@ -11,6 +11,7 @@ install:
     - pip install --upgrade setuptools
     - pip install codecov
     - pip install -r requirements-dev.txt
+    - pip install https://github.com/aio-libs/aiohttp/archive/master.zip
 
 script:
     make cov
