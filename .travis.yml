@@ -15,7 +15,6 @@ install:
     - pip install --upgrade setuptools
     - pip install codecov
     - pip install -r requirements-dev.txt
-    - pip install https://github.com/aio-libs/aiohttp/archive/master.zip
     - |
         if [ "$AIOHTTP_MASTER" = "y" ]; then
             pip install https://github.com/aio-libs/aiohttp/archive/master.zip
