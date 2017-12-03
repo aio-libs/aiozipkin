@@ -94,16 +94,18 @@ def request_span(request, request_key=REQUEST_AIOZIPKIN_KEY):
     return request[request_key]
 
 
-def make_trace_config(tracer):
+def _has_span(trace_request_ctx):
+    has_span = (isinstance(trace_request_ctx, dict) and
+                'span_context' in trace_request_ctx)
+    return has_span
 
+
+def make_trace_config(tracer):
     trace_config = aiohttp.TraceConfig()
 
     async def on_request_start(session, trace_config_ctx, method, url,
                                headers, trace_request_ctx=None):
-
-        has_span = (isinstance(trace_request_ctx, dict) and
-                    'span_context' in trace_request_ctx)
-        if not has_span:
+        if not _has_span(trace_request_ctx):
             return
 
         span_context = trace_request_ctx['span_context']
@@ -119,6 +121,8 @@ def make_trace_config(tracer):
 
     async def on_request_end(session, trace_config_ctx, method, url,
                              headers, resp, trace_request_ctx=None):
+        if not _has_span(trace_request_ctx):
+            return
 
         span = trace_config_ctx._span
         span.finish()
@@ -126,6 +130,8 @@ def make_trace_config(tracer):
 
     async def on_request_exception(session, trace_config_ctx, method, url,
                                    headers, error, trace_request_ctx=None):
+        if not _has_span(trace_request_ctx):
+            return
         span = trace_config_ctx._span
         span.finish(exception=error)
         delattr(trace_config_ctx, '_span')

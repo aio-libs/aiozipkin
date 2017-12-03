@@ -47,7 +47,7 @@ async def client(loop, test_client, tracer):
 
 
 @pytest.mark.asyncio
-async def test_aiohttp_signals(client, fake_transport):
+async def test_handler_with_client_signals(client, fake_transport):
     resp = await client.get('/simple')
     assert resp.status == 200
 
@@ -60,7 +60,7 @@ async def test_aiohttp_signals(client, fake_transport):
 
 
 @pytest.mark.asyncio
-async def test_aiohttp_signals_error(client, fake_transport):
+async def test_handler_with_client_signals_error(client, fake_transport):
     resp = await client.get('/error')
     assert resp.status == 500
 
@@ -71,3 +71,39 @@ async def test_aiohttp_signals_error(client, fake_transport):
 
     msg = 'Cannot connect to host'
     assert msg in record1['tags']['error']
+
+
+@pytest.mark.asyncio
+async def test_client_signals(tracer, fake_transport):
+    trace_config = az.make_trace_config(tracer)
+    session = aiohttp.ClientSession(trace_configs=[trace_config])
+
+    with tracer.new_trace() as span:
+        span.name('client:signals')
+        url = 'https://httpbin.org/get'
+        ctx = {'span_context': span.context}
+        resp = await session.get(url, trace_request_ctx=ctx)
+        await resp.text()
+        assert resp.status == 200
+
+    await session.close()
+
+    assert len(fake_transport.records) == 2
+    record1 = fake_transport.records[0].asdict()
+    record2 = fake_transport.records[1].asdict()
+    assert record1['parentId'] == record2['id']
+    assert record2['name'] == 'client:signals'
+
+
+@pytest.mark.asyncio
+async def test_client_signals_no_span(tracer, fake_transport):
+    trace_config = az.make_trace_config(tracer)
+    session = aiohttp.ClientSession(trace_configs=[trace_config])
+
+    url = 'https://httpbin.org/get'
+    resp = await session.get(url)
+    await resp.text()
+    assert resp.status == 200
+
+    await session.close()
+    assert len(fake_transport.records) == 0
