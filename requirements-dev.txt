@@ -1,6 +1,6 @@
 -e .
 aiodocker==0.8.5
-aiohttp==2.3.5
+aiohttp==2.3.6
 async-generator==1.8
 docutils==0.14
 flake8-quotes==0.12.1
