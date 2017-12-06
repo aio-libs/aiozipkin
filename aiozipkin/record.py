@@ -10,11 +10,15 @@ from .helpers import (
 )
 
 
+def _endpoint_asdict(endpoint):
+    return {k: v for k, v in endpoint._asdict().items() if v is not None}
+
+
 class Record:
 
     def __init__(self, context, local_endpoint):
         self._context = context
-        self._local_endpoint = local_endpoint._asdict()
+        self._local_endpoint = _endpoint_asdict(local_endpoint)
         self._finished = False
 
         self._name = 'unknown'
@@ -42,7 +46,7 @@ class Record:
         return self
 
     def set_tag(self, key, value):
-        self._tags[key] = value
+        self._tags[key] = str(value)
         return self
 
     def annotate(self, value, ts):
@@ -68,7 +72,7 @@ class Record:
         return self
 
     def remote_endpoint(self, endpoint):
-        self._remote_endpoint = endpoint._asdict()
+        self._remote_endpoint = _endpoint_asdict(endpoint)
         return self
 
     def asdict(self):

@@ -39,7 +39,9 @@ class Transport:
 
         # TODO: add status code check
         try:
-            async with self._session.post(self._address, json=data) as resp:
+            headers = {'Content-Type': 'application/json'}
+            async with self._session.post(self._address, json=data,
+                                          headers=headers) as resp:
                 await resp.read()
                 if resp.status >= 300:
                     msg = 'Remote zipkin responded with {} code'.format(

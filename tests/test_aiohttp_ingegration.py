@@ -61,7 +61,7 @@ async def test_handler_with_client_signals(client, fake_transport):
     record1 = fake_transport.records[0].asdict()
     record2 = fake_transport.records[1].asdict()
     assert record1['parentId'] == record2['id']
-    assert record2['tags']['http.status_code'] == 200
+    assert record2['tags']['http.status_code'] == '200'
 
 
 @pytest.mark.asyncio
