@@ -24,21 +24,15 @@ async def index(request):
 
 
 async def handler(request):
-    span = az.request_span(request)
-    tracer = az.get_tracer(request.app)
-
     await asyncio.sleep(0.01)
     session = request.app['session']
+    span = az.request_span(request)
+    ctx = {'span_context': span.context}
 
-    with tracer.new_child(span.context) as span_b:
-        headers = span_b.context.make_headers()
-        resp = await session.get(service_b_api, headers=headers)
-        data_b = await resp.text()
+    resp = await session.get(service_b_api, trace_request_ctx=ctx)
+    data_b = await resp.text()
 
-    with tracer.new_child(span.context) as span_e:
-        headers = span_e.context.make_headers()
-        resp = await session.get(service_e_api, headers=headers)
-
+    resp = await session.get(service_e_api, trace_request_ctx=ctx)
     data_e = await resp.text()
 
     body = 'service_a ' + data_b + ' ' + data_e
@@ -50,12 +44,14 @@ def make_app():
     app.router.add_get('/api/v1/data', handler)
     app.router.add_get('/', index)
 
-    session = aiohttp.ClientSession()
-    app['session'] = session
-
     zipkin_address = 'http://127.0.0.1:9411'
     endpoint = az.create_endpoint('service_a')
     tracer = az.create(zipkin_address, endpoint, sample_rate=1.0)
+
+    trace_config = az.make_trace_config(tracer)
+    session = aiohttp.ClientSession(trace_configs=[trace_config])
+    app['session'] = session
+
     az.setup(app, tracer)
     return app
 

@@ -1,8 +1,11 @@
 import ipaddress
+
+import aiohttp
 from aiohttp.web import HTTPException
 
 from .constants import HTTP_PATH, HTTP_STATUS_CODE, HTTP_METHOD
-from .helpers import make_context, SERVER, parse_debug, parse_sampled
+from .helpers import make_context, SERVER, parse_debug, parse_sampled, CLIENT
+
 
 APP_AIOZIPKIN_KEY = 'aiozipkin_tracer'
 REQUEST_AIOZIPKIN_KEY = 'aiozipkin_span'
@@ -61,7 +64,7 @@ def middleware_maker(tracer_key=APP_AIOZIPKIN_KEY,
                     raise
 
                 span.tag(HTTP_STATUS_CODE, resp.status)
-                return resp
+            return resp
 
         return aiozipkin_middleware
 
@@ -89,3 +92,58 @@ def get_tracer(app, tracer_key=APP_AIOZIPKIN_KEY):
 
 def request_span(request, request_key=REQUEST_AIOZIPKIN_KEY):
     return request[request_key]
+
+
+class ZipkingClientSignals:
+
+    def __init__(self, tracer):
+        self._tracer = tracer
+
+    def _has_span(self, trace_config_ctx):
+        trace_request_ctx = trace_config_ctx.trace_request_ctx
+        has_span = (isinstance(trace_request_ctx, dict) and
+                    'span_context' in trace_request_ctx)
+        return has_span
+
+    async def on_request_start(self, session, trace_config_ctx, method, url,
+                               headers):
+        if not self._has_span(trace_config_ctx):
+            return
+
+        span_context = trace_config_ctx.trace_request_ctx['span_context']
+        span = self._tracer.new_child(span_context)
+        trace_config_ctx._span = span
+        span.start()
+        span_name = 'client {0} {1}'.format(method.upper(), url.path)
+        span.name(span_name)
+        span.kind(CLIENT)
+
+        span_headers = span.context.make_headers()
+        headers.update(span_headers)
+
+    async def on_request_end(self, session, trace_config_ctx, method, url,
+                             headers, resp):
+        if not self._has_span(trace_config_ctx):
+            return
+
+        span = trace_config_ctx._span
+        span.finish()
+        delattr(trace_config_ctx, '_span')
+
+    async def on_request_exception(self, session, trace_config_ctx, method,
+                                   url, headers, error):
+        if not self._has_span(trace_config_ctx):
+            return
+        span = trace_config_ctx._span
+        span.finish(exception=error)
+        delattr(trace_config_ctx, '_span')
+
+
+def make_trace_config(tracer):
+    trace_config = aiohttp.TraceConfig()
+    zipkin = ZipkingClientSignals(tracer)
+
+    trace_config.on_request_start.append(zipkin.on_request_start)
+    trace_config.on_request_end.append(zipkin.on_request_end)
+    trace_config.on_request_exception.append(zipkin.on_request_exception)
+    return trace_config

@@ -15,6 +15,8 @@ async def handle(request):
 
     with tracer.new_child(span.context) as child_span:
         child_span.name('mysql:select')
+        # call to external service like https://python.org
+        # or database query
         await asyncio.sleep(0.01)
 
     text = 'Hello'
