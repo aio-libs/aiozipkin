@@ -3,7 +3,7 @@ aiodocker==0.8.5
 aiohttp==2.3.6
 async-generator==1.8
 docutils==0.14
-flake8-quotes==0.12.1
+flake8-quotes==0.13.0
 flake8==3.5.0
 ipdb==0.10.3
 pytest-aiohttp==0.3.0
