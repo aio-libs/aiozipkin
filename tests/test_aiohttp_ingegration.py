@@ -35,7 +35,7 @@ async def error_handler(request):
 
 @pytest.fixture
 @async_generator
-async def client(loop, test_client, tracer):
+async def client(test_client, tracer):
     app = web.Application()
     app.router.add_get('/simple', handler)
     app.router.add_get('/error', error_handler)
@@ -86,6 +86,12 @@ async def test_client_signals(tracer, fake_transport):
     with tracer.new_trace() as span:
         span.name('client:signals')
         url = 'https://httpbin.org/get'
+        ctx = {'span_context': span.context, 'propagate_headers': True}
+        resp = await session.get(url, trace_request_ctx=ctx)
+        await resp.text()
+        assert resp.status == 200
+
+        # do not propagate headers
         ctx = {'span_context': span.context}
         resp = await session.get(url, trace_request_ctx=ctx)
         await resp.text()
@@ -93,11 +99,13 @@ async def test_client_signals(tracer, fake_transport):
 
     await session.close()
 
-    assert len(fake_transport.records) == 2
+    assert len(fake_transport.records) == 3
     record1 = fake_transport.records[0].asdict()
     record2 = fake_transport.records[1].asdict()
-    assert record1['parentId'] == record2['id']
-    assert record2['name'] == 'client:signals'
+    record3 = fake_transport.records[2].asdict()
+    assert record2['parentId'] == record3['id']
+    assert record1['parentId'] == record3['id']
+    assert record3['name'] == 'client:signals'
 
 
 @pytest.mark.asyncio

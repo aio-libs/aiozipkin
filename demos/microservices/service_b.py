@@ -14,7 +14,7 @@ async def handler(request):
     session = request.app['session']
 
     span = az.request_span(request)
-    ctx = {'span_context': span.context}
+    ctx = {'span_context': span.context, 'propagate_headers': True}
 
     resp = await session.get(service_c_api, trace_request_ctx=ctx)
     data_c = await resp.text()
