@@ -118,8 +118,12 @@ class ZipkingClientSignals:
         span.name(span_name)
         span.kind(CLIENT)
 
-        span_headers = span.context.make_headers()
-        headers.update(span_headers)
+        propagate_headers = (trace_config_ctx
+                             .trace_request_ctx
+                             .get('propagate_headers', False))
+        if propagate_headers:
+            span_headers = span.context.make_headers()
+            headers.update(span_headers)
 
     async def on_request_end(self, session, trace_config_ctx, method, url,
                              headers, resp):
