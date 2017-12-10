@@ -120,7 +120,7 @@ class ZipkingClientSignals:
 
         propagate_headers = (trace_config_ctx
                              .trace_request_ctx
-                             .get('propagate_headers', False))
+                             .get('propagate_headers', True))
         if propagate_headers:
             span_headers = span.context.make_headers()
             headers.update(span_headers)

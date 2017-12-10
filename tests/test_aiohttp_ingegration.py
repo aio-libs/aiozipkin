@@ -86,16 +86,20 @@ async def test_client_signals(tracer, fake_transport):
     with tracer.new_trace() as span:
         span.name('client:signals')
         url = 'https://httpbin.org/get'
-        ctx = {'span_context': span.context, 'propagate_headers': True}
+        # do not propagate headers
+        ctx = {'span_context': span.context, 'propagate_headers': False}
         resp = await session.get(url, trace_request_ctx=ctx)
         await resp.text()
         assert resp.status == 200
+        assert az.make_context(resp.request_info.headers) is None
 
-        # do not propagate headers
+        # by default headers added
         ctx = {'span_context': span.context}
         resp = await session.get(url, trace_request_ctx=ctx)
         await resp.text()
         assert resp.status == 200
+        context = az.make_context(resp.request_info.headers)
+        assert context.trace_id == span.context.trace_id
 
     await session.close()
 
