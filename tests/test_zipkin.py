@@ -1,18 +1,8 @@
 import asyncio
 
-import aiohttp
+import pytest
 import aiozipkin as az
 from yarl import URL
-
-import pytest
-from async_generator import yield_, async_generator
-
-
-@pytest.fixture
-@async_generator
-async def client(loop):
-    async with aiohttp.ClientSession(loop=loop) as client:
-        await yield_(client)
 
 
 @pytest.mark.asyncio

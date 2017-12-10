@@ -1,10 +1,12 @@
 import asyncio
 import gc
 
+import aiohttp
 from aiozipkin.helpers import create_endpoint, TraceContext
 from aiozipkin.sampler import Sampler
 from aiozipkin.tracer import Tracer
 from aiozipkin.transport import Transport
+from async_generator import yield_, async_generator
 
 import pytest
 
@@ -58,6 +60,13 @@ def context():
         debug=False,
         shared=True)
     return context
+
+
+@pytest.fixture
+@async_generator
+async def client(loop):
+    async with aiohttp.ClientSession(loop=loop) as client:
+        await yield_(client)
 
 
 pytest_plugins = ['docker_fixtures']
