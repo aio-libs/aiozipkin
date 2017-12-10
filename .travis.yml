@@ -24,3 +24,15 @@ script:
     make cov
 after_success:
     codecov
+
+deploy:
+  provider: pypi
+  user: jettify
+  distributions: sdist bdist_wheel
+  password:
+    secure: U60ccByTCRq9Pb3wcG6eRMU1X1fWWFa4zeSlvRo1zi0OX7FinWZMNESHENO6m+32wmN0HwRJ/gXYYSPxEQBb0xNjUOyoIEwFMBXFiKyLqxq8auDs+IGxQkahAcS7ARQJUrGEMydgjdyIOvBmcstd9I321pXd1tD9FjlukwCFVT20Gojw1q4EddwmWbrYhEsgz7f3FkFDV1TNVofHGcc3+tEDyLH/fDoC5PDv2kSIFZk9OEhMOdUAHpu6HhxjyOfmmJPl03hiehMahwadTq635OzeHCYfw8SnEGKYpuMefy6tMEFL62nmmv0QHJAMWirfFi3CKMLIXyQ1iQq0X10oW9G25RbW05vvQPPFUpENt5zVvpsj2/M+zA+LSp29losrjXcjvj9At3jNZTt0mFRqjut9PpOqkbMgPm/8fN+PGX5SmaOYKpYETOd+YTJ3TlQlNVPwpU7PG9QBUJYmS4NIj9qFIgcRh6nowmUB3Rt5zo84qDQqwu/bvU74llZtxArAxgmvqQyM5HJqUvtuWJ+JP4ujARRaZI/pGNtWAUwVTRtqvCD9QaKk/YZs7YPwTMjjFl+bZ+pZGZlN3ic3EKX1r05IYlejINvvtAVtvBA8oiQsi9Sy72HytDf/KbdeMNxkud1T1ikA4a7Jwok5h5xRJECmQivsPPwfB8zMi25LyLE=
+  on:
+    tags: true
+    repo: aio-libs/aiozipkin
+    all_branches: true
+    python: 3.6
