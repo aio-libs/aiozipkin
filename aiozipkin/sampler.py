@@ -1,13 +1,15 @@
 from random import Random
+from typing import Optional
 
 
 class Sampler:
 
-    def __init__(self, *, sample_rate=1.0, seed=None):
+    def __init__(self, *, sample_rate: float=1.0,
+                 seed: Optional[int]=None) -> None:
         self._sample_rate = sample_rate
         self._rng = Random(seed)
 
-    def is_sampled(self, trace_id):
+    def is_sampled(self, trace_id: str) -> bool:
         if self._sample_rate == 0.0:
             sampled = False
         else:
