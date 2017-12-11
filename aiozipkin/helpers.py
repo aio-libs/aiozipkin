@@ -1,5 +1,8 @@
 import time
-from collections import namedtuple
+from typing import Optional, NamedTuple
+
+from .mypy_types import OptTs, OptStr, OptInt, OptBool, Headers
+
 
 # possible span kinds
 CLIENT = 'CLIENT'
@@ -21,39 +24,45 @@ FLAGS_HEADER = 'X-B3-Flags'
 SAMPLED_ID_HEADER = 'X-B3-Sampled'
 
 
-_TraceContext = namedtuple(
+_TraceContext = NamedTuple(
     'TraceContext', [
-        'trace_id',
-        'parent_id',
-        'span_id',
-        'sampled',
-        'debug',
-        'shared',
+        ('trace_id', str),
+        ('parent_id', OptStr),
+        ('span_id', str),
+        ('sampled', bool),
+        ('debug', bool),
+        ('shared', bool),
         ]
 )
 
 
 class TraceContext(_TraceContext):
 
-    def make_headers(self):
+    def make_headers(self) -> Headers:
         return make_headers(self)
 
 
-Endpoint = namedtuple(
-    'Endpoint', ['serviceName', 'ipv4', 'ipv6', 'port']
+Endpoint = NamedTuple(
+    'Endpoint', [('serviceName', str),
+                 ('ipv4', OptStr),
+                 ('ipv6', OptStr),
+                 ('port', OptInt)]
 )
 
 
-def create_endpoint(servce_name, *, ipv4=None, ipv6=None, port=None):
+def create_endpoint(servce_name: str, *,
+                    ipv4: OptStr=None,
+                    ipv6: OptStr=None,
+                    port: OptInt=None):
     return Endpoint(servce_name, ipv4, ipv6, port)
 
 
-def make_timestamp(ts=None):
+def make_timestamp(ts: OptTs=None) -> int:
     ts = ts if ts is not None else time.time()
     return int(ts * 1000 * 1000)  # microseconds
 
 
-def make_headers(context):
+def make_headers(context: TraceContext) -> Headers:
     headers = {
         TRACE_ID_HEADER: context.trace_id,
         SPAN_ID_HEADER: context.span_id,
@@ -65,7 +74,7 @@ def make_headers(context):
     return headers
 
 
-def parse_sampled(headers):
+def parse_sampled(headers: Headers) -> OptBool:
     sampled = headers.get(SAMPLED_ID_HEADER.lower(), None)
     if sampled is None or sampled == '':
         return None
@@ -73,11 +82,11 @@ def parse_sampled(headers):
     return True if sampled == '1' else False
 
 
-def parse_debug(headers):
+def parse_debug(headers: Headers) -> bool:
     return True if headers.get(FLAGS_HEADER, '0') == '1' else False
 
 
-def make_context(headers):
+def make_context(headers: Headers) -> Optional[TraceContext]:
     # TODO: add validation for trace_id/span_id/parent_id
 
     # normalize header names just in case someone passed regular dict
