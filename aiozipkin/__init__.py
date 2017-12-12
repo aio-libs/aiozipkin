@@ -12,10 +12,6 @@ from .helpers import (
     SERVER,
     PRODUCER,
     CONSUMER,
-    CLIENT_SEND,
-    SERVER_SEND,
-    CLIENT_RECEIVED,
-    SERVER_RECEIVED,
     create_endpoint,
 )
 from .sampler import Sampler
@@ -40,9 +36,4 @@ __all__ = (
     'SERVER',
     'PRODUCER',
     'CONSUMER',
-    # possible span annotations
-    'CLIENT_SEND',
-    'SERVER_SEND',
-    'CLIENT_RECEIVED',
-    'SERVER_RECEIVED',
 )

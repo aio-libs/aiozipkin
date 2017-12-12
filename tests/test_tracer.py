@@ -3,12 +3,6 @@ from unittest import mock
 import pytest
 from aiozipkin.helpers import (
     TraceContext,
-    CLIENT,
-    CLIENT_RECEIVED,
-    CLIENT_SEND,
-    SERVER,
-    SERVER_RECEIVED,
-    SERVER_SEND,
 )
 from aiozipkin.tracer import NoopSpan, Span
 
@@ -122,37 +116,10 @@ def test_error(tracer, fake_transport):
     assert data['tags'] == {'error': 'boom'}
 
 
-def test_cs_annotation(tracer, fake_transport):
+def test_null_annotation(tracer, fake_transport):
     with tracer.new_trace() as span:
-        span.annotate(CLIENT_SEND, ts=1506970524)
+        span.annotate(None, ts=1506970524)
 
     assert len(fake_transport.records) == 1
     record = fake_transport.records[0]
-    assert record.asdict()['kind'] == CLIENT
-
-
-def test_sr_annotation(tracer, fake_transport):
-    with tracer.new_trace() as span:
-        span.annotate(SERVER_RECEIVED, ts=1506970524)
-
-    assert len(fake_transport.records) == 1
-    record = fake_transport.records[0]
-    assert record.asdict()['kind'] == SERVER
-
-
-def test_cr_annotation(tracer, fake_transport):
-    with tracer.new_trace() as span:
-        span.annotate(CLIENT_RECEIVED, ts=1506970524)
-
-    assert len(fake_transport.records) == 1
-    record = fake_transport.records[0]
-    assert record.asdict()['kind'] == CLIENT
-
-
-def test_ss_annotation(tracer, fake_transport):
-    with tracer.new_trace() as span:
-        span.annotate(SERVER_SEND, ts=1506970524)
-
-    assert len(fake_transport.records) == 1
-    record = fake_transport.records[0]
-    assert record.asdict()['kind'] == SERVER
+    assert record.asdict()['annotations'][0]['value'] == 'None'
