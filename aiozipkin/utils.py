@@ -1,30 +1,30 @@
-import codecs
 import os
 import struct
+import binascii
 
 
 # https://github.com/Yelp/py_zipkin/blob/
 # 7937ca859f8ae1f1009ab69fd1ddcd8fc33f1dad/py_zipkin/util.py#L1-L54
-def generate_random_64bit_string():
+def generate_random_64bit_string() -> str:
     """Returns a 64 bit UTF-8 encoded string. In the interests of simplicity,
     this is always cast to a `str` instead of (in py2 land) a unicode string.
     Certain clients (I'm looking at you, Twisted) don't enjoy unicode headers.
 
     :returns: random 16-character string
     """
-    return str(codecs.encode(os.urandom(8), 'hex_codec').decode('utf-8'))
+    return str(binascii.hexlify(os.urandom(8)).decode('utf-8'))
 
 
-def generate_random_128bit_string():
+def generate_random_128bit_string() -> str:
     """Returns a 128 bit UTF-8 encoded string. Follows the same conventions
     as generate_random_64bit_string().
 
     :returns: random 32-character string
     """
-    return str(codecs.encode(os.urandom(16), 'hex_codec').decode('utf-8'))
+    return str(binascii.hexlify(os.urandom(16)).decode('utf-8'))
 
 
-def unsigned_hex_to_signed_int(hex_string):
+def unsigned_hex_to_signed_int(hex_string: str) -> int:
     """Converts a 64-bit hex string to a signed int value.
 
     This is due to the fact that Apache Thrift only has signed values.
@@ -39,7 +39,7 @@ def unsigned_hex_to_signed_int(hex_string):
     return struct.unpack('q', struct.pack('Q', int(hex_string, 16)))[0]
 
 
-def signed_int_to_unsigned_hex(signed_int):
+def signed_int_to_unsigned_hex(signed_int: int) -> str:
     """Converts a signed int value to a 64-bit hex string.
 
     Examples:

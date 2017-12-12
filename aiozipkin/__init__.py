@@ -1,13 +1,13 @@
 from .aiohttp_helpers import (
     get_tracer,
     make_context,
+    make_trace_config,
     middleware_maker,
     request_span,
     setup,
-    make_trace_config,
 )
+
 from .helpers import (
-    create_endpoint,
     CLIENT,
     SERVER,
     PRODUCER,
@@ -16,6 +16,7 @@ from .helpers import (
     SERVER_SEND,
     CLIENT_RECEIVED,
     SERVER_RECEIVED,
+    create_endpoint,
 )
 from .sampler import Sampler
 from .tracer import create, Tracer

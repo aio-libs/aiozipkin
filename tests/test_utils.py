@@ -4,7 +4,7 @@ from unittest import mock
 from aiozipkin import utils
 
 
-@mock.patch('aiozipkin.utils.codecs.encode', autospec=True)
+@mock.patch('aiozipkin.utils.binascii.hexlify', autospec=True)
 def test_generate_random_64bit_string(rand):
     rand.return_value = b'17133d482ba4f605'
     random_string = utils.generate_random_64bit_string()
@@ -14,7 +14,7 @@ def test_generate_random_64bit_string(rand):
     assert isinstance(random_string, str)
 
 
-@mock.patch('aiozipkin.utils.codecs.encode', autospec=True)
+@mock.patch('aiozipkin.utils.binascii.hexlify', autospec=True)
 def test_generate_random_128bit_string(rand):
     rand.return_value = b'17133d482ba4f60517133d482ba4f605'
     random_string = utils.generate_random_128bit_string()
