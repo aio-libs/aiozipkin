@@ -49,7 +49,8 @@ async def test_exception_in_span(zipkin_url, client, loop):
 
     await tracer.close()
     # give zipkin time to process maessage :((
-    await asyncio.sleep(1)
+    # TODO: convert sleep to retries
+    await asyncio.sleep(5)
 
     url = URL(zipkin_url).with_path('/zipkin/api/v1/traces')
     resp = await client.get(url)
