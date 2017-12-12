@@ -18,7 +18,7 @@ from .sampler import Sampler
 from .tracer import create, Tracer
 
 
-__version__ = '0.0.1b4'
+__version__ = '0.0.1b5'
 __all__ = (
     'Tracer',
     'Sampler',
