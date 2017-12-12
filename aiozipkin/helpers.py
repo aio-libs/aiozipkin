@@ -10,12 +10,6 @@ SERVER = 'SERVER'
 PRODUCER = 'PRODUCER'
 CONSUMER = 'CONSUMER'
 
-# reserved annotation names
-CLIENT_SEND = 'cs'
-SERVER_SEND = 'ss'
-CLIENT_RECEIVED = 'cr'
-SERVER_RECEIVED = 'sr'
-
 
 TRACE_ID_HEADER = 'X-B3-TraceId'
 SPAN_ID_HEADER = 'X-B3-SpanId'

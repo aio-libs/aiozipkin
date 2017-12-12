@@ -2,14 +2,8 @@ from typing import TypeVar, Dict, Any, List, NamedTuple
 from .mypy_types import OptInt, OptStr, Optional  # flake8: noqa
 
 from .helpers import (
-    CLIENT,
-    CLIENT_RECEIVED,
-    CLIENT_SEND,
     CONSUMER,
     PRODUCER,
-    SERVER,
-    SERVER_RECEIVED,
-    SERVER_SEND,
     Endpoint,
     TraceContext,
 )
@@ -62,21 +56,7 @@ class Record:
         return self
 
     def annotate(self: T, value: str, ts: int) -> T:
-        if value == CLIENT_SEND:
-            self.kind(CLIENT)
-            self._timestamp = ts
-        elif value == SERVER_RECEIVED:
-            self.kind(SERVER)
-            self._timestamp = ts
-        elif value == CLIENT_RECEIVED:
-            self.kind(CLIENT)
-            self.finish(ts)
-        elif value == SERVER_SEND:
-            self.kind(SERVER)
-            self.finish(ts)
-        else:
-            v = Annotation(value, int(ts))
-            self._annotations.append(v)
+        self._annotations.append(Annotation(str(value), int(ts)))
         return self
 
     def kind(self: T, kind: str) -> T:
