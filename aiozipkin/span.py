@@ -122,7 +122,7 @@ class NoopSpan(SpanAbc):
         self.start()
         return self
 
-    def __exit__(self, exception_type, exception_value, traceback):
+    def __exit__(self, exception_type, exception_value, traceback) -> None:
         self.finish()
 
 
@@ -190,5 +190,5 @@ class Span(SpanAbc):
         self.start()
         return self
 
-    def __exit__(self, exception_type, exception_value, traceback):
+    def __exit__(self, exception_type, exception_value, traceback) -> None:
         self.finish(exception=exception_value)
