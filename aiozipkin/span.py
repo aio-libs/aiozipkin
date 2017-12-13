@@ -32,7 +32,7 @@ class SpanAbc(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def start(self: T, ts: Optional[float]=None) -> T:
+    def start(self: T, ts: OptTs=None) -> T:
         pass
 
     @abstractmethod
@@ -43,9 +43,9 @@ class SpanAbc(metaclass=ABCMeta):
     @abstractmethod
     def remote_endpoint(self: T,
                         servce_name: str, *,
-                        ipv4: Optional[str]=None,
-                        ipv6: Optional[str]=None,
-                        port=Optional[int]) -> T:
+                        ipv4: OptStr=None,
+                        ipv6: OptStr=None,
+                        port: OptInt=None) -> T:
         pass
 
     @abstractmethod
@@ -55,7 +55,7 @@ class SpanAbc(metaclass=ABCMeta):
     @abstractmethod
     def annotate(self: T,
                  value: str,
-                 ts: Optional[float]=None) -> T:
+                 ts: OptTs=None) -> T:
         pass
 
     @abstractmethod
@@ -173,7 +173,7 @@ class Span(SpanAbc):
         self._record.set_tag(key, value)
         return self
 
-    def annotate(self, value: str, ts: Optional[float]=None) -> 'Span':
+    def annotate(self, value: str, ts: OptTs=None) -> 'Span':
         ts = make_timestamp(ts)
         self._record.annotate(value, ts)
         return self
