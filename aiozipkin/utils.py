@@ -1,6 +1,6 @@
+import binascii
 import os
 import struct
-import binascii
 
 
 # https://github.com/Yelp/py_zipkin/blob/

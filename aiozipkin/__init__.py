@@ -6,16 +6,15 @@ from .aiohttp_helpers import (
     request_span,
     setup,
 )
-
 from .helpers import (
     CLIENT,
-    SERVER,
-    PRODUCER,
     CONSUMER,
+    PRODUCER,
+    SERVER,
     create_endpoint,
 )
 from .sampler import Sampler
-from .tracer import create, Tracer
+from .tracer import Tracer, create
 
 
 __version__ = '0.0.1b5'

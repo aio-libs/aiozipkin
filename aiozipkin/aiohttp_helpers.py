@@ -3,8 +3,8 @@ import ipaddress
 import aiohttp
 from aiohttp.web import HTTPException
 
-from .constants import HTTP_PATH, HTTP_STATUS_CODE, HTTP_METHOD
-from .helpers import make_context, SERVER, parse_debug, parse_sampled, CLIENT
+from .constants import HTTP_METHOD, HTTP_PATH, HTTP_STATUS_CODE
+from .helpers import CLIENT, SERVER, make_context, parse_debug, parse_sampled
 
 
 APP_AIOZIPKIN_KEY = 'aiozipkin_tracer'

@@ -1,7 +1,7 @@
 import time
-from typing import Optional, NamedTuple
+from typing import NamedTuple, Optional
 
-from .mypy_types import OptTs, OptStr, OptInt, OptBool, Headers
+from .mypy_types import Headers, OptBool, OptInt, OptStr, OptTs
 
 
 # possible span kinds
