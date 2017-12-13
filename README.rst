@@ -112,8 +112,9 @@ Installation process is simple, just::
 
 Jaeger support
 --------------
-jaeger_ support zipkin_ span format as result it is possible to use *aiozipkin*
-with jaeger_ server:
+jaeger_ supports zipkin_ span format as result it is possible to use *aiozipkin*
+with jaeger_ server. You just need to specify *jaeger* server address and it
+should work out of the box. For more informations see tests.
 
 .. image:: https://raw.githubusercontent.com/aio-libs/aiozipkin/master/docs/jaeger.png
     :alt: jaeger ui animation
