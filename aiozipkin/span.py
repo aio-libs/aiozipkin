@@ -19,60 +19,59 @@ class SpanAbc(metaclass=ABCMeta):
     @property
     @abstractmethod
     def is_noop(self: T) -> bool:
-        return True
+        return True  # pragma: no cover
 
     @property
     @abstractmethod
     def context(self: T) -> TraceContext:
-        pass
+        pass  # pragma: no cover
 
     @property
     @abstractmethod
     def tracer(self: T) -> 'Tracer':
-        pass
+        pass  # pragma: no cover
 
     @abstractmethod
-    def start(self: T, ts: Optional[float]=None) -> T:
-        pass
+    def start(self: T, ts: OptTs=None) -> T:
+        pass  # pragma: no cover
 
     @abstractmethod
     def finish(self: T, ts: OptTs=None,
                exception: Optional[Exception]=None) -> T:
-        pass
+        pass  # pragma: no cover
 
     @abstractmethod
     def remote_endpoint(self: T,
                         servce_name: str, *,
-                        ipv4: Optional[str]=None,
-                        ipv6: Optional[str]=None,
-                        port=Optional[int]) -> T:
-        pass
+                        ipv4: OptStr=None,
+                        ipv6: OptStr=None,
+                        port: OptInt=None) -> T:
+        pass  # pragma: no cover
 
     @abstractmethod
     def tag(self: T, key: str, value: str) -> T:
-        pass
+        pass  # pragma: no cover
 
     @abstractmethod
     def annotate(self: T,
                  value: str,
-                 ts: Optional[float]=None) -> T:
-        pass
+                 ts: OptTs=None) -> T:
+        pass  # pragma: no cover
 
     @abstractmethod
     def kind(self: T, span_kind: str) -> T:
-        pass
+        pass  # pragma: no cover
 
     @abstractmethod
     def name(self: T, span_name: str) -> T:
-        pass
+        pass  # pragma: no cover
 
     def __enter__(self: T) -> T:
         self.start()
         return self
 
-    @abstractmethod
     def __exit__(self, exception_type, exception_value, traceback) -> None:
-        self.finish()
+        self.finish(exception=exception_value)
 
 
 class NoopSpan(SpanAbc):
@@ -117,13 +116,6 @@ class NoopSpan(SpanAbc):
 
     def name(self, span_name: str) -> 'NoopSpan':
         return self
-
-    def __enter__(self) -> 'NoopSpan':
-        self.start()
-        return self
-
-    def __exit__(self, exception_type, exception_value, traceback) -> None:
-        self.finish()
 
 
 class Span(SpanAbc):
@@ -173,7 +165,7 @@ class Span(SpanAbc):
         self._record.set_tag(key, value)
         return self
 
-    def annotate(self, value: str, ts: Optional[float]=None) -> 'Span':
+    def annotate(self, value: str, ts: OptTs=None) -> 'Span':
         ts = make_timestamp(ts)
         self._record.annotate(value, ts)
         return self
@@ -185,10 +177,3 @@ class Span(SpanAbc):
     def name(self, span_name: str) -> 'Span':
         self._record.name(span_name)
         return self
-
-    def __enter__(self) -> 'Span':
-        self.start()
-        return self
-
-    def __exit__(self, exception_type, exception_value, traceback) -> None:
-        self.finish(exception=exception_value)

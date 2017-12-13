@@ -1,5 +1,5 @@
 from .helpers import TraceContext, Endpoint
-from .mypy_types import OptLoop
+from .mypy_types import OptLoop, OptBool
 from .record import Record
 from .sampler import Sampler
 from .span import Span, NoopSpan, SpanAbc
@@ -20,7 +20,7 @@ class Tracer:
         self._local_endpoint = local_endpoint
 
     def new_trace(self,
-                  sampled: Optional[bool]=None,
+                  sampled: OptBool=None,
                   debug: bool=False) -> SpanAbc:
         context = self._next_context(None, sampled=sampled, debug=debug)
         return self.to_span(context)
@@ -54,8 +54,8 @@ class Tracer:
 
     def _next_context(self,
                       context: Optional[TraceContext]=None,
-                      sampled: Optional[bool]=None,
-                      debug: Optional[bool]=False) ->TraceContext:
+                      sampled: OptBool=None,
+                      debug: bool=False) ->TraceContext:
         span_id = generate_random_64bit_string()
         if context is not None:
             new_context = context._replace(

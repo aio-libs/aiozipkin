@@ -1,11 +1,11 @@
 from random import Random
-from typing import Optional
+
+from .mypy_types import OptInt
 
 
 class Sampler:
 
-    def __init__(self, *, sample_rate: float=1.0,
-                 seed: Optional[int]=None) -> None:
+    def __init__(self, *, sample_rate: float=1.0, seed: OptInt=None) -> None:
         self._sample_rate = sample_rate
         self._rng = Random(seed)
 
