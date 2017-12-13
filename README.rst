@@ -110,6 +110,15 @@ Installation process is simple, just::
     $ pip install aiozipkin
 
 
+Jaeger support
+--------------
+jaeger_ support zipkin_ span format as result it is possible to use *aiozipkin*
+with jaeger_ server:
+
+.. image:: https://raw.githubusercontent.com/aio-libs/aiozipkin/master/docs/jaeger.png
+    :alt: jaeger ui animation
+
+
 Requirements
 ------------
 
@@ -123,3 +132,4 @@ Requirements
 .. _asyncio: http://docs.python.org/3.5/library/asyncio.html
 .. _uvloop: https://github.com/MagicStack/uvloop
 .. _zipkin: http://zipkin.io
+.. _jaeger: http://jaeger.readthedocs.io/en/latest/
