@@ -27,4 +27,4 @@ async def test_basic(jaeger_url, jaeger_api_url, client, loop):
     resp = await client.get(url, headers={'Content-Type': 'application/json'})
     assert resp.status == 200
     data = await resp.json()
-    assert data['data'][0]['traceID'] == trace_id
+    assert data['data'][0]['traceID'] in trace_id

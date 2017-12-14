@@ -23,7 +23,7 @@ async def consume_message(message, tracer):
 async def handler(request):
     message = await request.json()
     tracer = az.get_tracer(request.app)
-    for i in range(5):
+    for _ in range(5):
         asyncio.ensure_future(aiojobs.aiohttp.spawn(
             request, consume_message(message, tracer)))
 

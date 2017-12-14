@@ -24,6 +24,23 @@ async def docker():
     await client.close()
 
 
+async def wait_for_response(url, delay=0.001):
+    last_error = None
+    async with aiohttp.ClientSession() as session:
+        for _ in range(100):
+            try:
+                async with session.get(url) as response:
+                    data = await response.text()
+                    assert response.status < 500, data
+                break
+            except (aiohttp.ClientError, AssertionError) as e:
+                last_error = e
+                await asyncio.sleep(delay)
+                delay *= 2
+        else:
+            pytest.fail('Cannot start server: {}'.format(last_error))
+
+
 @pytest.fixture(scope='session')
 @async_generator
 async def zipkin_server(docker, docker_pull):
@@ -51,22 +68,8 @@ async def zipkin_server(docker, docker_pull):
 
     params = dict(host=host, port=port)
 
-    delay = 0.001
-    last_error = None
     url = 'http://{}:{}'.format(host, port)
-
-    async with aiohttp.ClientSession() as session:
-        for i in range(100):
-            try:
-                async with session.get(url) as response:
-                    await response.text()
-                break
-            except aiohttp.ClientError as e:
-                last_error = e
-                await asyncio.sleep(delay)
-                delay *= 2
-        else:
-            pytest.fail('Cannot start zipkin server: {}'.format(last_error))
+    await wait_for_response(url)
 
     await yield_(params)
 
@@ -120,21 +123,8 @@ async def jaeger_server(docker, docker_pull):
     jaeger_port = (await container.port(16686))[0]['HostPort']
     params = dict(host=host, zipkin_port=zipkin_port, jaeger_port=jaeger_port)
 
-    delay = 0.001
-    last_error = None
     url = 'http://{}:{}'.format(host, zipkin_port)
-    async with aiohttp.ClientSession() as session:
-        for i in range(100):
-            try:
-                async with session.get(url) as response:
-                    await response.text()
-                break
-            except aiohttp.ClientError as e:
-                last_error = e
-                await asyncio.sleep(delay)
-                delay *= 2
-        else:
-            pytest.fail('Cannot start {} server: {}'.format(last_error, image))
+    await wait_for_response(url)
 
     await yield_(params)
 
