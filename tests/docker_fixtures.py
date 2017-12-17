@@ -90,7 +90,7 @@ async def jaeger_server(docker, docker_pull):
     # -p5778:5778 -p16686:16686 -p14268:14268
     # -p9411:9411 jaegertracing/all-in-one:latest
 
-    tag = 'latest'
+    tag = '1.0.0'
     image = 'jaegertracing/all-in-one:{}'.format(tag)
     host = '127.0.0.1'
 
