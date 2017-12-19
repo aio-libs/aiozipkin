@@ -1,3 +1,5 @@
+from typing import Optional, Dict  # flake8: noqa
+
 from .helpers import TraceContext, Endpoint
 from .mypy_types import OptLoop, OptBool
 from .record import Record
@@ -5,8 +7,6 @@ from .sampler import Sampler
 from .span import Span, NoopSpan, SpanAbc
 from .transport import Transport
 from .utils import generate_random_64bit_string, generate_random_128bit_string
-
-from typing import Optional, Dict  # flake8: noqa
 
 
 class Tracer:
