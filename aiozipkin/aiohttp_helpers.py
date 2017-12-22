@@ -1,10 +1,11 @@
 import ipaddress
 
 import aiohttp
-from aiohttp.web import HTTPException
+from aiohttp.web import HTTPException, Request, Application
 
 from .constants import HTTP_METHOD, HTTP_PATH, HTTP_STATUS_CODE
 from .helpers import CLIENT, SERVER, make_context, parse_debug, parse_sampled
+from .tracer import Tracer
 
 
 APP_AIOZIPKIN_KEY = 'aiozipkin_tracer'
@@ -28,8 +29,8 @@ def _set_remote_endpoint(span, request):
             span.remote_endpoint(None, **kwargs)
 
 
-def middleware_maker(tracer_key=APP_AIOZIPKIN_KEY,
-                     request_key=REQUEST_AIOZIPKIN_KEY):
+def middleware_maker(tracer_key: str=APP_AIOZIPKIN_KEY,
+                     request_key: str=REQUEST_AIOZIPKIN_KEY):
     async def middleware_factory(app, handler):
         async def aiozipkin_middleware(request):
             context = make_context(request.headers)
@@ -71,9 +72,10 @@ def middleware_maker(tracer_key=APP_AIOZIPKIN_KEY,
     return middleware_factory
 
 
-def setup(app, tracer,
-          tracer_key=APP_AIOZIPKIN_KEY,
-          request_key=REQUEST_AIOZIPKIN_KEY):
+def setup(app: Application,
+          tracer: Tracer,
+          tracer_key: str=APP_AIOZIPKIN_KEY,
+          request_key: str=REQUEST_AIOZIPKIN_KEY) -> Application:
     app[tracer_key] = tracer
     app.middlewares.append(middleware_maker(tracer_key, request_key))
 
@@ -82,15 +84,14 @@ def setup(app, tracer,
         await app[tracer_key].close()
 
     app.on_cleanup.append(close_aiozipkin)
-
     return app
 
 
-def get_tracer(app, tracer_key=APP_AIOZIPKIN_KEY):
+def get_tracer(app: Application, tracer_key: str=APP_AIOZIPKIN_KEY) -> Tracer:
     return app[tracer_key]
 
 
-def request_span(request, request_key=REQUEST_AIOZIPKIN_KEY):
+def request_span(request: Request, request_key: str=REQUEST_AIOZIPKIN_KEY):
     return request[request_key]
 
 
@@ -143,7 +144,7 @@ class ZipkingClientSignals:
         delattr(trace_config_ctx, '_span')
 
 
-def make_trace_config(tracer):
+def make_trace_config(tracer: Tracer) -> aiohttp.TraceConfig:
     trace_config = aiohttp.TraceConfig()
     zipkin = ZipkingClientSignals(tracer)
 
