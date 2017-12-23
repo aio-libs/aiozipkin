@@ -10,6 +10,8 @@ SERVER = 'SERVER'
 PRODUCER = 'PRODUCER'
 CONSUMER = 'CONSUMER'
 
+# zipkin headers, for more information see:
+# https://github.com/openzipkin/b3-propagation
 
 TRACE_ID_HEADER = 'X-B3-TraceId'
 SPAN_ID_HEADER = 'X-B3-SpanId'
@@ -33,6 +35,8 @@ _TraceContext = NamedTuple(
 class TraceContext(_TraceContext):
 
     def make_headers(self) -> Headers:
+        """Creates dict with zipkin headers from available context.
+        """
         return make_headers(self)
 
 
@@ -48,15 +52,22 @@ def create_endpoint(servce_name: str, *,
                     ipv4: OptStr=None,
                     ipv6: OptStr=None,
                     port: OptInt=None):
+    """Factory function to create Endpoint object.
+    """
     return Endpoint(servce_name, ipv4, ipv6, port)
 
 
 def make_timestamp(ts: OptTs=None) -> int:
+    """Create zipkin timestamp in microseconds, or convert available one
+    from second. Useful when user supply ts from time.time() call.
+    """
     ts = ts if ts is not None else time.time()
     return int(ts * 1000 * 1000)  # microseconds
 
 
 def make_headers(context: TraceContext) -> Headers:
+    """Creates dict with zipkin headers from supplied trace context.
+    """
     headers = {
         TRACE_ID_HEADER: context.trace_id,
         SPAN_ID_HEADER: context.span_id,
@@ -81,6 +92,9 @@ def parse_debug(headers: Headers) -> bool:
 
 
 def make_context(headers: Headers) -> Optional[TraceContext]:
+    """Converts available headers to TraceContext, if headers mapping does
+    not contain zipkin headers, function returns None.
+    """
     # TODO: add validation for trace_id/span_id/parent_id
 
     # normalize header names just in case someone passed regular dict
