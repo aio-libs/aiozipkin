@@ -4,6 +4,9 @@ aiozipkin
     :target: https://travis-ci.org/aio-libs/aiozipkin
 .. image:: https://codecov.io/gh/aio-libs/aiozipkin/branch/master/graph/badge.svg
     :target: https://codecov.io/gh/aio-libs/aiozipkin
+.. image:: https://api.codeclimate.com/v1/badges/1ff813d5cad2d702cbf1/maintainability
+   :target: https://codeclimate.com/github/aio-libs/aiozipkin/maintainability
+   :alt: Maintainability
 .. image:: https://img.shields.io/pypi/v/aiozipkin.svg
     :target: https://pypi.python.org/pypi/aiozipkin
 .. image:: https://readthedocs.org/projects/aiozipkin/badge/?version=latest
