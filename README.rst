@@ -1,5 +1,5 @@
 aiozipkin
-==========
+=========
 .. image:: https://travis-ci.org/aio-libs/aiozipkin.svg?branch=master
     :target: https://travis-ci.org/aio-libs/aiozipkin
 .. image:: https://codecov.io/gh/aio-libs/aiozipkin/branch/master/graph/badge.svg
@@ -24,9 +24,27 @@ to troubleshoot latency problems in microservice architectures. It manages
 both the collection and lookup of this data. Zipkin’s design is based on
 the Google Dapper paper.
 
+Applications are instrumented with  **aiozipkin** report timing data to zipkin_.
+The Zipkin UI also presents a Dependency diagram showing how many traced
+requests went through each application. If you are troubleshooting latency
+problems or errors, you can filter or sort all traces based on the
+application, length of trace, annotation, or timestamp.
 
 .. image:: https://raw.githubusercontent.com/aio-libs/aiozipkin/master/docs/zipkin_animation2.gif
     :alt: zipkin ui animation
+
+
+zipkin vocabulary
+-----------------
+Before code lets learn important zipkin_ vocabulary
+
+.. image:: https://raw.githubusercontent.com/aio-libs/aiozipkin/master/docs/zipkin_glossary.png
+    :alt: zipkin ui glossary
+
+* **Span** represents one specific method (RPC) call
+* **Annotation** string data associated with a particular timestamp in span
+* **Tag** - key and value associated with given span
+* **Trace** - collection of spans, related to serving particular request
 
 
 Simple example
@@ -104,6 +122,11 @@ server.
         host = "http://127.0.0.1:8080/api/v1/posts/{}".format(i)
         resp = await session.get(host, headers=headers)
         await resp.text()
+
+
+Documentation
+-------------
+http://aiozipkin.readthedocs.io/
 
 
 Installation
