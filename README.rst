@@ -155,7 +155,7 @@ Requirements
 
 .. _PEP492: https://www.python.org/dev/peps/pep-0492/
 .. _Python: https://www.python.org
-.. _aiohttp: https://github.com/KeepSafe/aiohttp
+.. _aiohttp: https://github.com/aio-libs/aiohttp
 .. _asyncio: http://docs.python.org/3.5/library/asyncio.html
 .. _uvloop: https://github.com/MagicStack/uvloop
 .. _zipkin: http://zipkin.io
