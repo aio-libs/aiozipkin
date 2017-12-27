@@ -36,7 +36,8 @@ application, length of trace, annotation, or timestamp.
 
 zipkin vocabulary
 -----------------
-Before code lets learn important zipkin_ vocabulary
+Before code lets learn important zipkin_ vocabulary, for more detailed
+information please visit https://zipkin.io/pages/instrumenting
 
 .. image:: https://raw.githubusercontent.com/aio-libs/aiozipkin/master/docs/zipkin_glossary.png
     :alt: zipkin ui glossary

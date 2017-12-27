@@ -18,7 +18,7 @@ Create virtualenv with python3.6 (python 3.5 also supported). For example
 using *virtualenvwrapper* commands could look like::
 
    $ cd aiozipkin
-   $ mkvirtualenv --python=`which python3.5` aiozipkin
+   $ mkvirtualenv --python=`which python3.6` aiozipkin
 
 
 After that please install libraries required for development::
@@ -30,14 +30,15 @@ Congratulations, you are ready to run the test suite::
 
     $ make cov
 
-To run individual use following command::
+To run individual test use following command::
 
     $ py.test -sv tests/test_tracer.py -k test_name
 
 
 Project use Docker_ for integration tests, test infrastructure will
-automatically pull ``zipkin:2`` image and start server, you need to worry
-about this just make sure you have Docker_ installed.
+automatically pull ``zipkin:2`` or ``jaegertracing/all-in-one:1.0.0`` image
+and start server, you need to worry about this just make sure you
+have Docker_ installed.
 
 
 Reporting an Issue
