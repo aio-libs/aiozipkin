@@ -48,15 +48,15 @@ class Transport:
             headers = {'Content-Type': 'application/json'}
             async with self._session.post(self._address, json=data,
                                           headers=headers) as resp:
-                await resp.read()
+                body = await resp.text()
                 if resp.status >= 300:
-                    msg = 'Remote zipkin responded with {} code'.format(
-                        resp.status)
+                    msg = 'zipkin responded with code: {} and body: {}'.format(
+                        resp.status, body)
                     raise RuntimeError(msg)
 
         except Exception as exc:
             # that code should never fail
-            logger.error('Can not send spans to zipking', exc_info=exc)
+            logger.error('Can not send spans to zipkin', exc_info=exc)
 
     async def close(self) -> None:
         if self._closing:
