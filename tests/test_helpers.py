@@ -2,7 +2,7 @@ import time
 import pytest
 
 from aiozipkin.helpers import (
-    TraceContext, make_headers, make_context, make_timestamp)
+    TraceContext, make_headers, make_context, make_timestamp, filter_none)
 
 
 @pytest.fixture
@@ -49,3 +49,17 @@ def test_make_timestamp():
 
     ts = make_timestamp(time.time())
     assert len(str(ts)) == 16
+
+
+def test_filter_none():
+    r = filter_none({'a': 1, 'b': None})
+    assert r == {'a': 1}
+
+    r = filter_none({'a': 1, 'b': None, 'c': None}, keys=['a', 'c'])
+    assert r == {'a': 1, 'b': None}
+
+    r = filter_none({}, keys=['a', 'c'])
+    assert r == {}
+
+    r = filter_none({'a': 1, 'b': None, 'c': {'c': None}}, keys=['a', 'c'])
+    assert r == {'a': 1, 'b': None, 'c': {'c': None}}
