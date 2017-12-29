@@ -1,4 +1,5 @@
 import asyncio
+import logging
 
 import pytest
 import aiozipkin as az
@@ -23,7 +24,7 @@ async def test_basic(zipkin_url, client, loop):
     # close forced sending data to server regardless of send interval
     await tracer.close()
     # give zipkin time to process maessage :((
-    await asyncio.sleep(1)
+    await asyncio.sleep(5)
 
     trace_id = span.context.trace_id
     url = URL(zipkin_url).with_path('/zipkin/api/v1/traces')
@@ -67,3 +68,24 @@ async def test_exception_in_span(zipkin_url, client, loop):
 
     assert any(expected in s['binaryAnnotations']
                for trace in data for s in trace)
+
+
+@pytest.mark.asyncio
+async def test_zipkin_error(client, loop, caplog):
+    endpoint = az.create_endpoint('error_service', ipv4='127.0.0.1', port=80)
+    interval = 50
+    zipkin_url = 'https://httpbin.org/status/400'
+    tracer = az.create(zipkin_url, endpoint, sample_rate=1.0,
+                       send_inteval=interval, loop=loop)
+    with tracer.new_trace(sampled=True) as span:
+        span.kind(az.CLIENT)
+        await asyncio.sleep(0.0)
+    await tracer.close()
+
+    assert len(caplog.records) == 1
+
+    msg = 'zipkin responded with code: 404'
+    assert msg in str(caplog.records[0].exc_info)
+
+    t = ('aiozipkin', logging.ERROR, 'Can not send spans to zipkin')
+    assert caplog.record_tuples == [t]
