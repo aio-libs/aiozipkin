@@ -35,7 +35,7 @@ application, length of trace, annotation, or timestamp.
 
 
 Features
---------
+========
 * Distributed tracing capabilities to **asyncio** applications.
 * Support zipkin_ ``v2`` protocol.
 * Easy to use API.
@@ -146,8 +146,11 @@ Installation process is simple, just::
     $ pip install aiozipkin
 
 
+Support of other collectors
+===========================
 **aiozipkin** can work with any other zipkin_ compatible service, currently we
 tested it with jaeger_ and stackdriver_.
+
 
 Jaeger support
 --------------
@@ -169,8 +172,6 @@ google_ cloud documentation how to setup make zipkin collector:
 
 .. image:: https://raw.githubusercontent.com/aio-libs/aiozipkin/master/docs/stackdriver.png
     :alt: jaeger ui animation
-
-
 
 
 Requirements

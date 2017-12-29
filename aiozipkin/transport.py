@@ -59,7 +59,6 @@ class Transport:
             logger.error('Can not send spans to zipking', exc_info=exc)
 
     async def close(self) -> None:
-        # TODO: make sure queue is empty before closing
         if self._closing:
             return
 

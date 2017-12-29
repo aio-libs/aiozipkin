@@ -7,6 +7,7 @@ import service_d
 import service_e
 
 
+# TODO: rework after aiohttp 3.0.0 release
 def run():
     loop = asyncio.get_event_loop()
     apps = [
