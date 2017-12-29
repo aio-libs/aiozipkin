@@ -1,5 +1,5 @@
 import time
-from typing import NamedTuple, Optional
+from typing import NamedTuple, Optional, Dict, List, Any
 
 from .mypy_types import Headers, OptBool, OptInt, OptStr, OptTs
 
@@ -114,3 +114,24 @@ def make_context(headers: Headers) -> Optional[TraceContext]:
         debug=parse_debug(headers),
     )
     return context
+
+
+OptKeys = Optional[List[str]]
+
+
+def filter_none(data: Dict[str, Any],
+                keys: OptKeys=None) -> Dict[str, Any]:
+    """Filter keys from dict with None values.
+
+    Check occurs only on root level. If list of keys specified, filter
+    works only for selected keys
+    """
+
+    def limited_filter(k, v):
+        return k not in keys or v is not None
+
+    def full_filter(k, v):
+        return v is not None
+
+    f = limited_filter if keys is not None else full_filter
+    return {k: v for k, v in data.items() if f(k, v)}

@@ -6,6 +6,7 @@ from .helpers import (
     PRODUCER,
     Endpoint,
     TraceContext,
+    filter_none,
 )
 
 
@@ -13,7 +14,7 @@ Annotation = NamedTuple('Annotation', [('value', str), ('timestamp', int)])
 
 
 def _endpoint_asdict(endpoint: Endpoint) -> Dict[str, Any]:
-    return {k: v for k, v in endpoint._asdict().items() if v is not None}
+    return filter_none(endpoint._asdict())
 
 
 T = TypeVar('T', bound='Record')
@@ -84,4 +85,4 @@ class Record:
             'annotations': [a._asdict() for a in self._annotations],
             'tags': self._tags,
         }
-        return rec
+        return filter_none(rec, ['kind'])
