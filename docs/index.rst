@@ -6,13 +6,20 @@
 aiozipkin's documentation!
 ===========================
 
-**aiozipkin** is Python 3.5+ module that adds distributed tracing capabilities
-from asyncio applications with Zipkin (http://zipkin.io) server instrumentation.
 
-Zipkin is a distributed tracing system. It helps gather timing data needed
+**aiozipkin** is Python 3.5+ module that adds distributed tracing capabilities
+from asyncio_ applications with zipkin (http://zipkin.io) server instrumentation.
+
+zipkin_ is a distributed tracing system. It helps gather timing data needed
 to troubleshoot latency problems in microservice architectures. It manages
 both the collection and lookup of this data. Zipkin’s design is based on
 the Google Dapper paper.
+
+Applications are instrumented with  **aiozipkin** report timing data to zipkin_.
+The Zipkin UI also presents a Dependency diagram showing how many traced
+requests went through each application. If you are troubleshooting latency
+problems or errors, you can filter or sort all traces based on the
+application, length of trace, annotation, or timestamp.
 
 
 .. image:: https://raw.githubusercontent.com/aio-libs/aiozipkin/master/docs/zipkin_animation2.gif
@@ -21,13 +28,11 @@ the Google Dapper paper.
 
 Features
 --------
- * Telnet server that provides insides of operation of you app
-
- * Supported several commands that helps to list, cancel and trace runnin
-   asyncio_ tasks
-
- * Provided python REPL capabilities, that executed in running event loop,
-   helps to inspect state of your ``asyncio`` application
+* Distributed tracing capabilities to **asyncio** applications.
+* Support zipkin_ ``v2`` protocol.
+* Easy to use API.
+* Explicit context handling, no thread local variables.
+* Can work with jaeger_ and stackdriver_ through zipkin compatible API.
 
 Contents
 --------
@@ -37,6 +42,7 @@ Contents
 
    tutorial
    examples
+   other
    api
    contributing
 
@@ -51,8 +57,10 @@ Indices and tables
 
 .. _PEP492: https://www.python.org/dev/peps/pep-0492/
 .. _Python: https://www.python.org
-.. _aioconsole: https://github.com/vxgmichel/aioconsole
 .. _aiohttp: https://github.com/KeepSafe/aiohttp
 .. _asyncio: http://docs.python.org/3.5/library/asyncio.html
-.. _curio: https://github.com/dabeaz/curio
 .. _uvloop: https://github.com/MagicStack/uvloop
+.. _zipkin: http://zipkin.io
+.. _jaeger: http://jaeger.readthedocs.io/en/latest/
+.. _stackdriver: https://cloud.google.com/stackdriver/
+.. _google: https://cloud.google.com/trace/docs/zipkin

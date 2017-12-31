@@ -5,6 +5,8 @@ from .aiohttp_helpers import (
     middleware_maker,
     request_span,
     setup,
+    APP_AIOZIPKIN_KEY,
+    REQUEST_AIOZIPKIN_KEY,
 )
 from .helpers import (
     CLIENT,
@@ -30,6 +32,8 @@ __all__ = (
     'request_span',
     'middleware_maker',
     'make_trace_config',
+    'APP_AIOZIPKIN_KEY',
+    'REQUEST_AIOZIPKIN_KEY',
     # possible span kinds
     'CLIENT',
     'SERVER',

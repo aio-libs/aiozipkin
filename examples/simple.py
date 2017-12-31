@@ -8,7 +8,7 @@ async def run():
     endpoint = az.create_endpoint(
         'simple_service', ipv4='127.0.0.1', port=8080)
 
-    # creates tracer object that tracer all calls if you want sample
+    # creates tracer object that traces all calls, if you want sample
     # only 50% just set sample_rate=0.5
     tracer = az.create(zipkin_address, endpoint, sample_rate=1.0)
 

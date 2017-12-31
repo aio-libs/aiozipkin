@@ -33,9 +33,15 @@ _TraceContext = NamedTuple(
 
 
 class TraceContext(_TraceContext):
+    """Immutable class with trace related data that travels across
+    process boundaries.
+    """
 
     def make_headers(self) -> Headers:
         """Creates dict with zipkin headers from available context.
+
+        Resulting dict should be passed to HTTP client  propagate contest
+        to other services.
         """
         return make_headers(self)
 

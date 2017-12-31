@@ -63,3 +63,6 @@ target/
 .ropeproject
 tags
 node_modules/
+
+# mypy
+.mypy_cache/
