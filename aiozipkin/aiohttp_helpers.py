@@ -11,6 +11,17 @@ APP_AIOZIPKIN_KEY = 'aiozipkin_tracer'
 REQUEST_AIOZIPKIN_KEY = 'aiozipkin_span'
 
 
+__all__ = (
+    'setup',
+    'get_tracer',
+    'request_span',
+    'middleware_maker',
+    'make_trace_config',
+    'APP_AIOZIPKIN_KEY',
+    'REQUEST_AIOZIPKIN_KEY',
+)
+
+
 def _set_remote_endpoint(span, request):
     peername = request.remote
     if peername is not None:
@@ -28,6 +39,8 @@ def _set_remote_endpoint(span, request):
             span.remote_endpoint(None, **kwargs)
 
 
+# TODO: new aiohttp 3.0.0 has a bit different API for middlewares
+# should be reworked once 3.0.0 out, do we care about backward compatibility
 def middleware_maker(tracer_key=APP_AIOZIPKIN_KEY,
                      request_key=REQUEST_AIOZIPKIN_KEY):
     async def middleware_factory(app, handler):
@@ -74,10 +87,16 @@ def middleware_maker(tracer_key=APP_AIOZIPKIN_KEY,
 def setup(app, tracer,
           tracer_key=APP_AIOZIPKIN_KEY,
           request_key=REQUEST_AIOZIPKIN_KEY):
+    """Sets required parameters in aiohttp applications for aiozipkin.
+
+    Tracer added into application context and cleaned after application
+    shutdown. You can provide custom tracer_key, if default name is not
+    suitable.
+    """
     app[tracer_key] = tracer
     app.middlewares.append(middleware_maker(tracer_key, request_key))
 
-    # register cleanup signal to close zipkin connections
+    # register cleanup signal to close zipkin transport connections
     async def close_aiozipkin(app):
         await app[tracer_key].close()
 
@@ -87,14 +106,25 @@ def setup(app, tracer,
 
 
 def get_tracer(app, tracer_key=APP_AIOZIPKIN_KEY):
+    """Returns tracer object from application context.
+
+    By default tracer has APP_AIOZIPKIN_KEY in aiohttp application context,
+    you can provide own key, if for some reason default one is not suitable.
+    """
     return app[tracer_key]
 
 
 def request_span(request, request_key=REQUEST_AIOZIPKIN_KEY):
+    """Return span created by middleware from request context, you can use it
+    as parent on next child span.
+    """
     return request[request_key]
 
 
 class ZipkingClientSignals:
+    """Class contains signal handler for aiohttp client. Handlers executed
+    only if aiohttp session contains tracer context with span.
+    """
 
     def __init__(self, tracer):
         self._tracer = tracer
