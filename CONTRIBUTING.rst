@@ -1,8 +1,8 @@
 Contributing
 ============
 
-Running Tests
--------------
+Setting Development Environment
+-------------------------------
 
 .. _GitHub: https://github.com/aio-libs/aiozipkin
 
@@ -26,6 +26,9 @@ After that please install libraries required for development::
     $ pip install -r requirements-dev.txt
     $ pip install -e .
 
+
+Running Tests
+-------------
 Congratulations, you are ready to run the test suite::
 
     $ make cov
