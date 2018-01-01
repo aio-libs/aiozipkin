@@ -3,6 +3,7 @@ from typing import List, Dict, Any, Optional  # flake8: noqa
 
 import aiohttp
 from yarl import URL
+
 from .log import logger
 from .mypy_types import OptLoop
 from .record import Record
@@ -20,6 +21,7 @@ class Transport:
         self._session = aiohttp.ClientSession(loop=self._loop)
         self._sender_task = asyncio.ensure_future(
             self._sender_loop(), loop=self._loop)
+
         self._ender = self._loop.create_future()
         self._timer = None  # type: Optional[asyncio.Future[Any]]
 
@@ -32,11 +34,14 @@ class Transport:
             if self._queue:
                 await self._send()
 
-            self._timer = asyncio.ensure_future(
-                asyncio.sleep(self._send_interval, loop=self._loop),
-                loop=self._loop)
-            await next(asyncio.as_completed(  # type: ignore
-                [self._timer, self._ender], loop=self._loop))  # type: ignore
+            await self._wait()
+
+    async def _wait(self) -> None:
+        self._timer = asyncio.ensure_future(
+            asyncio.sleep(self._send_interval, loop=self._loop),
+            loop=self._loop)
+        await next(asyncio.as_completed(  # type: ignore
+            [self._timer, self._ender], loop=self._loop))  # type: ignore
 
     async def _send(self) -> None:
         # TODO: add retries

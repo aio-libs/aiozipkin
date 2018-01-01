@@ -133,10 +133,10 @@ def filter_none(data: Dict[str, Any],
     works only for selected keys
     """
 
-    def limited_filter(k, v):
-        return k not in keys or v is not None
+    def limited_filter(k: str, v: Any) -> bool:
+        return k not in keys or v is not None  # type: ignore
 
-    def full_filter(k, v):
+    def full_filter(k: str, v: Any) -> bool:
         return v is not None
 
     f = limited_filter if keys is not None else full_filter
