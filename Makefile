@@ -3,7 +3,7 @@
 FLAGS=
 
 
-flake: checkrst
+flake: checkrst bandit mypy
 	flake8 aiozipkin tests examples setup.py demos
 
 test: flake
@@ -14,6 +14,12 @@ vtest:
 
 checkrst:
 	python setup.py check --restructuredtext
+
+bandit:
+	bandit -r ./aiozipkin
+
+mypy:
+	mypy aiozipkin --ignore-missing-imports --disallow-untyped-calls
 
 testloop:
 	while true ; do \
