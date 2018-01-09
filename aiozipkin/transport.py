@@ -40,8 +40,9 @@ class Transport:
         self._timer = asyncio.ensure_future(
             asyncio.sleep(self._send_interval, loop=self._loop),
             loop=self._loop)
-        await next(asyncio.as_completed(  # type: ignore
-            [self._timer, self._ender], loop=self._loop))  # type: ignore
+
+        await asyncio.wait([self._timer, self._ender], loop=self._loop,
+                           return_when=asyncio.FIRST_COMPLETED)
 
     async def _send(self) -> None:
         # TODO: add retries
