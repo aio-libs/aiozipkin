@@ -1,5 +1,7 @@
 import asyncio
+import gc
 import logging
+import tracemalloc
 
 import pytest
 import aiozipkin as az
@@ -89,3 +91,26 @@ async def test_zipkin_error(client, loop, caplog):
 
     t = ('aiozipkin', logging.ERROR, 'Can not send spans to zipkin')
     assert caplog.record_tuples == [t]
+
+
+@pytest.mark.asyncio
+async def test_leak_in_transport(zipkin_url, client, loop):
+
+    tracemalloc.start()
+
+    endpoint = az.create_endpoint('simple_service')
+    tracer = az.create(zipkin_url, endpoint, sample_rate=1,
+                       send_inteval=0.0001, loop=loop)
+
+    await asyncio.sleep(5)
+    gc.collect()
+    snapshot1 = tracemalloc.take_snapshot()
+
+    await asyncio.sleep(10)
+    gc.collect()
+    snapshot2 = tracemalloc.take_snapshot()
+
+    top_stats = snapshot2.compare_to(snapshot1, 'lineno')
+    count = sum(s.count for s in top_stats)
+    await tracer.close()
+    assert count < 400  # in case of leak this number is around 901452
