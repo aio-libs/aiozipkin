@@ -1,3 +1,4 @@
+import asyncio
 import aiozipkin as az
 
 from aiohttp import web
@@ -6,12 +7,7 @@ from aiohttp.web_exceptions import HTTPNotFound, HTTPException
 from aiozipkin.aiohttp_helpers import middleware_maker
 
 import pytest
-from unittest.mock import patch, MagicMock, Mock
-
-
-class AsyncMock(MagicMock):
-    async def __call__(self, *args, **kwargs):
-        return super(AsyncMock, self).__call__(*args, **kwargs)
+from unittest.mock import patch, Mock
 
 
 def test_basic_setup(tracer):
@@ -47,6 +43,28 @@ async def test_middleware_with_default_transport(tracer, fake_transport):
     span = az.request_span(req_noop)
     assert span
     assert len(fake_transport.records) == 1
+
+
+@pytest.mark.asyncio
+async def test_middleware_with_not_skip_route(tracer, fake_transport):
+
+    async def handler(request):
+        return web.Response(body=b'data')
+
+    app = web.Application()
+    skip_route = app.router.add_get('/', handler)
+    az.setup(app, tracer)
+
+    match_info = Mock()
+    match_info.route = skip_route
+
+    req = make_mocked_request('GET', '/', headers={'token': 'x'}, app=app)
+    req._match_info = match_info
+    middleware_factory = middleware_maker(skip_routes=[skip_route])
+    middleware = await middleware_factory(app, handler)
+    await middleware(req)
+
+    assert len(fake_transport.records) == 0
 
 
 valid_ips = [
@@ -150,9 +168,11 @@ async def test_middleware_with_handler_404(tracer):
 
 @pytest.mark.asyncio
 async def test_middleware_cleanup_app(tracer):
-    tracer.close = AsyncMock()
-    app = web.Application()
-    az.setup(app, tracer)
-    app.freeze()
-    await app.cleanup()
-    assert tracer.close.call_count == 1
+    fut = asyncio.Future()
+    fut.set_result(None)
+    with patch.object(tracer, 'close', return_value=fut) as mocked_close:
+        app = web.Application()
+        az.setup(app, tracer)
+        app.freeze()
+        await app.cleanup()
+        assert mocked_close.call_count == 1
