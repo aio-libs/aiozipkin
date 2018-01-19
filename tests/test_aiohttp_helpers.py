@@ -30,7 +30,7 @@ async def test_middleware_with_default_transport(tracer, fake_transport):
 
     async def handler(request):
         return web.Response(body=b'data')
-    req = make_mocked_request('GET', '/', headers={'token': 'x'})
+    req = make_mocked_request('GET', '/', headers={'token': 'x'}, app=app)
 
     middleware_factory = middleware_maker()
 
@@ -42,7 +42,7 @@ async def test_middleware_with_default_transport(tracer, fake_transport):
 
     # noop span does not produce records
     headers = {'X-B3-Sampled': '0'}
-    req_noop = make_mocked_request('GET', '/', headers=headers)
+    req_noop = make_mocked_request('GET', '/', headers=headers, app=app)
     await middleware(req_noop)
     span = az.request_span(req_noop)
     assert span
@@ -80,7 +80,8 @@ async def test_middleware_with_valid_ip(tracer, version,
 
     req = make_mocked_request('GET', '/',
                               headers={'token': 'x'},
-                              transport=transp)
+                              transport=transp,
+                              app=app)
 
     middleware_factory = middleware_maker()
     middleware = await middleware_factory(app, handler)
@@ -120,7 +121,7 @@ async def test_middleware_with_invalid_ip(tracer, version, address):
 
     req = make_mocked_request('GET', '/',
                               headers={'token': 'x'},
-                              transport=transp)
+                              transport=transp, app=app)
 
     middleware_factory = middleware_maker()
     middleware = await middleware_factory(app, handler)
@@ -138,7 +139,7 @@ async def test_middleware_with_handler_404(tracer):
     async def handler(request):
         raise HTTPNotFound
 
-    req = make_mocked_request('GET', '/', headers={'token': 'x'})
+    req = make_mocked_request('GET', '/', headers={'token': 'x'}, app=app)
 
     middleware_factory = middleware_maker()
     middleware = await middleware_factory(app, handler)

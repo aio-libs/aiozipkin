@@ -39,22 +39,44 @@ def _set_remote_endpoint(span, request):
             span.remote_endpoint(None, **kwargs)
 
 
+def _get_span(request, tracer_key):
+    context = make_context(request.headers)
+    tracer = request.app[tracer_key]
+
+    if context is None:
+        sampled = parse_sampled(request.headers)
+        debug = parse_debug(request.headers)
+        span = tracer.new_trace(sampled=sampled, debug=debug)
+    else:
+        span = tracer.join_span(context)
+    return span
+
+
+def _set_span_properties(span, request):
+    span_name = '{0} {1}'.format(request.method.upper(),
+                                 request.path)
+    span.name(span_name)
+    span.kind(SERVER)
+    span.tag(HTTP_PATH, request.path)
+    span.tag(HTTP_METHOD, request.method.upper())
+    _set_remote_endpoint(span, request)
+
+
 # TODO: new aiohttp 3.0.0 has a bit different API for middlewares
 # should be reworked once 3.0.0 out, do we care about backward compatibility
-def middleware_maker(tracer_key=APP_AIOZIPKIN_KEY,
+def middleware_maker(skip_routes=None, tracer_key=APP_AIOZIPKIN_KEY,
                      request_key=REQUEST_AIOZIPKIN_KEY):
+
+    skip_routes_set = set(skip_routes) if skip_routes else set()
+
     async def middleware_factory(app, handler):
         async def aiozipkin_middleware(request):
-            context = make_context(request.headers)
-            tracer = app[tracer_key]
 
-            if context is None:
-                sampled = parse_sampled(request.headers)
-                debug = parse_debug(request.headers)
-                span = tracer.new_trace(sampled=sampled, debug=debug)
-            else:
-                span = tracer.join_span(context)
+            if request.match_info.route in skip_routes_set:
+                resp = await handler(request)
+                return resp
 
+            span = _get_span(request, tracer_key)
             request[request_key] = span
 
             if span.is_noop:
@@ -62,14 +84,7 @@ def middleware_maker(tracer_key=APP_AIOZIPKIN_KEY,
                 return resp
 
             with span:
-                span_name = '{0} {1}'.format(request.method.upper(),
-                                             request.path)
-                span.name(span_name)
-                span.kind(SERVER)
-                span.tag(HTTP_PATH, request.path)
-                span.tag(HTTP_METHOD, request.method.upper())
-                _set_remote_endpoint(span, request)
-
+                _set_span_properties(span, request)
                 try:
                     resp = await handler(request)
                 except HTTPException as e:
@@ -84,7 +99,8 @@ def middleware_maker(tracer_key=APP_AIOZIPKIN_KEY,
     return middleware_factory
 
 
-def setup(app, tracer,
+def setup(app, tracer, *,
+          skip_routes=None,
           tracer_key=APP_AIOZIPKIN_KEY,
           request_key=REQUEST_AIOZIPKIN_KEY):
     """Sets required parameters in aiohttp applications for aiozipkin.
@@ -94,7 +110,10 @@ def setup(app, tracer,
     suitable.
     """
     app[tracer_key] = tracer
-    app.middlewares.append(middleware_maker(tracer_key, request_key))
+    m = middleware_maker(skip_routes=skip_routes,
+                         tracer_key=tracer_key,
+                         request_key=request_key)
+    app.middlewares.append(m)
 
     # register cleanup signal to close zipkin transport connections
     async def close_aiozipkin(app):
