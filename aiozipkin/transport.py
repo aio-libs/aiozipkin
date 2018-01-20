@@ -61,7 +61,7 @@ class Transport:
                     raise RuntimeError(msg)
 
         except Exception as exc:
-            # that code should never fail
+            # that code should never fail and break application
             logger.error('Can not send spans to zipkin', exc_info=exc)
 
     async def close(self) -> None:

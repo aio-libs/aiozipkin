@@ -39,9 +39,10 @@ def _set_remote_endpoint(span, request):
             span.remote_endpoint(None, **kwargs)
 
 
-def _get_span(request, tracer_key):
+def _get_span(request, tracer):
+    # builds span from incoming request, if no context found, create
+    # new span
     context = make_context(request.headers)
-    tracer = request.app[tracer_key]
 
     if context is None:
         sampled = parse_sampled(request.headers)
@@ -71,14 +72,14 @@ def middleware_maker(skip_routes=None, tracer_key=APP_AIOZIPKIN_KEY,
 
     async def middleware_factory(app, handler):
         async def aiozipkin_middleware(request):
-
+            # route is in skip list, we do not track anything with zipkin
             if request.match_info.route in skip_routes_set:
                 resp = await handler(request)
                 return resp
 
-            span = _get_span(request, tracer_key)
+            tracer = request.app[tracer_key]
+            span = _get_span(request, tracer)
             request[request_key] = span
-
             if span.is_noop:
                 resp = await handler(request)
                 return resp
