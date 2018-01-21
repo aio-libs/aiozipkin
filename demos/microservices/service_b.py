@@ -7,6 +7,8 @@ from aiohttp import web
 
 service_c_api = 'http://127.0.0.1:9003/api/v1/data'
 service_d_api = 'http://127.0.0.1:9004/api/v1/data'
+host = '127.0.0.1'
+port = 9002
 
 
 async def handler(request):
@@ -17,13 +19,18 @@ async def handler(request):
     ctx = {'span_context': span.context, 'propagate_headers': True}
 
     resp = await session.get(service_c_api, trace_request_ctx=ctx)
-    data_c = await resp.text()
+    data_c = await resp.json()
 
     resp = await session.get(service_d_api, trace_request_ctx=ctx)
-    data_d = await resp.text()
+    data_d = await resp.json()
 
-    body = 'service_b ' + data_c + ' ' + data_d
-    return web.Response(text=body)
+    payload = {
+        'name': 'service_b',
+        'host': host,
+        'port': port,
+        'children': [data_c, data_d],
+    }
+    return web.json_response(payload)
 
 
 def make_app():
@@ -42,7 +49,5 @@ def make_app():
 
 
 if __name__ == '__main__':
-    host = '127.0.0.1'
-    port = 9001
     app = make_app()
     web.run_app(app, host=host, port=port)

@@ -1,0 +1,44 @@
+{% macro render_service(service) -%}
+<div class="uk-card uk-card-default uk-card-body uk-card-hover">
+    <h3 class="uk-card-title">
+        <a href="http://{{service.host}}:{{service.port}}/api/v1/data"target="_blank">{{service.name}}</a>
+    </h3>
+    <ul>
+        <li>host: {{service.host}}</li>
+        <li>port: {{service.port}}</li>
+    </ul>
+    <div class="uk-child-width-expand@s uk-grid-small uk-grid-match" uk-grid>
+        {% for s  in service.children %}
+            {{ render_service(s) }}
+        {% endfor %}
+    </div>
+</div>
+{%- endmacro %}
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>aiozipkin microservices demo</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-beta.38/css/uikit.min.css" />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-beta.38/js/uikit.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-beta.38/js/uikit-icons.min.js"></script>
+    </head>
+    <body>
+        <div class="uk-container uk-container-center uk-margin-top uk-margin-large-bottom">
+            <article class="uk-article">
+                <h1 class="uk-article-title"><a class="uk-link-reset" href="">aiozipkin microservices demo</a></h1>
+                <p class="uk-text-lead">
+                    There is larger micro services example, using aiohttp. This demo consists of
+                    five simple services that call each other, as result you can study client
+                    server communication and zipkin integration for large projects. Each
+                    box element of this page rendered with help of different service.
+                </p>
+                <p><span class="uk-label">Zipkin UI</span> <a href="{{zipkin}}" target="_blank">{{zipkin}}</a></p>
+                {{ render_service(service) }}
+            </article>
+        </div>
+    </body>
+</html>
+

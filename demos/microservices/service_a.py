@@ -1,5 +1,8 @@
 import asyncio
+import pathlib
 import aiohttp
+import jinja2
+import aiohttp_jinja2
 import aiozipkin as az
 
 from aiohttp import web
@@ -7,6 +10,9 @@ from aiohttp import web
 
 service_b_api = 'http://127.0.0.1:9002/api/v1/data'
 service_e_api = 'http://127.0.0.1:9005/api/v1/data'
+host = '127.0.0.1'
+port = 9001
+zipkin_address = 'http://127.0.0.1:9411'
 
 
 async def index(request):
@@ -27,24 +33,33 @@ async def handler(request):
     await asyncio.sleep(0.01)
     session = request.app['session']
     span = az.request_span(request)
-    ctx = {'span_context': span.context, 'propagate_headers': True}
+    ctx = {'span_context': span.context}
 
     resp = await session.get(service_b_api, trace_request_ctx=ctx)
-    data_b = await resp.text()
+    data_b = await resp.json()
 
     resp = await session.get(service_e_api, trace_request_ctx=ctx)
-    data_e = await resp.text()
+    data_e = await resp.json()
 
-    body = 'service_a ' + data_b + ' ' + data_e
-    return web.Response(text=body)
+    tree = {
+        'name': 'service_a',
+        'host': host,
+        'port': port,
+        'children': [data_b, data_e],
+    }
+    ctx = {
+        'zipkin':  zipkin_address,
+        'service': tree
+    }
+    return aiohttp_jinja2.render_template('index.html', request, ctx)
 
 
 def make_app():
+
     app = web.Application()
     app.router.add_get('/api/v1/data', handler)
     app.router.add_get('/', index)
 
-    zipkin_address = 'http://127.0.0.1:9411'
     endpoint = az.create_endpoint('service_a')
     tracer = az.create(zipkin_address, endpoint, sample_rate=1.0)
 
@@ -53,11 +68,14 @@ def make_app():
     app['session'] = session
 
     az.setup(app, tracer)
+
+    TEMPLATES_ROOT = pathlib.Path(__file__).parent / 'templates'
+    aiohttp_jinja2.setup(
+        app, loader=jinja2.FileSystemLoader(str(TEMPLATES_ROOT)))
+
     return app
 
 
 if __name__ == '__main__':
-    host = '127.0.0.1'
-    port = 9001
     app = make_app()
     web.run_app(app, host=host, port=port)
