@@ -4,10 +4,19 @@ import aiozipkin as az
 from aiohttp import web
 
 
+host = '127.0.0.1'
+port = 9005
+
+
 async def handler(request):
     await asyncio.sleep(0.01)
-    body = 'servcie_e'
-    return web.Response(text=body)
+    payload = {
+        'name': 'service_e',
+        'host': host,
+        'port': port,
+        'children': [],
+    }
+    return web.json_response(payload)
 
 
 def make_app():
@@ -22,7 +31,5 @@ def make_app():
 
 
 if __name__ == '__main__':
-    host = '127.0.0.1'
-    port = 9005
     app = make_app()
     web.run_app(app, host=host, port=port)
