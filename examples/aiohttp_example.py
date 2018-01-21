@@ -1,12 +1,7 @@
 import asyncio
 
-import aiohttp
 import aiozipkin as az
-
 from aiohttp import web
-
-
-zipkin_address = 'http://127.0.0.1:9411'
 
 
 async def handle(request):
@@ -19,53 +14,57 @@ async def handle(request):
         # or database query
         await asyncio.sleep(0.01)
 
-    text = 'Hello'
-    return web.Response(text=text)
+    text = """
+    <html lang="en">
+    <head>
+        <title>aiohttp simple example</title>
+    </head>
+    <body>
+        <h3>This page was traced by aiozipkin</h3>
+        <p><a href="http://127.0.0.1:9001/status">Go to not traced page</a></p>
+    </body>
+    </html>
+    """
+    return web.Response(text=text, content_type='text/html')
 
 
-def make_app(host, port, loop):
+async def not_traced_handle(request):
+    text = """
+    <html lang="en">
+    <head>
+        <title>aiohttp simple example</title>
+    </head>
+    <body>
+        <h3>This page was NOT traced by aiozipkin></h3>
+        <p><a href="http://127.0.0.1:9001">Go to traced page</a></p>
+    </body>
+    </html>
+    """
+    return web.Response(text=text, content_type='text/html')
+
+
+async def make_app(host, port):
     app = web.Application()
+    app.router.add_get('/', handle)
+    # here we aquire reference to route, so later we can command
+    # aiozipkin not to trace it
+    skip_route = app.router.add_get('/status', not_traced_handle)
+
     endpoint = az.create_endpoint(
         'aiohttp_server', ipv4=host, port=port)
-    tracer = az.create(zipkin_address, endpoint, sample_rate=1.0)
-    az.setup(app, tracer)
 
-    app.router.add_get('/', handle)
-    app.router.add_get('/api/v1/posts/{entity_id}', handle)
+    zipkin_address = 'http://127.0.0.1:9411'
+    tracer = az.create(zipkin_address, endpoint, sample_rate=1.0)
+    az.setup(app, tracer, skip_routes=[skip_route])
     return app
 
 
-async def run_server(loop):
-    host = '127.0.0.1'
-    port = 8080
-    app = make_app(host, port, loop)
-    handler = app.make_handler()
-    await loop.create_server(handler, host, port)
-    return handler
-
-
-async def run_client(loop):
-    endpoint = az.create_endpoint('aiohttp_client')
-    tracer = az.create(zipkin_address, endpoint, sample_rate=1.0)
-    session = aiohttp.ClientSession(loop=loop)
-
-    for i in range(1000):
-        with tracer.new_trace() as span:
-            span.kind(az.CLIENT)
-            headers = span.context.make_headers()
-            host = 'http://127.0.0.1:8080/api/v1/posts/{}'.format(i)
-            resp = await session.get(host, headers=headers)
-            await resp.text()
-        await asyncio.sleep(5, loop=loop)
-
-
 def run():
+    host = '127.0.0.1'
+    port = 9001
     loop = asyncio.get_event_loop()
-    handler = loop.run_until_complete(run_server(loop))
-    try:
-        loop.run_until_complete(run_client(loop))
-    except KeyboardInterrupt:
-        loop.run_until_complete(handler.finish_connections())
+    app = loop.run_until_complete(make_app(host, port))
+    web.run_app(app, host=host, port=port)
 
 
 if __name__ == '__main__':
