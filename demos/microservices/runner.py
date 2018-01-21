@@ -30,7 +30,7 @@ def run():
         runner = loop.run_until_complete(start_app(service, host, port))
         runners.append(runner)
 
-    print("Open in browser: http://127.0.0.1:9001")
+    print('Open in browser: http://127.0.0.1:9001')
     try:
         loop.run_forever()
     except KeyboardInterrupt:

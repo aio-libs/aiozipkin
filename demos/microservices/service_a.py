@@ -53,6 +53,7 @@ async def make_app():
 
     session = aiohttp.ClientSession(trace_configs=[trace_config])
     app['session'] = session
+
     async def close_session(app):
         await app['session'].close()
     app.on_cleanup.append(close_session)
