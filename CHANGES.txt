@@ -1,3 +1,14 @@
 CHANGES
 =======
 
+0.1.0 (2018-01-21)
+------------------
+After few months of work and beta releases here are basic features:
+
+* Initial release.
+* Implemented zipkin v2 protocol with HTTP transport
+* Added jaeger support
+* Added stackdriver support
+* Added aiohttp server support
+* Added aiohttp 3.0.0 client tracing support
+* Added examples and demos
