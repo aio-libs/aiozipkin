@@ -15,20 +15,6 @@ port = 9001
 zipkin_address = 'http://127.0.0.1:9411'
 
 
-async def index(request):
-    body = """
-    <html lang="en">
-    <head>
-        <title>aiohttp microservices</title>
-    </head>
-    <body>
-    <a href="http://127.0.0.1:9001/api/v1/data">Call API</a>
-    </body>
-    </html>
-    """
-    return web.Response(text=body, content_type='text/html')
-
-
 async def handler(request):
     await asyncio.sleep(0.01)
     session = request.app['session']
@@ -54,18 +40,22 @@ async def handler(request):
     return aiohttp_jinja2.render_template('index.html', request, ctx)
 
 
-def make_app():
+async def make_app():
 
     app = web.Application()
     app.router.add_get('/api/v1/data', handler)
-    app.router.add_get('/', index)
+    app.router.add_get('/', handler)
 
-    endpoint = az.create_endpoint('service_a')
+    endpoint = az.create_endpoint('service_a', ipv4=host, port=port)
     tracer = az.create(zipkin_address, endpoint, sample_rate=1.0)
 
     trace_config = az.make_trace_config(tracer)
+
     session = aiohttp.ClientSession(trace_configs=[trace_config])
     app['session'] = session
+    async def close_session(app):
+        await app['session'].close()
+    app.on_cleanup.append(close_session)
 
     az.setup(app, tracer)
 
@@ -77,5 +67,6 @@ def make_app():
 
 
 if __name__ == '__main__':
-    app = make_app()
+    loop = asyncio.get_event_loop()
+    app = loop.run_until_complete(make_app())
     web.run_app(app, host=host, port=port)

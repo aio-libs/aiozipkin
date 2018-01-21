@@ -3,19 +3,21 @@ Microservices Demo
 
 Example of microservices project using aiohttp_. There are 5 services, which
 calls each other to serve request. You can explore traces and services
-interconnection in Zipkin UI.
+interconnection in Zipkin UI. This demo uses new aiohttp features available
+only in >= 3.0.0 version
 
 
 Installation
 ============
 
-Clone repository and install library::
+Clone repository and install required dependencies::
 
     $ git clone git@github.com:aio-libs/aiozipkin.git
     $ cd aiozipkin
     $ pip install -e .
     $ pip install -r requirements-dev.txt
     $ pip install aiohttp-jinja2
+    $ pip install https://github.com/aio-libs/aiohttp/archive/master.zip
 
 
 Create start zipkin server, make sure you have docker installed::
