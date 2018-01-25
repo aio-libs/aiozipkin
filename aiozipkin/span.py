@@ -67,7 +67,7 @@ class SpanAbc(metaclass=ABCMeta):
         pass  # pragma: no cover
 
     @abstractmethod
-    def new_child(self: T, name: str = None, kind: str = None) -> T:
+    def new_child(self: T, name: OptStr = None, kind: OptStr = None) -> T:
         pass  # pragma: no cover
 
     def __enter__(self: T) -> T:
@@ -121,8 +121,11 @@ class NoopSpan(SpanAbc):
     def name(self, span_name: str) -> 'NoopSpan':
         return self
 
-    def new_child(self, name: str = None, kind: str = None) -> 'NoopSpan':
-        return self
+    def new_child(self,
+                  name: OptStr = None,
+                  kind: OptStr = None) -> 'NoopSpan':
+        context = self._tracer._next_context(self.context)
+        return NoopSpan(self.tracer, context)
 
 
 class Span(SpanAbc):
@@ -185,7 +188,7 @@ class Span(SpanAbc):
         self._record.name(span_name)
         return self
 
-    def new_child(self, name: str = None, kind: str = None) -> 'Span':
+    def new_child(self, name: OptStr = None, kind: OptStr = None) -> 'Span':
         span = self.tracer.new_child(self.context)
         if name is not None:
             span.name(name)
