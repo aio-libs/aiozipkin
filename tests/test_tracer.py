@@ -64,6 +64,9 @@ def test_noop_span_methods(tracer):
         span.annotate('end:sql', ts=1506970524)
         span.remote_endpoint('service_a', ipv4='127.0.0.1', port=8080)
 
+        with span.new_child() as child_span:
+            pass
+
     assert isinstance(span, NoopSpan)
     assert span.context.parent_id is not None
     assert not span.context.sampled
@@ -72,6 +75,8 @@ def test_noop_span_methods(tracer):
     span = tracer.to_span(context)
     assert isinstance(span, NoopSpan)
     assert span.tracer is tracer
+
+    assert isinstance(child_span, NoopSpan)
 
 
 def test_trace_join_span(tracer, context):
@@ -98,6 +103,31 @@ def test_trace_new_child(tracer, context):
     assert span.context.trace_id == context.trace_id
     assert span.context.parent_id == context.span_id
     assert span.context.span_id is not None
+
+
+def test_span_new_child(tracer, context, fake_transport):
+
+    with tracer.new_child(context) as span:
+        span.name('name')
+        with span.new_child('child', 'CLIENT') as child_span1:
+            pass
+        with span.new_child() as child_span2:
+            pass
+
+    assert span.context.trace_id == child_span1.context.trace_id
+    assert span.context.span_id == child_span1.context.parent_id
+    assert span.context.trace_id == child_span2.context.trace_id
+    assert span.context.span_id == child_span2.context.parent_id
+
+    record = fake_transport.records[0]
+    data = record.asdict()
+    assert data['name'] == 'child'
+    assert data['kind'] == 'CLIENT'
+
+    record = fake_transport.records[1]
+    data = record.asdict()
+    assert data['name'] == 'unknown'
+    assert 'kind' not in data
 
 
 def test_error(tracer, fake_transport):
