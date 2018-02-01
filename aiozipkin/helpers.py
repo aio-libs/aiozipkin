@@ -89,7 +89,6 @@ def parse_sampled(headers: Headers) -> OptBool:
     sampled = headers.get(SAMPLED_ID_HEADER.lower(), None)
     if sampled is None or sampled == '':
         return None
-    # TODO: add more test cases
     return True if sampled == '1' else False
 
 
