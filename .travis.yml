@@ -7,9 +7,11 @@ python:
   - '3.5'
 
 matrix:
-  allow_failures:
+  include:
     - python: '3.6'
       env: AIOHTTP_MASTER="y"
+  allow_failures:
+    - env: AIOHTTP_MASTER="y"
 
 install:
     - pip install --upgrade setuptools
