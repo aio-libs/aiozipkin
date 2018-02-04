@@ -7,7 +7,7 @@ python:
   - '3.5'
 
 matrix:
-  include:
+  allow_failures:
     - python: '3.6'
       env: AIOHTTP_MASTER="y"
 
