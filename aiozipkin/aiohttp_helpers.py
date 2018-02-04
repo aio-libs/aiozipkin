@@ -155,42 +155,40 @@ class ZipkingClientSignals:
                     'span_context' in trace_request_ctx)
         return has_span
 
-    async def on_request_start(self, session, trace_config_ctx, method, url,
-                               headers):
-        if not self._has_span(trace_config_ctx):
+    async def on_request_start(self, session, context, params):
+        if not self._has_span(context):
             return
 
-        span_context = trace_config_ctx.trace_request_ctx['span_context']
+        p = params
+        span_context = context.trace_request_ctx['span_context']
         span = self._tracer.new_child(span_context)
-        trace_config_ctx._span = span
+        context._span = span
         span.start()
-        span_name = 'client {0} {1}'.format(method.upper(), url.path)
+        span_name = 'client {0} {1}'.format(p.method.upper(), p.url.path)
         span.name(span_name)
         span.kind(CLIENT)
 
-        propagate_headers = (trace_config_ctx
+        propagate_headers = (context
                              .trace_request_ctx
                              .get('propagate_headers', True))
         if propagate_headers:
             span_headers = span.context.make_headers()
-            headers.update(span_headers)
+            p.headers.update(span_headers)
 
-    async def on_request_end(self, session, trace_config_ctx, method, url,
-                             headers, resp):
-        if not self._has_span(trace_config_ctx):
+    async def on_request_end(self, session, context, params):
+        if not self._has_span(context):
             return
 
-        span = trace_config_ctx._span
+        span = context._span
         span.finish()
-        delattr(trace_config_ctx, '_span')
+        delattr(context, '_span')
 
-    async def on_request_exception(self, session, trace_config_ctx, method,
-                                   url, headers, error):
-        if not self._has_span(trace_config_ctx):
+    async def on_request_exception(self, session, context, params):
+        if not self._has_span(context):
             return
-        span = trace_config_ctx._span
-        span.finish(exception=error)
-        delattr(trace_config_ctx, '_span')
+        span = context._span
+        span.finish(exception=params.exception)
+        delattr(context, '_span')
 
 
 def make_trace_config(tracer):
