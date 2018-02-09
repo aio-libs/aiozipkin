@@ -38,8 +38,10 @@ async def run():
             nested_span.tag('span_type', 'inner2')
             await asyncio.sleep(0.01)
 
-        await asyncio.sleep(30)
-        await tracer.close()
+    await tracer.close()
+    print('-' * 100)
+    print('Check zipkin UI for produced traces: http://localhost:9411/zipkin')
+
 
 if __name__ == '__main__':
     loop = asyncio.get_event_loop()
