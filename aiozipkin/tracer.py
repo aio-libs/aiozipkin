@@ -1,5 +1,6 @@
-from typing import Optional, Dict  # flake8: noqa
+from typing import Optional, Dict, Awaitable, Any, AsyncContextManager  # flake8: noqa
 
+from .context_managers import _ContextManager
 from .helpers import TraceContext, Endpoint
 from .mypy_types import OptLoop, OptBool
 from .record import Record
@@ -9,7 +10,7 @@ from .transport import Transport
 from .utils import generate_random_64bit_string, generate_random_128bit_string
 
 
-class Tracer:
+class Tracer(AsyncContextManager):
     def __init__(self,
                  transport: Transport,
                  sampler: Sampler,
@@ -80,12 +81,22 @@ class Tracer:
     async def close(self) -> None:
         await self._transport.close()
 
+    async def __aenter__(self) -> 'Tracer':
+        return self
+
+    async def __aexit__(self, *args) -> Optional[bool]:
+        return await self.close()
+
 
 def create(zipkin_address: str,
            local_endpoint: Endpoint, *,
            sample_rate: float=0.01,
            send_inteval: float=5,
-           loop: OptLoop=None) -> Tracer:
-    sampler = Sampler(sample_rate=sample_rate)
-    transport = Transport(zipkin_address, send_inteval=send_inteval, loop=loop)
-    return Tracer(transport, sampler, local_endpoint)
+           loop: OptLoop=None) -> Awaitable[Tracer]:
+
+    async def f() -> Tracer:
+        sampler = Sampler(sample_rate=sample_rate)
+        transport = Transport(zipkin_address, send_inteval=send_inteval, loop=loop)
+        return Tracer(transport, sampler, local_endpoint)
+    result = _ContextManager(f())  # type: Awaitable[Tracer]
+    return result
