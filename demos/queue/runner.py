@@ -11,7 +11,7 @@ def run():
     fe_port = 9010
     be_port = 9011
 
-    print("http://127.0.0.1:9010")
+    print('http://127.0.0.1:9010')
 
     fe_app = loop_run(frontend.make_app(host, fe_port))
     be_app = loop_run(backend.make_app(host, be_port))
@@ -19,7 +19,6 @@ def run():
     fe_handler = fe_app.make_handler()
     be_handler = be_app.make_handler()
     handlers = [fe_handler, be_handler]
-
 
     loop_run(fe_app.startup())
     loop_run(be_app.startup())
