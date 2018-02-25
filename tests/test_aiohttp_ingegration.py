@@ -7,11 +7,6 @@ from aiohttp import web
 from async_generator import yield_, async_generator
 
 
-reason = 'Tests requires new aiohttp version >=3.0.0'
-has_signals = hasattr(aiohttp, 'TraceConfig')
-pytestmark = pytest.mark.skipif(not has_signals, reason=reason)
-
-
 async def handler(request):
     span = az.request_span(request)
     session = request.app['session']
