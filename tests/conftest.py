@@ -47,6 +47,7 @@ def fake_transport():
 def tracer_fixture(fake_transport):
     sampler = Sampler(sample_rate=1.0)
     endpoint = create_endpoint('test_service', ipv4='127.0.0.1', port=8080)
+    # TODO: use context manger at some point
     return Tracer(fake_transport, sampler, endpoint)
 
 
