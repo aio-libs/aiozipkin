@@ -10,16 +10,14 @@ async def run():
 
     # creates tracer object that tracer all calls if you want sample
     # only 50% just set sample_rate=0.5
-    tracer = az.create(zipkin_address, endpoint, sample_rate=1.0)
+    async with az.create(zipkin_address, endpoint, sample_rate=1.0) as tracer:
+        # create and setup new trace
+        with tracer.new_trace() as span:
+            # here we just add name to the span for better search in UI
+            span.name('root::span')
+            # imitate long SQL query
+            await asyncio.sleep(0.1)
 
-    # create and setup new trace
-    with tracer.new_trace() as span:
-        # here we just add name to the span for better search in UI
-        span.name('root::span')
-        # imitate long SQL query
-        await asyncio.sleep(0.1)
-
-    await tracer.close()
     print('Done, check zipkin UI')
 
 if __name__ == '__main__':
