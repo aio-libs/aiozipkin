@@ -148,7 +148,7 @@ def request_span(request: Request,
     return request[request_key]
 
 
-class ZipkingClientSignals:
+class ZipkinClientSignals:
     """Class contains signal handler for aiohttp client. Handlers executed
     only if aiohttp session contains tracer context with span.
     """
@@ -200,7 +200,7 @@ class ZipkingClientSignals:
 
 def make_trace_config(tracer: Tracer) -> aiohttp.TraceConfig:
     trace_config = aiohttp.TraceConfig()
-    zipkin = ZipkingClientSignals(tracer)
+    zipkin = ZipkinClientSignals(tracer)
 
     trace_config.on_request_start.append(zipkin.on_request_start)
     trace_config.on_request_end.append(zipkin.on_request_end)
