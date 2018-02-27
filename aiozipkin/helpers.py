@@ -47,7 +47,7 @@ class TraceContext(_TraceContext):
 
 
 Endpoint = NamedTuple(
-    'Endpoint', [('serviceName', str),
+    'Endpoint', [('serviceName', OptStr),
                  ('ipv4', OptStr),
                  ('ipv6', OptStr),
                  ('port', OptInt)]
