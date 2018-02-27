@@ -42,7 +42,7 @@ class SpanAbc(metaclass=ABCMeta):
 
     @abstractmethod
     def remote_endpoint(self: T,
-                        servce_name: str, *,
+                        servce_name: OptStr, *,
                         ipv4: OptStr=None,
                         ipv6: OptStr=None,
                         port: OptInt=None) -> T:
@@ -103,7 +103,7 @@ class NoopSpan(SpanAbc):
         return self
 
     def remote_endpoint(self,
-                        servce_name: str, *,
+                        servce_name: OptStr, *,
                         ipv4: OptStr=None,
                         ipv6: OptStr=None,
                         port: OptInt=None) -> 'NoopSpan':
@@ -163,7 +163,7 @@ class Span(SpanAbc):
         return self
 
     def remote_endpoint(self,
-                        servce_name: str, *,
+                        servce_name: OptStr, *,
                         ipv4: OptStr=None,
                         ipv6: OptStr=None,
                         port: OptInt=None) -> 'Span':
