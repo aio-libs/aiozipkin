@@ -10,7 +10,7 @@ async def run():
 
     # creates tracer object that traces all calls, if you want sample
     # only 50% just set sample_rate=0.5
-    tracer = az.create(zipkin_address, endpoint, sample_rate=1.0)
+    tracer = await az.create(zipkin_address, endpoint, sample_rate=1.0)
 
     # create and setup new trace
     with tracer.new_trace(sampled=True) as span:

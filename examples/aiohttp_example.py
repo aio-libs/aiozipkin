@@ -54,7 +54,7 @@ async def make_app(host, port):
         'aiohttp_server', ipv4=host, port=port)
 
     zipkin_address = 'http://127.0.0.1:9411'
-    tracer = az.create(zipkin_address, endpoint, sample_rate=1.0)
+    tracer = await az.create(zipkin_address, endpoint, sample_rate=1.0)
     az.setup(app, tracer, skip_routes=[skip_route])
     return app
 
