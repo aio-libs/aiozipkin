@@ -47,7 +47,7 @@ async def make_app():
     app.router.add_get('/', handler)
 
     endpoint = az.create_endpoint('service_a', ipv4=host, port=port)
-    tracer = az.create(zipkin_address, endpoint, sample_rate=1.0)
+    tracer = await az.create(zipkin_address, endpoint, sample_rate=1.0)
 
     trace_config = az.make_trace_config(tracer)
 

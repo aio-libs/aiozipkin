@@ -42,7 +42,7 @@ async def index(request):
     return web.Response(text=page, content_type='text/html')
 
 
-def make_app(host, port):
+async def make_app(host, port):
     app = web.Application()
     app.router.add_get('/', index)
 
@@ -51,7 +51,7 @@ def make_app(host, port):
 
     zipkin_address = 'http://127.0.0.1:9411'
     endpoint = az.create_endpoint('frontend', ipv4=host, port=port)
-    tracer = az.create(zipkin_address, endpoint, sample_rate=1.0)
+    tracer = await az.create(zipkin_address, endpoint, sample_rate=1.0)
     az.setup(app, tracer)
     return app
 
@@ -59,5 +59,6 @@ def make_app(host, port):
 if __name__ == '__main__':
     host = '127.0.0.1'
     port = 9010
-    app = make_app(host, port)
+    loop = asyncio.get_event_loop()
+    app = loop.run_until_complete(make_app(host, port))
     web.run_app(app, host=host, port=port)
