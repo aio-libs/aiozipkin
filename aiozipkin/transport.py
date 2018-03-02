@@ -1,5 +1,5 @@
 import asyncio
-from typing import List, Dict, Any, Optional, AsyncContextManager  # flake8: noqa
+from typing import List, Dict, Any, Optional  # flake8: noqa
 
 import aiohttp
 from yarl import URL
@@ -9,7 +9,7 @@ from .mypy_types import OptLoop
 from .record import Record
 
 
-class Transport(AsyncContextManager):
+class Transport:
 
     def __init__(self, address: str, send_inteval: float=5,
                  loop: OptLoop=None) -> None:
@@ -49,7 +49,6 @@ class Transport(AsyncContextManager):
         data = self._queue[:]
         self._queue = []
 
-        # TODO: add status code check
         try:
             headers = {'Content-Type': 'application/json'}
             async with self._session.post(self._address, json=data,
@@ -81,9 +80,3 @@ class Transport(AsyncContextManager):
                 await self._timer
             except asyncio.CancelledError:
                 pass
-
-    async def __aenter__(self):
-        return self
-
-    async def __aexit__(self, *args):
-        await self.close()

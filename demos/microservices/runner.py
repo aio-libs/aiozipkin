@@ -19,7 +19,6 @@ async def start_app(service, host, port):
     return runner
 
 
-# TODO: rework after aiohttp 3.0.0 release
 def run():
     host = '127.0.0.1'
     loop = asyncio.get_event_loop()
