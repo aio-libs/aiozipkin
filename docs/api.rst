@@ -32,7 +32,7 @@ Core API Refernece
     :param dict headers: hostname to serve monitor telnet server
     :returns: TraceContext object or None
 
-.. function:: create(zipkin_address, local_endpoint, sample_rate, send_inteval, loop)
+.. cofunction:: create(zipkin_address, local_endpoint, sample_rate, send_inteval, loop)
 
    Creates Tracer object
 
