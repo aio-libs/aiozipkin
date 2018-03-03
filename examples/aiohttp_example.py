@@ -50,7 +50,7 @@ async def make_app(host, port):
     # aiozipkin not to trace it
     skip_route = app.router.add_get('/status', not_traced_handle)
 
-    endpoint = await az.create_endpoint(
+    endpoint = az.create_endpoint(
         'aiohttp_server', ipv4=host, port=port)
 
     zipkin_address = 'http://127.0.0.1:9411'
