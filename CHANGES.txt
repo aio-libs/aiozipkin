@@ -1,5 +1,11 @@
 CHANGES
 =======
+0.2.0 (2018-03-03)
+------------------
+* Breaking change: az.create is coroutine now #114
+* Added context manger for tracer object #114
+* Added more mypy types #117
+
 
 0.1.1 (2018-01-26)
 ------------------
