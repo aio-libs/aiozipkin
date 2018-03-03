@@ -32,7 +32,7 @@ Core API Refernece
     :param dict headers: hostname to serve monitor telnet server
     :returns: TraceContext object or None
 
-.. function:: create(zipkin_address, local_endpoint, sample_rate, send_inteval, loop)
+.. cofunction:: create(zipkin_address, local_endpoint, sample_rate, send_inteval, loop)
 
    Creates Tracer object
 
@@ -87,13 +87,22 @@ Core API Refernece
 Aiohtp integration API
 ----------------------
 
+API for integration with *aiohttp.web*, in just calling `setup` is enough for
+zipkin to start tracking requests. On high level attached plugin registers
+middleware that starts span on beginning of request and closes it on finish,
+saving important metadata, like route, status code etc.
+
+
 .. data:: APP_AIOZIPKIN_KEY
 
-    Key, for aiohttp application, where aiozipkin data saved.
+    Key, for aiohttp application, where aiozipkin related data saved. In case
+    for some reason you want to use 2 aiozipkin instances or change default
+    name, this parameter should not be used.
 
 .. data:: REQUEST_AIOZIPKIN_KEY
 
-    Key, for aiohttp request, where aiozipkin span sits
+    Key, for aiohttp request, where aiozipkin span related to current request
+    located.
 
 .. function:: setup(app, tracer, tracer_key=APP_AIOZIPKIN_KEY, request_key=APP_AIOZIPKIN_KEY)
 
