@@ -9,7 +9,7 @@ flake8-mypy==17.8.0
 flake8-quotes==1.0.0
 flake8==3.5.0
 ipdb==0.11
-mypy==0.580
+mypy==0.600
 pytest-aiohttp==0.3.0
 pytest-asyncio==0.8.0
 pytest-cov==2.5.1
