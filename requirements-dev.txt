@@ -1,5 +1,5 @@
 -e .
-aiodocker==0.12.0
+aiodocker==0.13.0
 aiohttp==3.2.1
 async-generator==1.9
 bandit==1.4.0
