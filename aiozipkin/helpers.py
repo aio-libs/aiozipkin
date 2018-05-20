@@ -25,7 +25,7 @@ _TraceContext = NamedTuple(
         ('trace_id', str),
         ('parent_id', OptStr),
         ('span_id', str),
-        ('sampled', bool),
+        ('sampled', OptBool),
         ('debug', bool),
         ('shared', bool),
         ]
@@ -111,9 +111,9 @@ def make_context(headers: Headers) -> Optional[TraceContext]:
         return None
 
     context = TraceContext(
-        trace_id=headers.get(TRACE_ID_HEADER.lower()),
-        parent_id=headers.get(PARENT_ID_HEADER.lower(), None),
-        span_id=headers.get(SPAN_ID_HEADER.lower()),
+        trace_id=headers[TRACE_ID_HEADER.lower()],
+        parent_id=headers.get(PARENT_ID_HEADER.lower()),
+        span_id=headers[SPAN_ID_HEADER.lower()],
         sampled=parse_sampled(headers),
         shared=False,
         debug=parse_debug(headers),

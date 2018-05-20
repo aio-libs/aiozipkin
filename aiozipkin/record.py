@@ -40,9 +40,11 @@ class Record:
         self._timestamp = ts
         return self
 
-    def finish(self: T, ts: int) -> T:
+    def finish(self: T, ts: OptInt) -> T:
         if self._finished:
             return self
+        if self._timestamp is None:
+            raise RuntimeError('Record should be started first')
         if ts is not None and self._kind not in (PRODUCER, CONSUMER):
             self._duration = max(ts - self._timestamp, 1)
         self._finished = True
