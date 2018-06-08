@@ -5,7 +5,7 @@ import aiohttp
 from aiohttp.web import HTTPException, Request, Application
 from aiohttp.web_urldispatcher import AbstractRoute
 
-from .constants import HTTP_METHOD, HTTP_PATH, HTTP_STATUS_CODE
+from .constants import HTTP_METHOD, HTTP_PATH, HTTP_STATUS_CODE, HTTP_ROUTE
 from .helpers import CLIENT, SERVER, make_context, parse_debug, parse_sampled
 from .span import SpanAbc
 from .tracer import Tracer
@@ -64,7 +64,15 @@ def _set_span_properties(span: SpanAbc, request: Request) -> None:
     span.kind(SERVER)
     span.tag(HTTP_PATH, request.path)
     span.tag(HTTP_METHOD, request.method.upper())
+
+    resource = request.match_info.route.resource
+    # available only in aiohttp >= 3.3.1
+    if getattr(resource, 'canonical', None) is not None:
+        route = request.match_info.route.resource.canonical
+        span.tag(HTTP_ROUTE, route)
+
     _set_remote_endpoint(span, request)
+
 
 
 # TODO: new aiohttp 3.0.0 has a bit different API for middlewares
