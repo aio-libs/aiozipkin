@@ -26,15 +26,20 @@ async def test_middleware_with_default_transport(tracer, fake_transport):
 
     async def handler(request):
         return web.Response(body=b'data')
-    req = make_mocked_request('GET', '/', headers={'token': 'x'}, app=app)
+
+    req = make_mocked_request('GET', '/aa', headers={'token': 'x'}, app=app)
+    req.match_info.route.resource.canonical = '/{pid}'
 
     middleware_factory = middleware_maker()
-
     middleware = await middleware_factory(app, handler)
+
     await middleware(req)
     span = az.request_span(req)
     assert span
     assert len(fake_transport.records) == 1
+
+    rec = fake_transport.records[0]
+    assert rec.asdict()['tags'][az.HTTP_ROUTE] == '/{pid}'
 
     # noop span does not produce records
     headers = {'X-B3-Sampled': '0'}
