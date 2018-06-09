@@ -15,6 +15,16 @@ from .helpers import (
     SERVER,
     create_endpoint,
 )
+from .constants import (
+    HTTP_HOST,
+    HTTP_METHOD,
+    HTTP_PATH,
+    HTTP_REQUEST_SIZE,
+    HTTP_RESPONSE_SIZE,
+    HTTP_STATUS_CODE,
+    HTTP_URL,
+    HTTP_ROUTE,
+)
 from .sampler import Sampler
 from .tracer import Tracer, create
 
@@ -39,4 +49,13 @@ __all__ = (
     'SERVER',
     'PRODUCER',
     'CONSUMER',
+    # constants
+    'HTTP_HOST',
+    'HTTP_METHOD',
+    'HTTP_PATH',
+    'HTTP_REQUEST_SIZE',
+    'HTTP_RESPONSE_SIZE',
+    'HTTP_STATUS_CODE',
+    'HTTP_URL',
+    'HTTP_ROUTE',
 )
