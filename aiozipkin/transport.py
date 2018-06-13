@@ -13,7 +13,7 @@ class Transport:
 
     def __init__(self, address: str, send_inteval: float=5,
                  loop: OptLoop=None) -> None:
-        self._address = URL(address).with_path('/api/v2/spans')
+        self._address = URL(address) / 'api/v2/spans'
         self._queue = []  # type: List[Dict[str, Any]]
         self._closing = False
         self._send_interval = send_inteval
