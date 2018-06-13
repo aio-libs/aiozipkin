@@ -1,5 +1,12 @@
 CHANGES
 =======
+
+0.3.0 (2018-06-13)
+------------------
+* Add support http.route tag for aiohttp #138
+* Make zipkin address builder more permissive #141 (thanks @dsantosfff)
+
+
 0.2.0 (2018-03-03)
 ------------------
 * Breaking change: az.create is coroutine now #114
