@@ -1,4 +1,4 @@
-from typing import Optional, Dict, Awaitable, Any, AsyncContextManager  # flake8: noqa
+from typing import Optional, Dict, Awaitable, Any, AsyncContextManager, cast  # flake8: noqa
 
 from .context_managers import _ContextManager
 from .helpers import TraceContext, Endpoint
@@ -6,7 +6,7 @@ from .mypy_types import OptLoop, OptBool
 from .record import Record
 from .sampler import Sampler
 from .span import Span, NoopSpan, SpanAbc
-from .transport import Transport
+from .transport import Transport, StubTransport
 from .utils import generate_random_64bit_string, generate_random_128bit_string
 
 
@@ -96,7 +96,10 @@ def create(zipkin_address: str,
 
     async def f() -> Tracer:
         sampler = Sampler(sample_rate=sample_rate)
-        transport = Transport(zipkin_address, send_interval=send_interval, loop=loop)
+        if not zipkin_address:
+            transport = cast(Transport, StubTransport())
+        else:
+            transport = Transport(zipkin_address, send_interval=send_interval, loop=loop)
         return Tracer(transport, sampler, local_endpoint)
     result = _ContextManager(f())  # type: Awaitable[Tracer]
     return result

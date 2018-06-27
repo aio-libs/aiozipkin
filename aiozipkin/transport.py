@@ -9,6 +9,17 @@ from .mypy_types import OptLoop
 from .record import Record
 
 
+class StubTransport:
+    def __init__(self, *args, **kwargs) -> None:
+        logger.info('Zipkin address was not provided, using stub transport')
+
+    def send(self, record: Record) -> None:
+        pass
+
+    async def close(self) -> None:
+        pass
+
+
 class Transport:
 
     def __init__(self, address: str, send_interval: float=5,
