@@ -11,12 +11,12 @@ from .record import Record
 
 class Transport:
 
-    def __init__(self, address: str, send_inteval: float=5,
+    def __init__(self, address: str, send_interval: float=5,
                  loop: OptLoop=None) -> None:
         self._address = URL(address) / 'api/v2/spans'
         self._queue = []  # type: List[Dict[str, Any]]
         self._closing = False
-        self._send_interval = send_inteval
+        self._send_interval = send_interval
         self._loop = loop or asyncio.get_event_loop()
         self._session = aiohttp.ClientSession(loop=self._loop)
         self._sender_task = asyncio.ensure_future(

@@ -91,12 +91,12 @@ class Tracer(AsyncContextManager):
 def create(zipkin_address: str,
            local_endpoint: Endpoint, *,
            sample_rate: float=0.01,
-           send_inteval: float=5,
+           send_interval: float=5,
            loop: OptLoop=None) -> Awaitable[Tracer]:
 
     async def f() -> Tracer:
         sampler = Sampler(sample_rate=sample_rate)
-        transport = Transport(zipkin_address, send_inteval=send_inteval, loop=loop)
+        transport = Transport(zipkin_address, send_interval=send_interval, loop=loop)
         return Tracer(transport, sampler, local_endpoint)
     result = _ContextManager(f())  # type: Awaitable[Tracer]
     return result
