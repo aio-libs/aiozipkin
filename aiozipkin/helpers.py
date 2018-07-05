@@ -57,7 +57,7 @@ Endpoint = NamedTuple(
 def create_endpoint(servce_name: str, *,
                     ipv4: OptStr=None,
                     ipv6: OptStr=None,
-                    port: OptInt=None):
+                    port: OptInt=None) -> Endpoint:
     """Factory function to create Endpoint object.
     """
     return Endpoint(servce_name, ipv4, ipv6, port)

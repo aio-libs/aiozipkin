@@ -11,7 +11,7 @@ class _ContextManager(Generic[T], AsyncContextManager, Awaitable):
 
     __slots__ = ('_coro', '_obj')
 
-    def __init__(self, coro: Awaitable) -> None:
+    def __init__(self, coro: Awaitable[T]) -> None:
         self._coro = coro  # type: Awaitable[T]
         self._obj = None  # type: Optional[T]
 
@@ -20,7 +20,8 @@ class _ContextManager(Generic[T], AsyncContextManager, Awaitable):
 
     async def __aenter__(self) -> T:
         self._obj = await self._coro
-        return await self._obj.__aenter__()
+        t = await self._obj.__aenter__()  # type: T
+        return t
 
     async def __aexit__(self,
                         exc_type: Optional[Type[BaseException]],

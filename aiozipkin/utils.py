@@ -36,7 +36,9 @@ def unsigned_hex_to_signed_int(hex_string: str) -> int:
     :param hex_string: the string representation of a zipkin ID
     :returns: signed int representation
     """
-    return struct.unpack('q', struct.pack('Q', int(hex_string, 16)))[0]
+    v = struct.unpack(
+        'q', struct.pack('Q', int(hex_string, 16)))[0]  # type: int
+    return v
 
 
 def signed_int_to_unsigned_hex(signed_int: int) -> str:
