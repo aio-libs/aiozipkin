@@ -19,7 +19,7 @@ bandit:
 	bandit -r ./aiozipkin
 
 mypy:
-	mypy aiozipkin --ignore-missing-imports --disallow-untyped-calls --no-site-packages --strict  --python-version 3.5
+	mypy aiozipkin --ignore-missing-imports --disallow-untyped-calls --no-site-packages --strict --python-executable `which python`
 
 testloop:
 	while true ; do \
