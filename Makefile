@@ -19,7 +19,7 @@ bandit:
 	bandit -r ./aiozipkin
 
 mypy:
-	mypy aiozipkin --ignore-missing-imports --disallow-untyped-calls --no-site-packages --strict --python-executable `which python`
+	mypy aiozipkin --ignore-missing-imports --disallow-untyped-calls --no-site-packages --strict --python-version `python -c 'import platform; print(platform.python_version()[0:3])'`
 
 testloop:
 	while true ; do \
