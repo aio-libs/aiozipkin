@@ -1,13 +1,13 @@
-from collections.abc import Awaitable
+from collections.abc import Awaitable as AbcAwaitable
 from typing import (TypeVar, Optional, Generator, Any, Type,
-                    AsyncContextManager, Generic)
+                    AsyncContextManager, Generic, Awaitable)
 from types import TracebackType
 
 
 T = TypeVar('T', bound=AsyncContextManager)
 
 
-class _ContextManager(Generic[T], AsyncContextManager, Awaitable):
+class _ContextManager(Generic[T], AsyncContextManager, AbcAwaitable):
 
     __slots__ = ('_coro', '_obj')
 

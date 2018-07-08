@@ -1,9 +1,12 @@
 import ipaddress
-from typing import Optional, Dict, Any, Set, Type, Awaitable, Callable  # flake8: noqa
+from types import SimpleNamespace
+from typing import cast, Optional, Dict, Any, Set, Awaitable, Callable  # flake8: noqa
 
 import aiohttp
 from aiohttp.web import HTTPException, Request, Application, Response
 from aiohttp.web_urldispatcher import AbstractRoute
+from aiohttp.tracing import (TraceRequestStartParams, TraceRequestEndParams,
+                             TraceRequestExceptionParams)
 
 from .constants import HTTP_METHOD, HTTP_PATH, HTTP_STATUS_CODE, HTTP_ROUTE
 from .helpers import CLIENT, SERVER, make_context, parse_debug, parse_sampled
@@ -149,7 +152,7 @@ def get_tracer(app: Application, tracer_key: str=APP_AIOZIPKIN_KEY) -> Tracer:
     By default tracer has APP_AIOZIPKIN_KEY in aiohttp application context,
     you can provide own key, if for some reason default one is not suitable.
     """
-    return app[tracer_key]
+    return cast(Tracer, app[tracer_key])
 
 
 def request_span(request: Request,
@@ -157,7 +160,7 @@ def request_span(request: Request,
     """Return span created by middleware from request context, you can use it
     as parent on next child span.
     """
-    return request[request_key]
+    return cast(SpanAbc, request[request_key])
 
 
 class ZipkinClientSignals:
@@ -168,13 +171,16 @@ class ZipkinClientSignals:
     def __init__(self, tracer: Tracer) -> None:
         self._tracer = tracer
 
-    def _has_span(self, trace_config_ctx) -> bool:
+    def _has_span(self, trace_config_ctx: SimpleNamespace) -> bool:
         trace_request_ctx = trace_config_ctx.trace_request_ctx
         has_span = (isinstance(trace_request_ctx, dict) and
                     'span_context' in trace_request_ctx)
         return has_span
 
-    async def on_request_start(self, session, context, params) -> None:
+    async def on_request_start(self,
+                               session: aiohttp.ClientSession,
+                               context: SimpleNamespace,
+                               params: TraceRequestStartParams) -> None:
         if not self._has_span(context):
             return
 
@@ -194,7 +200,10 @@ class ZipkinClientSignals:
             span_headers = span.context.make_headers()
             p.headers.update(span_headers)
 
-    async def on_request_end(self, session, context, params) -> None:
+    async def on_request_end(self,
+                             session: aiohttp.ClientSession,
+                             context: SimpleNamespace,
+                             params: TraceRequestEndParams) -> None:
         if not self._has_span(context):
             return
 
@@ -202,7 +211,10 @@ class ZipkinClientSignals:
         span.finish()
         delattr(context, '_span')
 
-    async def on_request_exception(self, session, context, params) -> None:
+    async def on_request_exception(self,
+                                   session: aiohttp.ClientSession,
+                                   context: SimpleNamespace,
+                                   params: TraceRequestExceptionParams) -> None:
         if not self._has_span(context):
             return
         span = context._span
