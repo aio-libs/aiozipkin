@@ -3,7 +3,7 @@
 FLAGS=
 
 
-flake: checkrst bandit mypy
+flake: checkrst bandit
 	flake8 aiozipkin tests examples setup.py demos
 
 test: flake
@@ -19,7 +19,7 @@ bandit:
 	bandit -r ./aiozipkin
 
 mypy:
-	mypy aiozipkin --ignore-missing-imports --disallow-untyped-calls --no-site-packages --strict --python-version `python -c 'import platform; print(platform.python_version()[0:3])'`
+	mypy aiozipkin --ignore-missing-imports --disallow-untyped-calls --no-site-packages --strict
 
 testloop:
 	while true ; do \
@@ -30,9 +30,9 @@ cov cover coverage: flake checkrst
 	py.test -s -v --cov-report term --cov-report html --cov aiozipkin ./tests
 	@echo "open file://`pwd`/htmlcov/index.html"
 
-ci: flake
-	py.test -s -v  --cov-report term --cov aiozipkin ./tests
-	npm run eslint
+ci: flake mypy
+	py.test -s -v --cov-report term --cov-report html --cov aiozipkin ./tests
+	@echo "open file://`pwd`/htmlcov/index.html"
 
 clean:
 	rm -rf `find . -name __pycache__`
