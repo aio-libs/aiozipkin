@@ -29,7 +29,7 @@ async def test_basic(zipkin_url, client, loop):
     await asyncio.sleep(5)
 
     trace_id = span.context.trace_id
-    url = URL(zipkin_url).with_path('/zipkin/api/v1/traces')
+    url = URL(zipkin_url).with_path('/zipkin/api/v2/traces')
     resp = await client.get(url)
     data = await resp.json()
     assert any(s['traceId'] == trace_id for trace in data for s in trace), data
@@ -48,7 +48,7 @@ async def test_basic_context_manager(zipkin_url, client, loop):
     await asyncio.sleep(5)
 
     trace_id = span.context.trace_id
-    url = URL(zipkin_url).with_path('/zipkin/api/v1/traces')
+    url = URL(zipkin_url).with_path('/zipkin/api/v2/traces')
     resp = await client.get(url)
     data = await resp.json()
     assert any(s['traceId'] == trace_id for trace in data for s in trace), data
@@ -73,20 +73,10 @@ async def test_exception_in_span(zipkin_url, client, loop):
     # TODO: convert sleep to retries
     await asyncio.sleep(5)
 
-    url = URL(zipkin_url).with_path('/zipkin/api/v1/traces')
+    url = URL(zipkin_url).with_path('/zipkin/api/v2/traces')
     resp = await client.get(url)
     data = await resp.json()
-
-    expected = {
-        'endpoint': {
-            'ipv4': '127.0.0.1',
-            'port': 80,
-            'serviceName': 'error_service'},
-        'key': 'error',
-        'value': 'foo'
-    }
-
-    assert any(expected in s['binaryAnnotations']
+    assert any({'error': 'foo'} == s.get('tags', {})
                for trace in data for s in trace)
 
 
