@@ -84,8 +84,8 @@ class Tracer(AsyncContextManager):
     async def __aenter__(self) -> 'Tracer':
         return self
 
-    async def __aexit__(self, *args) -> Optional[bool]:
-        return await self.close()
+    async def __aexit__(self, *args: Any) -> None:
+        await self.close()
 
 
 def create(zipkin_address: str,
