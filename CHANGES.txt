@@ -1,6 +1,13 @@
 CHANGES
 =======
 
+0.4.0 (2018-07-11)
+------------------
+* Add more coverage with typing #147
+* Breaking change: typo send_inteval => send_interval #144 (thanks @gugu)
+* Breaking change: do not append api/v2/spans to the zipkin dress #150
+
+
 0.3.0 (2018-06-13)
 ------------------
 * Add support http.route tag for aiohttp #138
