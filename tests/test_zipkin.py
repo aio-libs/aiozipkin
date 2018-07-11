@@ -84,7 +84,7 @@ async def test_exception_in_span(zipkin_url, client, loop):
 async def test_zipkin_error(client, loop, caplog):
     endpoint = az.create_endpoint('error_service', ipv4='127.0.0.1', port=80)
     interval = 50
-    zipkin_url = 'https://httpbin.org/status/400'
+    zipkin_url = 'https://httpbin.org/status/404'
     async with az.create(zipkin_url, endpoint, sample_rate=1.0,
                          send_interval=interval, loop=loop) as tracer:
         with tracer.new_trace(sampled=True) as span:

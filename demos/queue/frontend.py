@@ -49,7 +49,7 @@ async def make_app(host, port):
     session = aiohttp.ClientSession()
     app['session'] = session
 
-    zipkin_address = 'http://127.0.0.1:9411'
+    zipkin_address = 'http://127.0.0.1:9411/api/v2/spans'
     endpoint = az.create_endpoint('frontend', ipv4=host, port=port)
     tracer = await az.create(zipkin_address, endpoint, sample_rate=1.0)
     az.setup(app, tracer)

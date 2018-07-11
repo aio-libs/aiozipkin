@@ -79,7 +79,8 @@ async def zipkin_server(docker, docker_pull):
 
 @pytest.fixture
 def zipkin_url(zipkin_server):
-    return 'http://{host}:{port}'.format(**zipkin_server)
+    url = 'http://{host}:{port}/api/v2/spans'.format(**zipkin_server)
+    return url
 
 
 @pytest.fixture(scope='session')
@@ -134,7 +135,8 @@ async def jaeger_server(docker, docker_pull):
 
 @pytest.fixture
 def jaeger_url(jaeger_server):
-    return 'http://{host}:{zipkin_port}'.format(**jaeger_server)
+    url = 'http://{host}:{zipkin_port}/api/v2/spans'.format(**jaeger_server)
+    return url
 
 
 @pytest.fixture

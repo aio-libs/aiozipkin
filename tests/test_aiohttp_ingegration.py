@@ -84,8 +84,8 @@ async def test_client_signals(tracer, fake_transport):
         # do not propagate headers
         ctx = {'span_context': span.context, 'propagate_headers': False}
         resp = await session.get(url, trace_request_ctx=ctx)
-        await resp.text()
-        assert resp.status == 200
+        data = await resp.read()
+        assert len(data) > 0
         assert az.make_context(resp.request_info.headers) is None
 
         # by default headers added
@@ -114,8 +114,7 @@ async def test_client_signals_no_span(tracer, fake_transport):
 
     url = 'https://httpbin.org/get'
     resp = await session.get(url)
-    await resp.text()
-    assert resp.status == 200
-
+    data = await resp.read()
+    assert len(data) > 0
     await session.close()
     assert len(fake_transport.records) == 0
