@@ -92,7 +92,7 @@ async def test_client_signals(tracer, fake_transport):
         ctx = {'span_context': span.context}
         resp = await session.get(url, trace_request_ctx=ctx)
         await resp.text()
-        assert resp.status == 200
+        assert len(data) > 0
         context = az.make_context(resp.request_info.headers)
         assert context.trace_id == span.context.trace_id
 
