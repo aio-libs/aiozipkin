@@ -12,7 +12,7 @@ service_b_api = 'http://127.0.0.1:9002/api/v1/data'
 service_e_api = 'http://127.0.0.1:9005/api/v1/data'
 host = '127.0.0.1'
 port = 9001
-zipkin_address = 'http://127.0.0.1:9411'
+zipkin_address = 'http://127.0.0.1:9411/api/v2/spans'
 
 
 async def handler(request):

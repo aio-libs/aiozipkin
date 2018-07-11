@@ -94,9 +94,9 @@ def create(zipkin_address: str,
            send_interval: float=5,
            loop: OptLoop=None) -> Awaitable[Tracer]:
 
-    async def f() -> Tracer:
+    async def build_tracer() -> Tracer:
         sampler = Sampler(sample_rate=sample_rate)
         transport = Transport(zipkin_address, send_interval=send_interval, loop=loop)
         return Tracer(transport, sampler, local_endpoint)
-    result = _ContextManager(f())  # type: Awaitable[Tracer]
+    result = _ContextManager(build_tracer())  # type: Awaitable[Tracer]
     return result

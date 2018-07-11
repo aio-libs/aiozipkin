@@ -4,7 +4,7 @@ import aiozipkin as az
 
 async def run():
     # setup zipkin client
-    zipkin_address = 'http://127.0.0.1:9411'
+    zipkin_address = 'http://127.0.0.1:9411/api/v2/spans'
     endpoint = az.create_endpoint(
         'simple_service', ipv4='127.0.0.1', port=8080)
 
