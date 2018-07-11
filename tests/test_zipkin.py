@@ -92,8 +92,7 @@ async def test_zipkin_error(client, loop, caplog):
             await asyncio.sleep(0.0)
 
     assert len(caplog.records) == 1
-
-    msg = 'zipkin responded with code: 404'
+    msg = 'zipkin responded with code: '
     assert msg in str(caplog.records[0].exc_info)
 
     t = ('aiozipkin', logging.ERROR, 'Can not send spans to zipkin')
