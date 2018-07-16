@@ -65,7 +65,7 @@ def create_endpoint(service_name: str, *,
 
 def make_timestamp(ts: OptTs=None) -> int:
     """Create zipkin timestamp in microseconds, or convert available one
-    from second. Useful when user supply ts from time.time() call.
+    from second. Useful when user supplies ts from time.time() call.
     """
     ts = ts if ts is not None else time.time()
     return int(ts * 1000 * 1000)  # microseconds

@@ -157,7 +157,7 @@ def get_tracer(app: Application, tracer_key: str=APP_AIOZIPKIN_KEY) -> Tracer:
 
 def request_span(request: Request,
                  request_key: str=REQUEST_AIOZIPKIN_KEY) -> SpanAbc:
-    """Return span created by middleware from request context, you can use it
+    """Returns span created by middleware from request context, you can use it
     as parent on next child span.
     """
     return cast(SpanAbc, request[request_key])

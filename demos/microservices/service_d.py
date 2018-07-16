@@ -11,7 +11,7 @@ port = 9004
 async def handler(request):
     await asyncio.sleep(0.01)
     payload = {
-        'name': 'servcie_d',
+        'name': 'service_d',
         'host': host,
         'port': port,
         'children': [],
