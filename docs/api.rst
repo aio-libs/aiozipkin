@@ -1,7 +1,7 @@
 API
 ===
 
-Core API Refernece
+Core API Reference
 ------------------
 
 .. module:: aiozipkin
@@ -10,34 +10,34 @@ Core API Refernece
 
 .. data:: CLIENT
 
-    Contant indicates that span created on client side.
+    Constant indicates that span has been created on client side.
 
 .. data:: SERVER
 
-    Contant indicates that span created on server side.
+    Constant indicates that span has been created on server side.
 
 .. data:: PRODUCER
 
-    Contant indicates that span created by messsage producer.
+    Constant indicates that span has been created by messsage producer.
 
 .. data:: CONSUMER
 
-    Contant indicates that span created by messsage consumer.
+    Constant indicates that span has been created by messsage consumer.
 
 .. function:: make_context(headers: Dict[str, str])
 
     Creates tracing context object from from headers mapping if possible,
-    otherwise retursns `None`.
+    otherwise returns `None`.
 
     :param dict headers: hostname to serve monitor telnet server
     :returns: TraceContext object or None
 
-.. cofunction:: create(zipkin_address, local_endpoint, sample_rate, send_inteval, loop)
+.. cofunction:: create(zipkin_address, local_endpoint, sample_rate, send_interval, loop)
 
    Creates Tracer object
 
-   :param Endpoint zipkin_address: information related to service anddress \
-    and name, where current zipkin tracer installed
+   :param Endpoint zipkin_address: information related to service address \
+    and name, where current zipkin tracer is installed
    :param Endpoint local_endpoint: hostname to serve monitor telnet server
    :param float sample_rate: hostname to serve monitor telnet server
    :param float send_inteval: hostname to serve monitor telnet server
@@ -46,7 +46,7 @@ Core API Refernece
 
 .. class:: Endpoint(serviceName: str, ipv4=None, ipv6=None, port=None)
 
-   This this simple data only class, just holder for the servcie related
+   This this simple data only class, just holder for service related
    information:
 
    .. attribute:: serviceName
@@ -84,10 +84,10 @@ Core API Refernece
      :rtype bool: hostname to serve monitor telnet server
 
 
-Aiohtp integration API
-----------------------
+Aiohttp integration API
+-----------------------
 
-API for integration with *aiohttp.web*, in just calling `setup` is enough for
+API for integration with *aiohttp.web*, just calling `setup` is enough for
 zipkin to start tracking requests. On high level attached plugin registers
 middleware that starts span on beginning of request and closes it on finish,
 saving important metadata, like route, status code etc.
@@ -95,13 +95,13 @@ saving important metadata, like route, status code etc.
 
 .. data:: APP_AIOZIPKIN_KEY
 
-    Key, for aiohttp application, where aiozipkin related data saved. In case
+    Key, for aiohttp application, where aiozipkin related data is saved. In case
     for some reason you want to use 2 aiozipkin instances or change default
     name, this parameter should not be used.
 
 .. data:: REQUEST_AIOZIPKIN_KEY
 
-    Key, for aiohttp request, where aiozipkin span related to current request
+    Key, for aiohttp request, where aiozipkin span related to current request is
     located.
 
 .. function:: setup(app, tracer, tracer_key=APP_AIOZIPKIN_KEY, request_key=APP_AIOZIPKIN_KEY)
