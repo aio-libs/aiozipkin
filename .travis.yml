@@ -21,7 +21,8 @@ install:
     - pip install -r requirements-dev.txt
     - |
         if [ "$AIOHTTP_MASTER" = "y" ]; then
-            pip install https://github.com/aio-libs/aiohttp/archive/master.zip
+            pip install cython
+            pip install git+https://github.com/aio-libs/aiohttp.git
         fi;
     - |
         if [ "$MYPY" = "y" ]; then
