@@ -7,7 +7,7 @@ Setting Development Environment
 .. _GitHub: https://github.com/aio-libs/aiozipkin
 
 Thanks for your interest in contributing to ``aiozipkin``, there are multiple
-ways and places you can contribute, help on on documentation and tests very
+ways and places you can contribute, help on on documentation and tests is very
 appreciated.
 
 To setup development environment, fist of all just clone repository::
@@ -38,15 +38,15 @@ To run individual test use following command::
     $ py.test -sv tests/test_tracer.py -k test_name
 
 
-Project use Docker_ for integration tests, test infrastructure will
+Project uses Docker_ for integration tests, test infrastructure will
 automatically pull ``zipkin:2`` or ``jaegertracing/all-in-one:1.0.0`` image
-and start server, you need to worry about this just make sure you
+and start server, you don't to worry about this just make sure you
 have Docker_ installed.
 
 
 Reporting an Issue
 ------------------
-If you have found issue with `aiozipkin` please do
+If you have found an issue with `aiozipkin` please do
 not hesitate to file an issue on the GitHub_ project. When filing your
 issue please make sure you can express the issue with a reproducible test
 case.

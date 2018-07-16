@@ -5,10 +5,10 @@ tested it with jaeger_ and stackdriver_.
 
 Jaeger support
 --------------
-jaeger_ supports zipkin_ span format as result it is possible to use *aiozipkin*
+jaeger_ supports zipkin_ span format and as a result it is possible to use *aiozipkin*
 with jaeger_ server. You just need to specify *jaeger* server address and it
-should work out of the box. Not need to run local zipkin server.
-For more informations see tests and jaeger_ documentation.
+should work out of the box. No need to run a local zipkin server.
+For more information see tests and jaeger_ documentation.
 
 .. image:: https://raw.githubusercontent.com/aio-libs/aiozipkin/master/docs/jaeger.png
     :alt: jaeger ui animation
@@ -16,9 +16,9 @@ For more informations see tests and jaeger_ documentation.
 
 Stackdriver support
 -------------------
-Google stackdriver_ supports zipkin_ span format as result it is possible to
+Google stackdriver_ supports zipkin_ span format as a result it is possible to
 use *aiozipkin* with this google_ service. In order to make this work you
-need to setup zipkin service locally, that will send trace to the cloud. See
+need to setup zipkin service locally, that will send traces to the cloud. See
 google_ cloud documentation how to setup make zipkin collector:
 
 .. image:: https://raw.githubusercontent.com/aio-libs/aiozipkin/master/docs/stackdriver.png
