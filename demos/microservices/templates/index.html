@@ -1,7 +1,7 @@
 {% macro render_service(service) -%}
 <div class="uk-card uk-card-default uk-card-body uk-card-hover">
     <h3 class="uk-card-title uk-heading-line">
-        <a href="http://{{service.host}}:{{service.port}}/api/v1/data"target="_blank">{{service.name}}</a>
+        <a href="http://{{service.host}}:{{service.port}}/api/v1/data" target="_blank">{{service.name}}</a>
     </h3>
     <ul>
         <li>host: {{service.host}}</li>
@@ -31,10 +31,10 @@
             <article class="uk-article">
                 <h1 class="uk-article-title"><a class="uk-link-reset" href="">aiozipkin microservices demo</a></h1>
                 <p class="uk-text-lead">
-                    There is larger micro services example, using <a hre"https://github.com/aio-libs/aiohttp">aiohttp</a>.
-                    This demo consists of five simple services that call each other, as result you can study client
+                    There is a larger micro services example, using <a href="https://aiohttp.readthedocs.io/en/stable/">aiohttp</a>.
+                    This demo consists of five simple services that call each other, as a result you can study client
                     server communication and zipkin integration for large projects. Each
-                    box element of this page rendered with help of different service.
+                    box element of this page is rendered with help of different service.
                 </p>
                 <p><span class="uk-label">Zipkin UI</span> <a href="{{zipkin}}" target="_blank">{{zipkin}}</a></p>
                 {{ render_service(service) }}
@@ -43,7 +43,7 @@
             <hr class="uk-divider-icon">
             <h5 class="uk-text-center">
                 <span>
-                    <a hre"https://github.com/aio-libs/aiozipkin">https://github.com/aio-libs/aiozipkin</a>
+                    <a href="https://github.com/aio-libs/aiozipkin">https://github.com/aio-libs/aiozipkin</a>
                 </span>
             </h5>
         </div>
