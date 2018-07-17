@@ -2,10 +2,24 @@ import asyncio
 import gc
 import logging
 import tracemalloc
+from typing import Dict
 
 import pytest
 import aiozipkin as az
 from yarl import URL
+
+
+async def _retry_zipkin_client(url: URL, client: 'aiohttp.ClientSession',
+                               retries: int = 5) -> Dict:
+    tries = 0
+    while tries < retries:
+        asyncio.sleep(5)
+        resp = await client.get(url)  # type: 'aiohttp.ClientResponse'
+        if resp.status > 200:
+            tries += 1
+            continue
+        data = await resp.json()
+        return data
 
 
 @pytest.mark.asyncio
@@ -25,13 +39,10 @@ async def test_basic(zipkin_url, client, loop):
 
     # close forced sending data to server regardless of send interval
     await tracer.close()
-    # give zipkin time to process maessage :((
-    await asyncio.sleep(5)
 
     trace_id = span.context.trace_id
     url = URL(zipkin_url).with_path('/zipkin/api/v2/traces')
-    resp = await client.get(url)
-    data = await resp.json()
+    data = await _retry_zipkin_client(url, client)
     assert any(s['traceId'] == trace_id for trace in data for s in trace), data
 
 
@@ -44,13 +55,10 @@ async def test_basic_context_manager(zipkin_url, client, loop):
             span.name('root_span')
             await asyncio.sleep(0.1)
 
-    # give zipkin time to process maessage :((
-    await asyncio.sleep(5)
-
     trace_id = span.context.trace_id
     url = URL(zipkin_url).with_path('/zipkin/api/v2/traces')
-    resp = await client.get(url)
-    data = await resp.json()
+    data = await _retry_zipkin_client(url, client)
+
     assert any(s['traceId'] == trace_id for trace in data for s in trace), data
 
 
@@ -69,13 +77,8 @@ async def test_exception_in_span(zipkin_url, client, loop):
         with pytest.raises(RuntimeError):
             func(span)
 
-    # give zipkin time to process maessage :((
-    # TODO: convert sleep to retries
-    await asyncio.sleep(5)
-
     url = URL(zipkin_url).with_path('/zipkin/api/v2/traces')
-    resp = await client.get(url)
-    data = await resp.json()
+    data = await _retry_zipkin_client(url, client)
     assert any({'error': 'foo'} == s.get('tags', {})
                for trace in data for s in trace)
 
