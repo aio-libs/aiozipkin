@@ -84,8 +84,8 @@ class Tracer(AsyncContextManager):
     async def __aenter__(self) -> 'Tracer':
         return self
 
-    async def __aexit__(self, *args) -> Optional[bool]:
-        return await self.close()
+    async def __aexit__(self, *args: Any) -> None:
+        await self.close()
 
 
 def create(zipkin_address: str,
@@ -94,12 +94,12 @@ def create(zipkin_address: str,
            send_interval: float=5,
            loop: OptLoop=None) -> Awaitable[Tracer]:
 
-    async def f() -> Tracer:
+    async def build_tracer() -> Tracer:
         sampler = Sampler(sample_rate=sample_rate)
         if not zipkin_address:
             transport = cast(Transport, StubTransport())
         else:
             transport = Transport(zipkin_address, send_interval=send_interval, loop=loop)
         return Tracer(transport, sampler, local_endpoint)
-    result = _ContextManager(f())  # type: Awaitable[Tracer]
+    result = _ContextManager(build_tracer())  # type: Awaitable[Tracer]
     return result

@@ -54,18 +54,18 @@ Endpoint = NamedTuple(
 )
 
 
-def create_endpoint(servce_name: str, *,
+def create_endpoint(service_name: str, *,
                     ipv4: OptStr=None,
                     ipv6: OptStr=None,
-                    port: OptInt=None):
+                    port: OptInt=None) -> Endpoint:
     """Factory function to create Endpoint object.
     """
-    return Endpoint(servce_name, ipv4, ipv6, port)
+    return Endpoint(service_name, ipv4, ipv6, port)
 
 
 def make_timestamp(ts: OptTs=None) -> int:
     """Create zipkin timestamp in microseconds, or convert available one
-    from second. Useful when user supply ts from time.time() call.
+    from second. Useful when user supplies ts from time.time() call.
     """
     ts = ts if ts is not None else time.time()
     return int(ts * 1000 * 1000)  # microseconds

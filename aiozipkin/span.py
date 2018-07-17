@@ -1,5 +1,6 @@
 from abc import ABCMeta, abstractmethod
-from typing import TYPE_CHECKING, TypeVar, Optional
+from typing import TYPE_CHECKING, TypeVar, Optional, Type
+from types import TracebackType
 
 from .constants import ERROR
 from .helpers import Endpoint, make_timestamp, TraceContext
@@ -74,8 +75,10 @@ class SpanAbc(metaclass=ABCMeta):
         self.start()
         return self
 
-    def __exit__(self, exception_type, exception_value, traceback) -> None:
-        self.finish(exception=exception_value)
+    def __exit__(self, exc_type: Optional[Type[Exception]],
+                 exc_value: Optional[Exception],
+                 traceback: Optional[TracebackType]) -> None:
+        self.finish(exception=exc_value)
 
 
 class NoopSpan(SpanAbc):
@@ -148,7 +151,7 @@ class Span(SpanAbc):
     def tracer(self) -> 'Tracer':
         return self._tracer
 
-    def start(self, ts=None) -> 'Span':
+    def start(self, ts: OptTs=None) -> 'Span':
         ts = make_timestamp(ts)
         self._record.start(ts)
         return self

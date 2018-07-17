@@ -12,7 +12,8 @@ service_b_api = 'http://127.0.0.1:9002/api/v1/data'
 service_e_api = 'http://127.0.0.1:9005/api/v1/data'
 host = '127.0.0.1'
 port = 9001
-zipkin_address = 'http://127.0.0.1:9411'
+zipkin_address = 'http://127.0.0.1:9411/api/v2/spans'
+zipkin_ui_address = 'http://127.0.0.1:9411/zipkin/'
 
 
 async def handler(request):
@@ -34,7 +35,7 @@ async def handler(request):
         'children': [data_b, data_e],
     }
     ctx = {
-        'zipkin':  zipkin_address,
+        'zipkin':  zipkin_ui_address,
         'service': tree
     }
     return aiohttp_jinja2.render_template('index.html', request, ctx)
