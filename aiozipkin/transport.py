@@ -1,5 +1,7 @@
+import abc
 import asyncio
-from typing import List, Dict, Any, Optional  # flake8: noqa
+from collections import deque
+from typing import List, Dict, Any, Optional, Deque  # flake8: noqa
 
 import aiohttp
 from yarl import URL
@@ -9,18 +11,32 @@ from .mypy_types import OptLoop
 from .record import Record
 
 
-class StubTransport:
+class TransportABC(abc.ABC):
+
+    @abc.abstractmethod
+    def send(self, record: Record) -> None:
+        """Sends data to zipkin collector."""
+        pass
+
+    @abc.abstractmethod
+    async def close(self) -> None:
+        """Performs additional cleanup actions if required."""
+        pass
+
+
+class StubTransport(TransportABC):
     def __init__(self, *args, **kwargs) -> None:
         logger.info('Zipkin address was not provided, using stub transport')
+        self.records = deque(maxlen=100)  # type: Deque
 
     def send(self, record: Record) -> None:
-        pass
+        self.records.append(record)
 
     async def close(self) -> None:
         pass
 
 
-class Transport:
+class Transport(TransportABC):
 
     def __init__(self, address: str, send_interval: float=5,
                  loop: OptLoop=None) -> None:
