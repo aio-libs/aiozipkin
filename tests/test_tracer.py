@@ -2,9 +2,10 @@ from unittest import mock
 
 import pytest
 from aiozipkin.helpers import (
-    TraceContext,
+    TraceContext, create_endpoint,
 )
-from aiozipkin.tracer import NoopSpan, Span
+from aiozipkin.tracer import NoopSpan, Span, create
+from aiozipkin.transport import StubTransport, Transport
 
 
 def test_basic(tracer, fake_transport):
@@ -153,3 +154,17 @@ def test_null_annotation(tracer, fake_transport):
     assert len(fake_transport.records) == 1
     record = fake_transport.records[0]
     assert record.asdict()['annotations'][0]['value'] == 'None'
+
+
+@pytest.mark.asyncio
+async def test_create_transport():
+    endpoint = create_endpoint('test_service', ipv4='127.0.0.1', port=8080)
+    with mock.patch(
+            'aiozipkin.tracer.Tracer') as tracer_stub:  # type: mock.MagicMock
+        await create('', endpoint)
+        assert isinstance(tracer_stub.call_args[0][0], StubTransport)
+
+        with mock.patch('aiozipkin.tracer.Transport.__init__') as init_mock:
+            init_mock.return_value = None
+            await create('sample.endpoint', endpoint)
+            assert isinstance(tracer_stub.call_args[0][0], Transport)

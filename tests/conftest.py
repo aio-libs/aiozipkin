@@ -5,7 +5,7 @@ import aiohttp
 from aiozipkin.helpers import create_endpoint, TraceContext
 from aiozipkin.sampler import Sampler
 from aiozipkin.tracer import Tracer
-from aiozipkin.transport import Transport
+from aiozipkin.transport import StubTransport
 from async_generator import yield_, async_generator
 
 import pytest
@@ -25,21 +25,9 @@ def loop(event_loop):
     return event_loop
 
 
-class FakeTransport(Transport):
-
-    def __init__(self):
-        self.records = []
-
-    def send(self, record):
-        self.records.append(record)
-
-    async def close(self):
-        pass
-
-
 @pytest.fixture
 def fake_transport():
-    transport = FakeTransport()
+    transport = StubTransport()
     return transport
 
 
