@@ -18,6 +18,8 @@ checkrst:
 bandit:
 	bandit -r ./aiozipkin
 
+pyroma:
+	pyroma -d .
 mypy:
 	mypy aiozipkin --ignore-missing-imports --disallow-untyped-calls --no-site-packages --strict
 
