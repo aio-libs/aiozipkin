@@ -10,10 +10,10 @@ from yarl import URL
 
 
 async def _retry_zipkin_client(url: URL, client: 'aiohttp.ClientSession',
-                               retries: int = 5) -> Dict:
+                               retries: int = 5, backoff_time: int=1) -> Dict:
     tries = 0
     while tries < retries:
-        asyncio.sleep(5)
+        asyncio.sleep(backoff_time)
         resp = await client.get(url)  # type: 'aiohttp.ClientResponse'
         if resp.status > 200:
             tries += 1

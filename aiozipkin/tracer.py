@@ -6,13 +6,13 @@ from .mypy_types import OptLoop, OptBool
 from .record import Record
 from .sampler import Sampler
 from .span import Span, NoopSpan, SpanAbc
-from .transport import Transport, StubTransport
+from .transport import Transport, StubTransport, TransportABC
 from .utils import generate_random_64bit_string, generate_random_128bit_string
 
 
 class Tracer(AsyncContextManager):
     def __init__(self,
-                 transport: Transport,
+                 transport: TransportABC,
                  sampler: Sampler,
                  local_endpoint: Endpoint) -> None:
         self._records = {}  # type: Dict[TraceContext, Record]
@@ -97,7 +97,7 @@ def create(zipkin_address: str,
     async def build_tracer() -> Tracer:
         sampler = Sampler(sample_rate=sample_rate)
         if not zipkin_address:
-            transport = cast(Transport, StubTransport())
+            transport = StubTransport()
         else:
             transport = Transport(zipkin_address, send_interval=send_interval, loop=loop)
         return Tracer(transport, sampler, local_endpoint)

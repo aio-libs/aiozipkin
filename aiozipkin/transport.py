@@ -25,9 +25,11 @@ class TransportABC(abc.ABC):
 
 
 class StubTransport(TransportABC):
-    def __init__(self, *args: Optional[Any], **kwargs: Optional[Any]) -> None:
+    """Dummy transport, which logs spans to a limited queue."""
+
+    def __init__(self, queue_length: int=100) -> None:
         logger.info('Zipkin address was not provided, using stub transport')
-        self.records = deque(maxlen=100)  # type: Deque
+        self.records = deque(maxlen=queue_length)  # type: Deque
 
     def send(self, record: Record) -> None:
         self.records.append(record)
