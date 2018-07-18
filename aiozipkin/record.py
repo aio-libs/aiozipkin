@@ -36,6 +36,10 @@ class Record:
         self._annotations = []  # type: List[Annotation]
         self._tags = {}  # type: Dict[str, str]
 
+    @property
+    def context(self):
+        return self._context
+
     def start(self: T, ts: int) -> T:
         self._timestamp = ts
         return self

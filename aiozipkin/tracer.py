@@ -15,6 +15,7 @@ class Tracer(AsyncContextManager):
                  transport: TransportABC,
                  sampler: Sampler,
                  local_endpoint: Endpoint) -> None:
+        super().__init__()
         self._records = {}  # type: Dict[TraceContext, Record]
         self._transport = transport
         self._sampler = sampler
@@ -50,7 +51,7 @@ class Tracer(AsyncContextManager):
         return Span(self, context, record)
 
     def _send(self, record: Record) -> None:
-        self._records.pop(record._context, None)
+        self._records.pop(record.context, None)
         self._transport.send(record)
 
     def _next_context(self,
