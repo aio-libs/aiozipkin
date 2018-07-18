@@ -97,7 +97,7 @@ def create(zipkin_address: str,
     async def build_tracer() -> Tracer:
         sampler = Sampler(sample_rate=sample_rate)
         if not zipkin_address:
-            transport = StubTransport()
+            transport = StubTransport()  # type: TransportABC
         else:
             transport = Transport(zipkin_address, send_interval=send_interval, loop=loop)
         return Tracer(transport, sampler, local_endpoint)
