@@ -88,7 +88,7 @@ class Transport(TransportABC):
                         resp.status, body)
                     raise RuntimeError(msg)
 
-        except Exception as exc:
+        except Exception as exc:  # pylint: disable=broad-except
             # that code should never fail and break application
             logger.error('Can not send spans to zipkin', exc_info=exc)
 

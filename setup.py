@@ -59,4 +59,6 @@ setup(name='aiozipkin',
       packages=find_packages(),
       install_requires=install_requires,
       extras_require=extras_require,
+      keywords=['zipkin', 'distributed-tracing', 'tracing'],
+      zip_safe=True,
       include_package_data=True)

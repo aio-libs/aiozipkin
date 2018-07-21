@@ -12,6 +12,7 @@ class _ContextManager(Generic[T], AsyncContextManager, AbcAwaitable):
     __slots__ = ('_coro', '_obj')
 
     def __init__(self, coro: Awaitable[T]) -> None:
+        super().__init__()
         self._coro = coro  # type: Awaitable[T]
         self._obj = None  # type: Optional[T]
 
