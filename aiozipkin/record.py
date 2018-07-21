@@ -37,7 +37,7 @@ class Record:
         self._tags = {}  # type: Dict[str, str]
 
     @property
-    def context(self):
+    def context(self) -> TraceContext:
         return self._context
 
     def start(self: T, ts: int) -> T:
