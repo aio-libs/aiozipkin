@@ -24,8 +24,9 @@ async def handler(request):
     message = await request.json()
     tracer = az.get_tracer(request.app)
     for _ in range(5):
-        asyncio.ensure_future(aiojobs.aiohttp.spawn(
-            request, consume_message(message, tracer)))
+        asyncio.ensure_future(
+            aiojobs.aiohttp.spawn(request, consume_message(message, tracer))
+        )
 
     return web.Response(text='ok')
 
@@ -36,8 +37,7 @@ async def make_app(host, port):
     aiojobs.aiohttp.setup(app)
 
     zipkin_address = 'http://127.0.0.1:9411/api/v2/spans'
-    endpoint = az.create_endpoint(
-        'backend_broker', ipv4=host, port=port)
+    endpoint = az.create_endpoint('backend_broker', ipv4=host, port=port)
     tracer = await az.create(zipkin_address, endpoint, sample_rate=1.0)
     az.setup(app, tracer)
     return app

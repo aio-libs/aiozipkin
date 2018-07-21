@@ -34,10 +34,7 @@ async def handler(request):
         'port': port,
         'children': [data_b, data_e],
     }
-    ctx = {
-        'zipkin':  zipkin_ui_address,
-        'service': tree
-    }
+    ctx = {'zipkin': zipkin_ui_address, 'service': tree}
     return aiohttp_jinja2.render_template('index.html', request, ctx)
 
 
@@ -57,13 +54,15 @@ async def make_app():
 
     async def close_session(app):
         await app['session'].close()
+
     app.on_cleanup.append(close_session)
 
     az.setup(app, tracer)
 
     TEMPLATES_ROOT = pathlib.Path(__file__).parent / 'templates'
     aiohttp_jinja2.setup(
-        app, loader=jinja2.FileSystemLoader(str(TEMPLATES_ROOT)))
+        app, loader=jinja2.FileSystemLoader(str(TEMPLATES_ROOT))
+    )
 
     return app
 

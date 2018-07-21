@@ -31,9 +31,7 @@ async def index(request):
         span_producer.remote_endpoint('broker', ipv4='127.0.0.1', port=9011)
 
         headers = span_producer.context.make_headers()
-        message = {
-            'payload': 'click',
-            'headers': headers}
+        message = {'payload': 'click', 'headers': headers}
         resp = await session.post(backend_service, json=message)
         resp = await resp.text()
         assert resp == 'ok'
