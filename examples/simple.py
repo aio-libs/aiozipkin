@@ -6,7 +6,8 @@ async def run():
     # setup zipkin client
     zipkin_address = 'http://127.0.0.1:9411/api/v2/spans'
     endpoint = az.create_endpoint(
-        'simple_service', ipv4='127.0.0.1', port=8080)
+        'simple_service', ipv4='127.0.0.1', port=8080
+    )
 
     # creates tracer object that traces all calls, if you want sample
     # only 50% just set sample_rate=0.5

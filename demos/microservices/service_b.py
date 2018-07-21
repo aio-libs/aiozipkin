@@ -49,6 +49,7 @@ async def make_app():
 
     async def close_session(app):
         await app['session'].close()
+
     app.on_cleanup.append(close_session)
     return app
 
