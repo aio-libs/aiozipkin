@@ -7,7 +7,7 @@ from .mypy_types import OptInt
 class SamplerABC(abc.ABC):
 
     @abc.abstractmethod
-    def is_sampled(self, trace_id: str) -> bool:
+    def is_sampled(self, trace_id: str) -> bool:  # pragma: no cover
         """Defines if given trace should be recorded for further actions."""
         pass
 

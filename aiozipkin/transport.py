@@ -14,12 +14,12 @@ from .record import Record
 class TransportABC(abc.ABC):
 
     @abc.abstractmethod
-    def send(self, record: Record) -> None:
+    def send(self, record: Record) -> None:  # pragma: no cover
         """Sends data to zipkin collector."""
         pass
 
     @abc.abstractmethod
-    async def close(self) -> None:
+    async def close(self) -> None:  # pragma: no cover
         """Performs additional cleanup actions if required."""
         pass
 
