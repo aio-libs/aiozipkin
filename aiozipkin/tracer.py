@@ -4,7 +4,7 @@ from .context_managers import _ContextManager
 from .helpers import TraceContext, Endpoint
 from .mypy_types import OptLoop, OptBool
 from .record import Record
-from .sampler import Sampler
+from .sampler import Sampler, SamplerABC
 from .span import Span, NoopSpan, SpanAbc
 from .transport import Transport, StubTransport, TransportABC
 from .utils import generate_random_64bit_string, generate_random_128bit_string
@@ -13,7 +13,7 @@ from .utils import generate_random_64bit_string, generate_random_128bit_string
 class Tracer(AsyncContextManager):
     def __init__(self,
                  transport: TransportABC,
-                 sampler: Sampler,
+                 sampler: SamplerABC,
                  local_endpoint: Endpoint) -> None:
         super().__init__()
         self._records = {}  # type: Dict[TraceContext, Record]
@@ -102,5 +102,15 @@ def create(zipkin_address: str,
         else:
             transport = Transport(zipkin_address, send_interval=send_interval, loop=loop)
         return Tracer(transport, sampler, local_endpoint)
+    result = _ContextManager(build_tracer())  # type: Awaitable[Tracer]
+    return result
+
+
+def create_custom(transport: TransportABC,
+                  sampler: SamplerABC,
+                  local_endpoint: Endpoint,) -> Awaitable[Tracer]:
+    async def build_tracer() -> Tracer:
+        return Tracer(transport, sampler, local_endpoint)
+
     result = _ContextManager(build_tracer())  # type: Awaitable[Tracer]
     return result

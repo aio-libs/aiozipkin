@@ -44,6 +44,15 @@ Core API Reference
    :param asyncio.EventLoop loop: hostname to serve monitor telnet server
    :returns: Tracer
 
+.. cofunction:: create_custom(transport, sampler, local_endpoint)
+
+    Creates Tracer object with a custom Transport and Sampler implementation.
+
+    :param TransportABC transport: custom transport implementation
+    :param SamplerABC sampler: custom sampler implementation
+    :param Endpoint local_endpoint: hostname to serve monitor telnet server
+    :returns: Tracer
+
 .. class:: Endpoint(serviceName: str, ipv4=None, ipv6=None, port=None)
 
    This this simple data only class, just holder for service related
