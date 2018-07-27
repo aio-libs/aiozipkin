@@ -4,8 +4,8 @@ import pytest
 from aiozipkin.helpers import (
     TraceContext, create_endpoint,
 )
-from aiozipkin.tracer import NoopSpan, Span, create, create_custom
-from aiozipkin.transport import StubTransport, Transport
+from aiozipkin.tracer import NoopSpan, Span, create_custom
+from aiozipkin.transport import StubTransport
 from aiozipkin.sampler import SamplerABC
 
 
@@ -158,28 +158,15 @@ def test_null_annotation(tracer, fake_transport):
 
 
 @pytest.mark.asyncio
-async def test_create_transport():
-    endpoint = create_endpoint('test_service', ipv4='127.0.0.1', port=8080)
-    with mock.patch(
-            'aiozipkin.tracer.Tracer') as tracer_stub:  # type: mock.MagicMock
-        await create('', endpoint)
-        assert isinstance(tracer_stub.call_args[0][0], StubTransport)
-
-        with mock.patch('aiozipkin.tracer.Transport.__init__') as init_mock:
-            init_mock.return_value = None
-            await create('sample.endpoint', endpoint)
-            assert isinstance(tracer_stub.call_args[0][0], Transport)
-
-
-@pytest.mark.asyncio
 async def test_create_custom(fake_transport):
     endpoint = create_endpoint('test_service', ipv4='127.0.0.1', port=8080)
 
     class FakeSampler(SamplerABC):
         def is_sampled(self, trace_id: str):
             return True
+
     with mock.patch(
             'aiozipkin.tracer.Tracer') as tracer_stub:  # type: mock.MagicMock
-        await create_custom(fake_transport, FakeSampler(), endpoint)
+        await create_custom(endpoint, fake_transport, FakeSampler())
         assert isinstance(tracer_stub.call_args[0][0], StubTransport)
         assert isinstance(tracer_stub.call_args[0][1], FakeSampler)

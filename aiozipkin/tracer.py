@@ -97,20 +97,22 @@ def create(zipkin_address: str,
 
     async def build_tracer() -> Tracer:
         sampler = Sampler(sample_rate=sample_rate)
-        if not zipkin_address:
-            transport = StubTransport()  # type: TransportABC
-        else:
-            transport = Transport(zipkin_address, send_interval=send_interval, loop=loop)
+        transport = Transport(
+            zipkin_address, send_interval=send_interval, loop=loop)
         return Tracer(transport, sampler, local_endpoint)
     result = _ContextManager(build_tracer())  # type: Awaitable[Tracer]
     return result
 
 
-def create_custom(transport: TransportABC,
-                  sampler: SamplerABC,
-                  local_endpoint: Endpoint,) -> Awaitable[Tracer]:
+def create_custom(local_endpoint: Endpoint,
+                  transport: Optional[TransportABC]=None,
+                  sampler: Optional[SamplerABC]=None) -> Awaitable[Tracer]:
+    t = transport or StubTransport()
+    sample_rate = 1  # sample everything
+    s = sampler or Sampler(sample_rate=sample_rate)
+
     async def build_tracer() -> Tracer:
-        return Tracer(transport, sampler, local_endpoint)
+        return Tracer(t, s, local_endpoint)
 
     result = _ContextManager(build_tracer())  # type: Awaitable[Tracer]
     return result
