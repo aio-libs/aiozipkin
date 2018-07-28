@@ -1,6 +1,16 @@
 CHANGES
 =======
 
+0.5.0 (YYYY-MM-DD)
+------------------
+* More strict typing configuration is used #147
+* Fixed bunch of typos in code and docs #151 #153 (thanks @deejay1)
+* Added interface for Transport #155 (thanks @deejay1)
+* Added create_custom helper for easer tracer configuration #160 (thanks @deejay1)
+* Added interface for Sampler #160 (thanks @deejay1)
+* Added py.typed marker
+
+
 0.4.0 (2018-07-11)
 ------------------
 * Add more coverage with typing #147
