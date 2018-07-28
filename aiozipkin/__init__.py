@@ -26,7 +26,7 @@ from .constants import (
     HTTP_ROUTE,
 )
 from .sampler import Sampler
-from .tracer import Tracer, create
+from .tracer import Tracer, create, create_custom
 
 
 __version__ = '0.4.1a1'
@@ -34,6 +34,7 @@ __all__ = (
     'Tracer',
     'Sampler',
     'create',
+    'create_custom',
     'create_endpoint',
     'make_context',
     # aiohttp helpers
