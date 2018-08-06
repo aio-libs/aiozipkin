@@ -1,7 +1,7 @@
 -e .
 aiodocker==0.13.0
 aiohttp==3.3.2
-async-generator==1.9
+async-generator==1.10
 attrs==18.1.0
 bandit==1.4.0
 docutils==0.14
