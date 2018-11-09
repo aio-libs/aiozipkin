@@ -10,7 +10,7 @@ from .transport import Transport, StubTransport, TransportABC
 from .utils import generate_random_64bit_string, generate_random_128bit_string
 
 
-class Tracer(AsyncContextManager):
+class Tracer(AsyncContextManager[Tracer]):
     def __init__(self,
                  transport: TransportABC,
                  sampler: SamplerABC,
@@ -100,7 +100,7 @@ def create(zipkin_address: str,
         transport = Transport(
             zipkin_address, send_interval=send_interval, loop=loop)
         return Tracer(transport, sampler, local_endpoint)
-    result = _ContextManager(build_tracer())  # type: Awaitable[Tracer]
+    result = _ContextManager(build_tracer())
     return result
 
 
