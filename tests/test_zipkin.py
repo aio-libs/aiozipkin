@@ -2,19 +2,17 @@ import asyncio
 import gc
 import logging
 import tracemalloc
-from typing import Dict
 
 import pytest
 import aiozipkin as az
 from yarl import URL
 
 
-async def _retry_zipkin_client(url: URL, client: 'aiohttp.ClientSession',
-                               retries: int = 5, backoff_time: int=1) -> Dict:
+async def _retry_zipkin_client(url, client, retries=5, backoff_time=1):
     tries = 0
     while tries < retries:
         asyncio.sleep(backoff_time)
-        resp = await client.get(url)  # type: 'aiohttp.ClientResponse'
+        resp = await client.get(url)
         if resp.status > 200:
             tries += 1
             continue

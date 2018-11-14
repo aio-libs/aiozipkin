@@ -30,10 +30,8 @@ async def test_middleware_with_default_transport(tracer, fake_transport):
     req = make_mocked_request('GET', '/aa', headers={'token': 'x'}, app=app)
     req.match_info.route.resource.canonical = '/{pid}'
 
-    middleware_factory = middleware_maker()
-    middleware = await middleware_factory(app, handler)
-
-    await middleware(req)
+    middleware = middleware_maker()
+    await middleware(req, handler)
     span = az.request_span(req)
     assert span
     assert len(fake_transport.records) == 1
@@ -44,7 +42,7 @@ async def test_middleware_with_default_transport(tracer, fake_transport):
     # noop span does not produce records
     headers = {'X-B3-Sampled': '0'}
     req_noop = make_mocked_request('GET', '/', headers=headers, app=app)
-    await middleware(req_noop)
+    await middleware(req_noop, handler)
     span = az.request_span(req_noop)
     assert span
     assert len(fake_transport.records) == 1
@@ -65,9 +63,8 @@ async def test_middleware_with_not_skip_route(tracer, fake_transport):
 
     req = make_mocked_request('GET', '/', headers={'token': 'x'}, app=app)
     req._match_info = match_info
-    middleware_factory = middleware_maker(skip_routes=[skip_route])
-    middleware = await middleware_factory(app, handler)
-    await middleware(req)
+    middleware = middleware_maker(skip_routes=[skip_route])
+    await middleware(req, handler)
 
     assert len(fake_transport.records) == 0
 
@@ -106,10 +103,9 @@ async def test_middleware_with_valid_ip(tracer, version,
                               transport=transp,
                               app=app)
 
-    middleware_factory = middleware_maker()
-    middleware = await middleware_factory(app, handler)
+    middleware = middleware_maker()
     with patch('aiozipkin.span.Span.remote_endpoint') as mocked_remote_ep:
-        await middleware(req)
+        await middleware(req, handler)
 
         assert mocked_remote_ep.call_count == 1
         args, kwargs = mocked_remote_ep.call_args
@@ -146,11 +142,9 @@ async def test_middleware_with_invalid_ip(tracer, version, address):
                               headers={'token': 'x'},
                               transport=transp, app=app)
 
-    middleware_factory = middleware_maker()
-    middleware = await middleware_factory(app, handler)
+    middleware = middleware_maker()
     with patch('aiozipkin.span.Span.remote_endpoint') as mocked_remote_ep:
-        await middleware(req)
-
+        await middleware(req, handler)
         assert mocked_remote_ep.call_count == 0
 
 
@@ -164,11 +158,10 @@ async def test_middleware_with_handler_404(tracer):
 
     req = make_mocked_request('GET', '/', headers={'token': 'x'}, app=app)
 
-    middleware_factory = middleware_maker()
-    middleware = await middleware_factory(app, handler)
+    middleware = middleware_maker()
 
     with pytest.raises(HTTPException):
-        await middleware(req)
+        await middleware(req, handler)
 
 
 @pytest.mark.asyncio
