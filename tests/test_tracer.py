@@ -162,6 +162,7 @@ async def test_create_custom(fake_transport):
     endpoint = create_endpoint('test_service', ipv4='127.0.0.1', port=8080)
 
     class FakeSampler(SamplerABC):
+
         def is_sampled(self, trace_id: str):
             return True
 

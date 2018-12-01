@@ -3,7 +3,8 @@ from types import SimpleNamespace
 from typing import cast, Optional, Dict, Any, Set, Awaitable, Callable  # flake8: noqa
 
 import aiohttp
-from aiohttp.web import HTTPException, Request, Application, Response
+from aiohttp.web import (HTTPException, Request, Application, Response,
+                         middleware)
 from aiohttp.web_urldispatcher import AbstractRoute
 from aiohttp.tracing import (TraceRequestStartParams, TraceRequestEndParams,
                              TraceRequestExceptionParams)
@@ -82,42 +83,41 @@ Handler = Callable[[Request], Awaitable[Response]]
 Middleware = Callable[[Application, Handler], Awaitable[Handler]]
 
 
-# TODO: new aiohttp 3.0.0 has a bit different API for middlewares
-# should be reworked once 3.0.0 out, do we care about backward compatibility
 def middleware_maker(skip_routes: Optional[AbstractRoute]=None,
                      tracer_key: str=APP_AIOZIPKIN_KEY,
                      request_key: str=REQUEST_AIOZIPKIN_KEY) -> Middleware:
     s = skip_routes
     skip_routes_set = set(s) if s else set()  # type: Set[AbstractRoute]
 
-    async def middleware_factory(app: Application, handler: Handler) -> Handler:
-        async def aiozipkin_middleware(request: Request) -> Response:
-            # route is in skip list, we do not track anything with zipkin
-            if request.match_info.route in skip_routes_set:
-                resp = await handler(request)
-                return resp
+    _middleware = middleware  # type: Callable[[Middleware], Middleware]
 
-            tracer = request.app[tracer_key]
-            span = _get_span(request, tracer)
-            request[request_key] = span
-            if span.is_noop:
-                resp = await handler(request)
-                return resp
-
-            with span:
-                _set_span_properties(span, request)
-                try:
-                    resp = await handler(request)
-                except HTTPException as e:
-                    span.tag(HTTP_STATUS_CODE, e.status)
-                    raise
-
-                span.tag(HTTP_STATUS_CODE, resp.status)
+    @_middleware
+    async def aiozipkin_middleware(
+        request: Request, handler: Handler) -> Response:
+        # route is in skip list, we do not track anything with zipkin
+        if request.match_info.route in skip_routes_set:
+            resp = await handler(request)
             return resp
 
-        return aiozipkin_middleware
+        tracer = request.app[tracer_key]
+        span = _get_span(request, tracer)
+        request[request_key] = span
+        if span.is_noop:
+            resp = await handler(request)
+            return resp
 
-    return middleware_factory
+        with span:
+            _set_span_properties(span, request)
+            try:
+                resp = await handler(request)
+            except HTTPException as e:
+                span.tag(HTTP_STATUS_CODE, e.status)
+                raise
+
+            span.tag(HTTP_STATUS_CODE, resp.status)
+        return resp
+
+    return aiozipkin_middleware
 
 
 def setup(app: Application,
