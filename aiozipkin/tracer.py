@@ -1,4 +1,4 @@
-from typing import Optional, Dict, Awaitable, Any, AsyncContextManager, cast  # flake8: noqa
+from typing import Optional, Dict, Awaitable, Any, AsyncContextManager, cast, TYPE_CHECKING  # flake8: noqa
 
 from .context_managers import _ContextManager
 from .helpers import TraceContext, Endpoint
@@ -10,7 +10,13 @@ from .transport import Transport, StubTransport, TransportABC
 from .utils import generate_random_64bit_string, generate_random_128bit_string
 
 
-class Tracer(AsyncContextManager[Tracer]):
+if TYPE_CHECKING:
+    Base = AsyncContextManager['Tracer']
+else:
+    Base = AsyncContextManager
+
+
+class Tracer(Base):
     def __init__(self,
                  transport: TransportABC,
                  sampler: SamplerABC,
