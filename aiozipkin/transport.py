@@ -29,7 +29,7 @@ class StubTransport(TransportABC):
 
     def __init__(self, queue_length: int=100) -> None:
         logger.info('Zipkin address was not provided, using stub transport')
-        self.records = deque(maxlen=queue_length)  # type: Deque
+        self.records = deque(maxlen=queue_length)  # type: Deque[Record]
 
     def send(self, record: Record) -> None:
         self.records.append(record)
