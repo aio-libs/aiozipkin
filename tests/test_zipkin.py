@@ -11,7 +11,7 @@ from yarl import URL
 async def _retry_zipkin_client(url, client, retries=5, backoff_time=1):
     tries = 0
     while tries < retries:
-        asyncio.sleep(backoff_time)
+        await asyncio.sleep(backoff_time)
         resp = await client.get(url)
         if resp.status > 200:
             tries += 1
