@@ -1,6 +1,8 @@
+import sys
 import ipaddress
 from types import SimpleNamespace
-from typing import cast, Optional, Dict, Any, Set, Awaitable, Callable  # flake8: noqa
+from typing import cast, Optional, Dict, Any, Set, Awaitable, Callable, Generator  # flake8: noqa
+from contextlib import contextmanager
 
 import aiohttp
 from aiohttp.web import (HTTPException, Request, Application, Response,
@@ -10,7 +12,7 @@ from aiohttp.tracing import (TraceRequestStartParams, TraceRequestEndParams,
                              TraceRequestExceptionParams)
 
 from .constants import HTTP_METHOD, HTTP_PATH, HTTP_STATUS_CODE, HTTP_ROUTE
-from .helpers import CLIENT, SERVER, make_context, parse_debug, parse_sampled
+from .helpers import CLIENT, SERVER, make_context, parse_debug, parse_sampled, TraceContext
 from .span import SpanAbc
 from .tracer import Tracer
 
@@ -28,6 +30,9 @@ __all__ = (
     'APP_AIOZIPKIN_KEY',
     'REQUEST_AIOZIPKIN_KEY',
 )
+
+Handler = Callable[[Request], Awaitable[Response]]
+Middleware = Callable[[Application, Handler], Awaitable[Handler]]
 
 
 def _set_remote_endpoint(span: SpanAbc, request: Request) -> None:
@@ -78,9 +83,23 @@ def _set_span_properties(span: SpanAbc, request: Request) -> None:
     _set_remote_endpoint(span, request)
 
 
+PY37 = sys.version_info >= (3, 7)
 
-Handler = Callable[[Request], Awaitable[Response]]
-Middleware = Callable[[Application, Handler], Awaitable[Handler]]
+if PY37:
+    from contextvars import ContextVar
+    OptTraceVar = ContextVar[Optional[TraceContext]]
+    zipkin_context = ContextVar('zipkin_context', default=None)  # type: OptTraceVar
+
+    @contextmanager
+    def set_context_value(
+            context_var: OptTraceVar,
+            value: TraceContext
+    ) -> Generator[OptTraceVar, None, None]:
+        token = context_var.set(value)
+        try:
+            yield context_var
+        finally:
+            context_var.reset(token)
 
 
 def middleware_maker(skip_routes: Optional[AbstractRoute]=None,
@@ -106,15 +125,26 @@ def middleware_maker(skip_routes: Optional[AbstractRoute]=None,
             resp = await handler(request)
             return resp
 
-        with span:
-            _set_span_properties(span, request)
-            try:
-                resp = await handler(request)
-            except HTTPException as e:
-                span.tag(HTTP_STATUS_CODE, e.status)
-                raise
+        if PY37:
+            with set_context_value(zipkin_context, span.context):
+                with span:
+                    _set_span_properties(span, request)
+                    try:
+                        resp = await handler(request)
+                    except HTTPException as e:
+                        span.tag(HTTP_STATUS_CODE, e.status)
+                        raise
+                    span.tag(HTTP_STATUS_CODE, resp.status)
+        else:
+            with span:
+                _set_span_properties(span, request)
+                try:
+                    resp = await handler(request)
+                except HTTPException as e:
+                    span.tag(HTTP_STATUS_CODE, e.status)
+                    raise
+                span.tag(HTTP_STATUS_CODE, resp.status)
 
-            span.tag(HTTP_STATUS_CODE, resp.status)
         return resp
 
     return aiozipkin_middleware
@@ -171,21 +201,31 @@ class ZipkinClientSignals:
     def __init__(self, tracer: Tracer) -> None:
         self._tracer = tracer
 
-    def _has_span(self, trace_config_ctx: SimpleNamespace) -> bool:
+    def _get_span_context(
+            self, trace_config_ctx: SimpleNamespace) -> Optional[TraceContext]:
         trace_request_ctx = trace_config_ctx.trace_request_ctx
-        has_span = (isinstance(trace_request_ctx, dict) and
-                    'span_context' in trace_request_ctx)
-        return has_span
+        has_explicit_context = (isinstance(trace_request_ctx, dict) and
+                                'span_context' in trace_request_ctx)
+        if has_explicit_context:
+            r = trace_request_ctx['span_context']  # type: TraceContext
+            return r
+
+        if PY37:
+            has_implicit_context = zipkin_context.get() is not None
+            if has_implicit_context:
+                return zipkin_context.get()
+
+        return None
 
     async def on_request_start(self,
                                session: aiohttp.ClientSession,
                                context: SimpleNamespace,
                                params: TraceRequestStartParams) -> None:
-        if not self._has_span(context):
+        span_context = self._get_span_context(context)
+        if span_context is None:
             return
 
         p = params
-        span_context = context.trace_request_ctx['span_context']
         span = self._tracer.new_child(span_context)
         context._span = span
         span.start()
@@ -193,9 +233,9 @@ class ZipkinClientSignals:
         span.name(span_name)
         span.kind(CLIENT)
 
-        propagate_headers = (context
-                             .trace_request_ctx
-                             .get('propagate_headers', True))
+        ctx = context.trace_request_ctx
+        propagate_headers = (ctx is None or
+                             ctx.get('propagate_headers', True))
         if propagate_headers:
             span_headers = span.context.make_headers()
             p.headers.update(span_headers)
@@ -204,7 +244,8 @@ class ZipkinClientSignals:
                              session: aiohttp.ClientSession,
                              context: SimpleNamespace,
                              params: TraceRequestEndParams) -> None:
-        if not self._has_span(context):
+        span_context = self._get_span_context(context)
+        if span_context is None:
             return
 
         span = context._span
@@ -215,7 +256,8 @@ class ZipkinClientSignals:
                                    session: aiohttp.ClientSession,
                                    context: SimpleNamespace,
                                    params: TraceRequestExceptionParams) -> None:
-        if not self._has_span(context):
+        span_context = self._get_span_context(context)
+        if span_context is None:
             return
         span = context._span
         span.finish(exception=params.exception)
