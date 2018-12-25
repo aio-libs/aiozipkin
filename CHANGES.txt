@@ -1,7 +1,7 @@
 CHANGES
 =======
 
-0.5.0 (YYYY-MM-DD)
+0.5.0 (2018-12-25)
 ------------------
 * More strict typing configuration is used #147
 * Fixed bunch of typos in code and docs #151 #153 (thanks @deejay1)
