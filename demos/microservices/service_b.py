@@ -15,13 +15,10 @@ async def handler(request):
     await asyncio.sleep(0.01)
     session = request.app['session']
 
-    span = az.request_span(request)
-    ctx = {'span_context': span.context, 'propagate_headers': True}
-
-    resp = await session.get(service_c_api, trace_request_ctx=ctx)
+    resp = await session.get(service_c_api)
     data_c = await resp.json()
 
-    resp = await session.get(service_d_api, trace_request_ctx=ctx)
+    resp = await session.get(service_d_api)
     data_d = await resp.json()
 
     payload = {

@@ -19,13 +19,11 @@ zipkin_ui_address = 'http://127.0.0.1:9411/zipkin/'
 async def handler(request):
     await asyncio.sleep(0.01)
     session = request.app['session']
-    span = az.request_span(request)
-    ctx = {'span_context': span.context}
 
-    resp = await session.get(service_b_api, trace_request_ctx=ctx)
+    resp = await session.get(service_b_api)
     data_b = await resp.json()
 
-    resp = await session.get(service_e_api, trace_request_ctx=ctx)
+    resp = await session.get(service_e_api)
     data_e = await resp.json()
 
     tree = {
