@@ -5,7 +5,7 @@ from aiohttp import web
 
 
 host = '127.0.0.1'
-port = 9002
+port = 9003
 
 
 async def handler(request):
