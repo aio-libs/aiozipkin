@@ -53,6 +53,11 @@ def test_make_single_header(trace_context, other_trace_context):
     expected = {'b3': h}
     assert headers == expected == headers2
 
+    new_context = trace_context._replace(debug=True, sampled=None)
+    headers = make_single_header(new_context)
+    expected = {'b3':  '6f9a20b5092fa5e144fd15cc31141cd4-41baf1be2fb9bfc5-1'}
+    assert headers == expected
+
 
 def test_make_context(trace_context):
     headers = make_headers(trace_context)
@@ -71,6 +76,14 @@ def test_make_context_single_header(trace_context, other_trace_context):
     headers = make_single_header(other_trace_context)
     context = make_context(headers)
     assert other_trace_context == context
+
+    headers = {'b3': '0'}
+    context = make_context(headers)
+    assert context is None
+
+    headers = {'b3': '6f9a20b5092fa5e144fd15cc31141cd4'}
+    context = make_context(headers)
+    assert context is None
 
 
 def test_make_timestamp():
