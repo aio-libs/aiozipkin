@@ -62,6 +62,7 @@ def test_make_context(trace_context):
     context = make_context({})
     assert context is None
 
+
 def test_make_context_single_header(trace_context, other_trace_context):
     headers = make_single_header(trace_context)
     context = make_context(headers)
