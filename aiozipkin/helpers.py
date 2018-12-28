@@ -18,7 +18,8 @@ SPAN_ID_HEADER = 'X-B3-SpanId'
 PARENT_ID_HEADER = 'X-B3-ParentSpanId'
 FLAGS_HEADER = 'X-B3-Flags'
 SAMPLED_ID_HEADER = 'X-B3-Sampled'
-
+SINGLE_HEADER = 'b3'
+DELIMITER = '-'
 
 _TraceContext = NamedTuple(
     'TraceContext', [
@@ -44,6 +45,9 @@ class TraceContext(_TraceContext):
         to other services.
         """
         return make_headers(self)
+
+    def make_single_header(self) -> Headers:
+        return make_single_header(self)
 
 
 Endpoint = NamedTuple(
@@ -85,6 +89,26 @@ def make_headers(context: TraceContext) -> Headers:
     return headers
 
 
+def make_single_header(context: TraceContext) -> Headers:
+    """Creates dict with zipkin single header format.
+    """
+    # b3={TraceId}-{SpanId}-{SamplingState}-{ParentSpanId}
+    c = context
+
+    # encode sampled flag
+    sampled = 'd' if c.sampled is None else str(int(c.sampled))
+    if c.debug:
+        sampled = '1'
+
+    params = [c.trace_id, c.span_id, sampled]  # type: List[str]
+    if c.parent_id is not None:
+        params.append(c.parent_id)
+
+    h = DELIMITER.join(params)
+    headers = {SINGLE_HEADER: h}
+    return headers
+
+
 def parse_sampled(headers: Headers) -> OptBool:
     sampled = headers.get(SAMPLED_ID_HEADER.lower(), None)
     if sampled is None or sampled == '':
@@ -94,6 +118,39 @@ def parse_sampled(headers: Headers) -> OptBool:
 
 def parse_debug(headers: Headers) -> bool:
     return True if headers.get(FLAGS_HEADER, '0') == '1' else False
+
+
+def parse_single_header(headers: Headers) -> Optional[TraceContext]:
+    # b3={TraceId}-{SpanId}-{SamplingState}-{ParentSpanId}
+    if headers[SINGLE_HEADER] == '0':
+        return None
+    payload = headers[SINGLE_HEADER].lower()
+    parts = payload.split(DELIMITER)  # type: List[str]
+    if len(parts) < 2:
+        return None
+
+    parent_id = None  # type: OptStr
+    debug = False
+    sampled = None  # type: OptBool
+
+    trace_id = parts[0]
+    span_id = parts[1]
+
+    if len(parts) >= 3:
+        if parts[2] in ('1', '0'):
+            sampled = bool(int(parts[2]))
+
+    if len(parts) >= 4:
+        parent_id = parts[3]
+
+    context = TraceContext(
+        trace_id=trace_id,
+        span_id=span_id,
+        parent_id=parent_id,
+        sampled=sampled,
+        shared=False,
+        debug=debug)
+    return context
 
 
 def make_context(headers: Headers) -> Optional[TraceContext]:
@@ -106,19 +163,24 @@ def make_context(headers: Headers) -> Optional[TraceContext]:
     # instead dict with case insensitive keys
     headers = {k.lower(): v for k, v in headers.items()}
 
-    if not all(h in headers for h in (
-            TRACE_ID_HEADER.lower(), SPAN_ID_HEADER.lower())):
+    required = (TRACE_ID_HEADER.lower(), SPAN_ID_HEADER.lower())
+    has_b3 = all(h in headers for h in required)
+    has_b3_single = SINGLE_HEADER in headers
+
+    if not(has_b3_single or has_b3):
         return None
 
-    context = TraceContext(
-        trace_id=headers[TRACE_ID_HEADER.lower()],
-        parent_id=headers.get(PARENT_ID_HEADER.lower()),
-        span_id=headers[SPAN_ID_HEADER.lower()],
-        sampled=parse_sampled(headers),
-        shared=False,
-        debug=parse_debug(headers),
-    )
-    return context
+    if has_b3:
+        context = TraceContext(
+            trace_id=headers[TRACE_ID_HEADER.lower()],
+            parent_id=headers.get(PARENT_ID_HEADER.lower()),
+            span_id=headers[SPAN_ID_HEADER.lower()],
+            sampled=parse_sampled(headers),
+            shared=False,
+            debug=parse_debug(headers),
+        )
+        return context
+    return parse_single_header(headers)
 
 
 OptKeys = Optional[List[str]]
