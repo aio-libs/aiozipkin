@@ -55,6 +55,8 @@ class Transport(TransportABC):
         self._timer = None  # type: Optional[asyncio.Future[Any]]
 
     def send(self, record: Record) -> None:
+        # TODO: wake up sending loop if number of records is larger
+        # then threshold
         data = record.asdict()
         self._queue.append(data)
 

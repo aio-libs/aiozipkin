@@ -265,6 +265,9 @@ class ZipkinClientSignals:
 
 
 def make_trace_config(tracer: Tracer) -> aiohttp.TraceConfig:
+    """Creates aiohttp.TraceConfig with enabled aiozipking instrumentation
+    for aiohttp client.
+    """
     trace_config = aiohttp.TraceConfig()
     zipkin = ZipkinClientSignals(tracer)
 

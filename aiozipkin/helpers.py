@@ -120,7 +120,10 @@ def parse_debug(headers: Headers) -> bool:
     return True if headers.get(FLAGS_HEADER, '0') == '1' else False
 
 
-def parse_single_header(headers: Headers) -> Optional[TraceContext]:
+def _parse_single_header(headers: Headers) -> Optional[TraceContext]:
+    # Makes TraceContext from zipkin single header format.
+    # https://github.com/openzipkin/b3-propagation
+
     # b3={TraceId}-{SpanId}-{SamplingState}-{ParentSpanId}
     if headers[SINGLE_HEADER] == '0':
         return None
@@ -180,7 +183,7 @@ def make_context(headers: Headers) -> Optional[TraceContext]:
             debug=parse_debug(headers),
         )
         return context
-    return parse_single_header(headers)
+    return _parse_single_header(headers)
 
 
 OptKeys = Optional[List[str]]
