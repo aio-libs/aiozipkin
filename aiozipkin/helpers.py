@@ -20,6 +20,7 @@ FLAGS_HEADER = 'X-B3-Flags'
 SAMPLED_ID_HEADER = 'X-B3-Sampled'
 SINGLE_HEADER = 'b3'
 DELIMITER = '-'
+DEBUG_MARKER = 'd'
 
 _TraceContext = NamedTuple(
     'TraceContext', [
@@ -96,9 +97,12 @@ def make_single_header(context: TraceContext) -> Headers:
     c = context
 
     # encode sampled flag
-    sampled = 'd' if c.sampled is None else str(int(c.sampled))
     if c.debug:
+        sampled = 'd'
+    elif c.sampled:
         sampled = '1'
+    else:
+        sampled = '0'
 
     params = [c.trace_id, c.span_id, sampled]  # type: List[str]
     if c.parent_id is not None:
@@ -109,15 +113,40 @@ def make_single_header(context: TraceContext) -> Headers:
     return headers
 
 
-def parse_sampled(headers: Headers) -> OptBool:
+def parse_sampled_header(headers: Headers) -> OptBool:
     sampled = headers.get(SAMPLED_ID_HEADER.lower(), None)
     if sampled is None or sampled == '':
         return None
     return True if sampled == '1' else False
 
 
-def parse_debug(headers: Headers) -> bool:
+def parse_debug_header(headers: Headers) -> bool:
     return True if headers.get(FLAGS_HEADER, '0') == '1' else False
+
+
+def _parse_parent_id(parts: List[str]) -> OptStr:
+    # parse parent_id part from zipkin single header propagation
+    parent_id = None
+    if len(parts) >= 4:
+        parent_id = parts[3]
+    return parent_id
+
+
+def _parse_debug(parts: List[str]) -> bool:
+    # parse debug part from zipkin single header propagation
+    debug = False
+    if len(parts) >= 3 and parts[2] == DEBUG_MARKER:
+        debug = True
+    return debug
+
+
+def _parse_sampled(parts: List[str]) -> OptBool:
+    # parse sampled part from zipkin single header propagation
+    sampled = None  # type: OptBool
+    if len(parts) >= 3:
+        if parts[2] in ('1', '0'):
+            sampled = bool(int(parts[2]))
+    return sampled
 
 
 def _parse_single_header(headers: Headers) -> Optional[TraceContext]:
@@ -132,27 +161,16 @@ def _parse_single_header(headers: Headers) -> Optional[TraceContext]:
     if len(parts) < 2:
         return None
 
-    parent_id = None  # type: OptStr
-    debug = False
-    sampled = None  # type: OptBool
-
-    trace_id = parts[0]
-    span_id = parts[1]
-
-    if len(parts) >= 3:
-        if parts[2] in ('1', '0'):
-            sampled = bool(int(parts[2]))
-
-    if len(parts) >= 4:
-        parent_id = parts[3]
+    debug = _parse_debug(parts)
+    sampled = debug if debug else _parse_sampled(parts)
 
     context = TraceContext(
-        trace_id=trace_id,
-        span_id=span_id,
-        parent_id=parent_id,
+        trace_id=parts[0],
+        span_id=parts[1],
+        parent_id=_parse_parent_id(parts),
         sampled=sampled,
-        shared=False,
-        debug=debug)
+        debug=debug,
+        shared=False)
     return context
 
 
@@ -174,13 +192,15 @@ def make_context(headers: Headers) -> Optional[TraceContext]:
         return None
 
     if has_b3:
+        debug = parse_debug_header(headers)
+        sampled = debug if debug else parse_sampled_header(headers)
         context = TraceContext(
             trace_id=headers[TRACE_ID_HEADER.lower()],
             parent_id=headers.get(PARENT_ID_HEADER.lower()),
             span_id=headers[SPAN_ID_HEADER.lower()],
-            sampled=parse_sampled(headers),
+            sampled=sampled,
+            debug=debug,
             shared=False,
-            debug=parse_debug(headers),
         )
         return context
     return _parse_single_header(headers)
