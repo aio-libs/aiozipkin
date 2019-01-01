@@ -24,7 +24,7 @@ def other_trace_context():
         trace_id='6f9a20b5092fa5e144fd15cc31141cd4',
         parent_id='05e3ac9a4f6e3b90',
         span_id='41baf1be2fb9bfc5',
-        sampled=None,
+        sampled=True,
         debug=True,
         shared=False)
     return context

@@ -161,12 +161,15 @@ def _parse_single_header(headers: Headers) -> Optional[TraceContext]:
     if len(parts) < 2:
         return None
 
+    debug = _parse_debug(parts)
+    sampled = debug if debug else _parse_sampled(parts)
+
     context = TraceContext(
         trace_id=parts[0],
         span_id=parts[1],
         parent_id=_parse_parent_id(parts),
-        sampled=_parse_sampled(parts),
-        debug=_parse_debug(parts),
+        sampled=sampled,
+        debug=debug,
         shared=False)
     return context
 
@@ -189,13 +192,15 @@ def make_context(headers: Headers) -> Optional[TraceContext]:
         return None
 
     if has_b3:
+        debug = parse_debug_header(headers)
+        sampled = debug if debug else parse_sampled_header(headers)
         context = TraceContext(
             trace_id=headers[TRACE_ID_HEADER.lower()],
             parent_id=headers.get(PARENT_ID_HEADER.lower()),
             span_id=headers[SPAN_ID_HEADER.lower()],
-            sampled=parse_sampled_header(headers),
+            sampled=sampled,
+            debug=debug,
             shared=False,
-            debug=parse_debug_header(headers),
         )
         return context
     return _parse_single_header(headers)
