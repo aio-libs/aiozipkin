@@ -12,7 +12,8 @@ from aiohttp.tracing import (TraceRequestStartParams, TraceRequestEndParams,
                              TraceRequestExceptionParams)
 
 from .constants import HTTP_METHOD, HTTP_PATH, HTTP_STATUS_CODE, HTTP_ROUTE
-from .helpers import CLIENT, SERVER, make_context, parse_debug, parse_sampled, TraceContext
+from .helpers import (CLIENT, SERVER, make_context, parse_debug_header,
+                      parse_sampled_header, TraceContext)
 from .span import SpanAbc
 from .tracer import Tracer
 
@@ -58,8 +59,8 @@ def _get_span(request: Request, tracer: Tracer) -> SpanAbc:
     context = make_context(request.headers)
 
     if context is None:
-        sampled = parse_sampled(request.headers)
-        debug = parse_debug(request.headers)
+        sampled = parse_sampled_header(request.headers)
+        debug = parse_debug_header(request.headers)
         span = tracer.new_trace(sampled=sampled, debug=debug)
     else:
         span = tracer.join_span(context)

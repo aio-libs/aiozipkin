@@ -25,7 +25,7 @@ def other_trace_context():
         parent_id='05e3ac9a4f6e3b90',
         span_id='41baf1be2fb9bfc5',
         sampled=None,
-        debug=False,
+        debug=True,
         shared=False)
     return context
 
@@ -55,7 +55,12 @@ def test_make_single_header(trace_context, other_trace_context):
 
     new_context = trace_context._replace(debug=True, sampled=None)
     headers = make_single_header(new_context)
-    expected = {'b3':  '6f9a20b5092fa5e144fd15cc31141cd4-41baf1be2fb9bfc5-1'}
+    expected = {'b3':  '6f9a20b5092fa5e144fd15cc31141cd4-41baf1be2fb9bfc5-d'}
+    assert headers == expected
+
+    new_context = trace_context._replace(debug=False, sampled=None)
+    headers = make_single_header(new_context)
+    expected = {'b3':  '6f9a20b5092fa5e144fd15cc31141cd4-41baf1be2fb9bfc5-0'}
     assert headers == expected
 
 
