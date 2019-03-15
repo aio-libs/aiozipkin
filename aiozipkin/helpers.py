@@ -30,7 +30,7 @@ _TraceContext = NamedTuple(
         ('sampled', OptBool),
         ('debug', bool),
         ('shared', bool),
-        ]
+    ]
 )
 
 
@@ -60,15 +60,15 @@ Endpoint = NamedTuple(
 
 
 def create_endpoint(service_name: str, *,
-                    ipv4: OptStr=None,
-                    ipv6: OptStr=None,
-                    port: OptInt=None) -> Endpoint:
+                    ipv4: OptStr = None,
+                    ipv6: OptStr = None,
+                    port: OptInt = None) -> Endpoint:
     """Factory function to create Endpoint object.
     """
     return Endpoint(service_name, ipv4, ipv6, port)
 
 
-def make_timestamp(ts: OptTs=None) -> int:
+def make_timestamp(ts: OptTs = None) -> int:
     """Create zipkin timestamp in microseconds, or convert available one
     from second. Useful when user supplies ts from time.time() call.
     """
@@ -210,7 +210,7 @@ OptKeys = Optional[List[str]]
 
 
 def filter_none(data: Dict[str, Any],
-                keys: OptKeys=None) -> Dict[str, Any]:
+                keys: OptKeys = None) -> Dict[str, Any]:
     """Filter keys from dict with None values.
 
     Check occurs only on root level. If list of keys specified, filter

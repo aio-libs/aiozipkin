@@ -33,20 +33,20 @@ class SpanAbc(metaclass=ABCMeta):
         pass  # pragma: no cover
 
     @abstractmethod
-    def start(self: T, ts: OptTs=None) -> T:
+    def start(self: T, ts: OptTs = None) -> T:
         pass  # pragma: no cover
 
     @abstractmethod
-    def finish(self: T, ts: OptTs=None,
-               exception: Optional[Exception]=None) -> T:
+    def finish(self: T, ts: OptTs = None,
+               exception: Optional[Exception] = None) -> T:
         pass  # pragma: no cover
 
     @abstractmethod
     def remote_endpoint(self: T,
                         servce_name: OptStr, *,
-                        ipv4: OptStr=None,
-                        ipv6: OptStr=None,
-                        port: OptInt=None) -> T:
+                        ipv4: OptStr = None,
+                        ipv6: OptStr = None,
+                        port: OptInt = None) -> T:
         pass  # pragma: no cover
 
     @abstractmethod
@@ -56,7 +56,7 @@ class SpanAbc(metaclass=ABCMeta):
     @abstractmethod
     def annotate(self: T,
                  value: str,
-                 ts: OptTs=None) -> T:
+                 ts: OptTs = None) -> T:
         pass  # pragma: no cover
 
     @abstractmethod
@@ -98,24 +98,24 @@ class NoopSpan(SpanAbc):
     def tracer(self) -> 'Tracer':
         return self._tracer
 
-    def start(self, ts: OptTs=None) -> 'NoopSpan':
+    def start(self, ts: OptTs = None) -> 'NoopSpan':
         return self
 
-    def finish(self, ts: OptTs=None,
-               exception: Optional[Exception]=None) -> 'NoopSpan':
+    def finish(self, ts: OptTs = None,
+               exception: Optional[Exception] = None) -> 'NoopSpan':
         return self
 
     def remote_endpoint(self,
                         servce_name: OptStr, *,
-                        ipv4: OptStr=None,
-                        ipv6: OptStr=None,
-                        port: OptInt=None) -> 'NoopSpan':
+                        ipv4: OptStr = None,
+                        ipv6: OptStr = None,
+                        port: OptInt = None) -> 'NoopSpan':
         return self
 
     def tag(self, key: str, value: str) -> 'NoopSpan':
         return self
 
-    def annotate(self, value: str, ts: OptTs=None) -> 'NoopSpan':
+    def annotate(self, value: str, ts: OptTs = None) -> 'NoopSpan':
         return self
 
     def kind(self, span_kind: str) -> 'NoopSpan':
@@ -151,13 +151,13 @@ class Span(SpanAbc):
     def tracer(self) -> 'Tracer':
         return self._tracer
 
-    def start(self, ts: OptTs=None) -> 'Span':
+    def start(self, ts: OptTs = None) -> 'Span':
         ts = make_timestamp(ts)
         self._record.start(ts)
         return self
 
-    def finish(self, ts: OptTs=None,
-               exception: Optional[Exception]=None) -> 'Span':
+    def finish(self, ts: OptTs = None,
+               exception: Optional[Exception] = None) -> 'Span':
         if exception is not None:
             self.tag(ERROR, str(exception))
         ts = make_timestamp(ts)
@@ -167,9 +167,9 @@ class Span(SpanAbc):
 
     def remote_endpoint(self,
                         servce_name: OptStr, *,
-                        ipv4: OptStr=None,
-                        ipv6: OptStr=None,
-                        port: OptInt=None) -> 'Span':
+                        ipv4: OptStr = None,
+                        ipv6: OptStr = None,
+                        port: OptInt = None) -> 'Span':
         endpoint = Endpoint(servce_name, ipv4, ipv6, port)
         self._record.remote_endpoint(endpoint)
         return self
@@ -178,7 +178,7 @@ class Span(SpanAbc):
         self._record.set_tag(key, value)
         return self
 
-    def annotate(self, value: str, ts: OptTs=None) -> 'Span':
+    def annotate(self, value: str, ts: OptTs = None) -> 'Span':
         ts = make_timestamp(ts)
         self._record.annotate(value, ts)
         return self

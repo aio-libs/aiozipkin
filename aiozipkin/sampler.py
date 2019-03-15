@@ -14,7 +14,8 @@ class SamplerABC(abc.ABC):
 
 class Sampler(SamplerABC):
 
-    def __init__(self, *, sample_rate: float=1.0, seed: OptInt=None) -> None:
+    def __init__(
+            self, *, sample_rate: float = 1.0, seed: OptInt = None) -> None:
         self._sample_rate = sample_rate
         self._rng = Random(seed)
 
