@@ -1,4 +1,4 @@
-from typing import Optional, Dict, Awaitable, Any, AsyncContextManager, cast, TYPE_CHECKING  # flake8: noqa
+from typing import Optional, Dict, Awaitable, Any, AsyncContextManager, TYPE_CHECKING  # noqa
 
 from .context_managers import _ContextManager
 from .helpers import TraceContext, Endpoint
@@ -28,8 +28,8 @@ class Tracer(Base):
         self._local_endpoint = local_endpoint
 
     def new_trace(self,
-                  sampled: OptBool=None,
-                  debug: bool=False) -> SpanAbc:
+                  sampled: OptBool = None,
+                  debug: bool = False) -> SpanAbc:
         context = self._next_context(None, sampled=sampled, debug=debug)
         return self.to_span(context)
 
@@ -61,9 +61,9 @@ class Tracer(Base):
         self._transport.send(record)
 
     def _next_context(self,
-                      context: Optional[TraceContext]=None,
-                      sampled: OptBool=None,
-                      debug: bool=False) ->TraceContext:
+                      context: Optional[TraceContext] = None,
+                      sampled: OptBool = None,
+                      debug: bool = False) -> TraceContext:
         span_id = generate_random_64bit_string()
         if context is not None:
             new_context = context._replace(
@@ -97,9 +97,9 @@ class Tracer(Base):
 
 def create(zipkin_address: str,
            local_endpoint: Endpoint, *,
-           sample_rate: float=0.01,
-           send_interval: float=5,
-           loop: OptLoop=None) -> Awaitable[Tracer]:
+           sample_rate: float = 0.01,
+           send_interval: float = 5,
+           loop: OptLoop = None) -> Awaitable[Tracer]:
 
     async def build_tracer() -> Tracer:
         sampler = Sampler(sample_rate=sample_rate)
@@ -111,8 +111,8 @@ def create(zipkin_address: str,
 
 
 def create_custom(local_endpoint: Endpoint,
-                  transport: Optional[TransportABC]=None,
-                  sampler: Optional[SamplerABC]=None) -> Awaitable[Tracer]:
+                  transport: Optional[TransportABC] = None,
+                  sampler: Optional[SamplerABC] = None) -> Awaitable[Tracer]:
     t = transport or StubTransport()
     sample_rate = 1  # sample everything
     s = sampler or Sampler(sample_rate=sample_rate)
