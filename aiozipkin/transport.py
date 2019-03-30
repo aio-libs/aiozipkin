@@ -1,14 +1,22 @@
 import abc
 import asyncio
 from collections import deque
-from typing import List, Dict, Any, Optional, Deque  # flake8: noqa
-
+from typing import (List, Dict, Any, Optional, Deque, Tuple,
+                    Callable, Awaitable)  # flake8: noqa
 import aiohttp
+from aiohttp.client_exceptions import ClientError
 from yarl import URL
 
 from .log import logger
 from .mypy_types import OptLoop
 from .record import Record
+
+DEFAULT_TIMEOUT = aiohttp.ClientTimeout(total=5 * 60)
+BATCHES_MAX_COUNT = 10 ** 4
+
+DataList = List[Dict[str, Any]]
+SndBatches = Deque[Tuple[int, DataList]]
+SendDataCoro = Callable[[DataList], Awaitable[bool]]
 
 
 class TransportABC(abc.ABC):
@@ -38,34 +46,64 @@ class StubTransport(TransportABC):
         pass
 
 
-class Transport(TransportABC):
+class BatchManager:
 
-    def __init__(self, address: str, send_interval: float = 5,
-                 loop: OptLoop = None) -> None:
-        self._address = URL(address)
-        self._queue = []  # type: List[Dict[str, Any]]
-        self._closing = False
+    def __init__(self, max_size: int, send_interval: float,
+                 attempt_count: int, send_data: SendDataCoro,
+                 loop: asyncio.AbstractEventLoop) -> None:
+        self._max_size = max_size
         self._send_interval = send_interval
-        self._loop = loop or asyncio.get_event_loop()
-        self._session = aiohttp.ClientSession(loop=self._loop)
+        self._send_data = send_data
+        self._attempt_count = attempt_count
+        self._loop = loop
+        self._max = BATCHES_MAX_COUNT
+        self._sending_batches = deque([], maxlen=self._max)  # type: SndBatches
+        self._active_batch = None  # type: Optional[DataList]
+        self._ender = self._loop.create_future()
+        self._timer = None  # type: Optional[asyncio.Future[Any]]
         self._sender_task = asyncio.ensure_future(
             self._sender_loop(), loop=self._loop)
 
-        self._ender = self._loop.create_future()
-        self._timer = None  # type: Optional[asyncio.Future[Any]]
+    def add(self, data: Dict[str, Any]) -> None:
+        if self._active_batch is None:
+            self._active_batch = []
+        self._active_batch.append(data)
+        if len(self._active_batch) >= self._max_size:
+            self._sending_batches.append((0, self._active_batch))
+            self._active_batch = None
+            if self._timer is not None and not self._timer.done():
+                self._timer.cancel()
 
-    def send(self, record: Record) -> None:
-        # TODO: wake up sending loop if number of records is larger
-        # then threshold
-        data = record.asdict()
-        self._queue.append(data)
+    async def stop(self) -> None:
+        self._ender.set_result(None)
+
+        await self._sender_task
+        await self._send()
+
+        if self._timer is not None:
+            self._timer.cancel()
+            try:
+                await self._timer
+            except asyncio.CancelledError:
+                pass
 
     async def _sender_loop(self) -> None:
         while not self._ender.done():
-            if self._queue:
-                await self._send()
-
             await self._wait()
+            await self._send()
+
+    async def _send(self) -> None:
+        if self._active_batch is not None:
+            self._sending_batches.append((0, self._active_batch))
+            self._active_batch = None
+
+        batches = self._sending_batches.copy()
+        self._sending_batches = deque([], maxlen=self._max)
+        for attempt, batch in batches:
+            if not await self._send_data(batch):
+                attempt += 1
+                if attempt < self._attempt_count:
+                    self._sending_batches.append((attempt, batch))
 
     async def _wait(self) -> None:
         self._timer = asyncio.ensure_future(
@@ -75,39 +113,57 @@ class Transport(TransportABC):
         await asyncio.wait([self._timer, self._ender], loop=self._loop,
                            return_when=asyncio.FIRST_COMPLETED)
 
-    async def _send(self) -> None:
-        # TODO: add retries
-        data = self._queue[:]
-        self._queue = []
 
+class Transport(TransportABC):
+
+    def __init__(self, address: str,
+                 send_interval: float = 5,
+                 loop: OptLoop = None,
+                 *,
+                 send_max_size: int = 100,
+                 send_attempt_count: int = 3,
+                 send_timeout: Optional[aiohttp.ClientTimeout] = None
+                 ) -> None:
+        self._address = URL(address)
+        self._queue = []  # type: DataList
+        self._closing = False
+        self._send_interval = send_interval
+        self._loop = loop or asyncio.get_event_loop()
+        if send_timeout is None:
+            send_timeout = DEFAULT_TIMEOUT
+        self._session = aiohttp.ClientSession(
+            loop=self._loop, timeout=send_timeout,
+            headers={'Content-Type': 'application/json'})
+        self._batch_manager = BatchManager(send_max_size,
+                                           send_interval, send_attempt_count,
+                                           self._send_data,
+                                           self._loop)
+
+    def send(self, record: Record) -> None:
+        data = record.asdict()
+        self._batch_manager.add(data)
+
+    async def _send_data(self, data: DataList) -> bool:
         try:
-            headers = {'Content-Type': 'application/json'}
-            async with self._session.post(self._address, json=data,
-                                          headers=headers) as resp:
+
+            async with self._session.post(self._address, json=data) as resp:
                 body = await resp.text()
                 if resp.status >= 300:
                     msg = 'zipkin responded with code: {} and body: {}'.format(
                         resp.status, body)
                     raise RuntimeError(msg)
 
+        except (asyncio.TimeoutError, ClientError):
+            return False
         except Exception as exc:  # pylint: disable=broad-except
             # that code should never fail and break application
             logger.error('Can not send spans to zipkin', exc_info=exc)
+        return True
 
     async def close(self) -> None:
         if self._closing:
             return
 
         self._closing = True
-        self._ender.set_result(None)
-
-        await self._sender_task
-        await self._send()
+        await self._batch_manager.stop()
         await self._session.close()
-
-        if self._timer is not None:
-            self._timer.cancel()
-            try:
-                await self._timer
-            except asyncio.CancelledError:
-                pass
