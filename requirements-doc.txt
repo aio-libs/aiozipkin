@@ -1,4 +1,4 @@
 setuptools>=38.0.0
-sphinx==1.8.5
+sphinx==2.0.0
 sphinxcontrib-asyncio==0.2.0
 aiohttp-theme==0.1.4
