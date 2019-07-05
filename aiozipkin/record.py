@@ -1,5 +1,5 @@
-from typing import TypeVar, Dict, Any, List, NamedTuple
-from .mypy_types import OptInt, OptStr, Optional  # flake8: noqa
+from typing import TypeVar, Dict, Any, List, NamedTuple, Optional
+from .mypy_types import OptInt, OptStr  # flake8: noqa
 
 from .helpers import (
     CONSUMER,

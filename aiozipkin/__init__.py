@@ -1,6 +1,5 @@
 from .aiohttp_helpers import (
     get_tracer,
-    make_context,
     make_trace_config,
     middleware_maker,
     request_span,
@@ -14,6 +13,7 @@ from .helpers import (
     PRODUCER,
     SERVER,
     create_endpoint,
+    make_context,
 )
 from .constants import (
     HTTP_HOST,
