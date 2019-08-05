@@ -6,7 +6,7 @@ attrs==19.1.0
 bandit==1.6.2
 docutils==0.15.2
 flake8-bugbear==19.3.0
-flake8-quotes==2.0.1
+flake8-quotes==2.1.0
 flake8==3.7.7
 ipdb==0.12
 mypy==0.711
