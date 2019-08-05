@@ -15,5 +15,5 @@ pytest-aiohttp==0.3.0
 pytest-asyncio==0.10.0
 pytest-cov==2.7.1
 pytest-sugar==0.9.2
-pytest==5.0.0
+pytest==5.0.1
 typeshed==0.0.1
