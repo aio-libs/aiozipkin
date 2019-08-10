@@ -11,12 +11,14 @@ from .utils import generate_random_64bit_string, generate_random_128bit_string
 
 
 if TYPE_CHECKING:
-    Base = AsyncContextManager['Tracer']
+    class _Base(AsyncContextManager['Tracer']):
+        pass
 else:
-    Base = AsyncContextManager
+    class _Base(AsyncContextManager):
+        pass
 
 
-class Tracer(Base):
+class Tracer(_Base):
     def __init__(self,
                  transport: TransportABC,
                  sampler: SamplerABC,
