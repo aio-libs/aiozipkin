@@ -37,7 +37,7 @@ class StubTransport(TransportABC):
 
     def __init__(self, queue_length: int = 100) -> None:
         logger.info('Zipkin address was not provided, using stub transport')
-        self.records = deque(maxlen=queue_length)  # type: Deque[Record]
+        self.records: Deque[Record] = deque(maxlen=queue_length)
 
     def send(self, record: Record) -> None:
         self.records.append(record)
@@ -57,10 +57,10 @@ class BatchManager:
         self._attempt_count = attempt_count
         self._loop = loop
         self._max = BATCHES_MAX_COUNT
-        self._sending_batches = deque([], maxlen=self._max)  # type: SndBatches
-        self._active_batch = None  # type: Optional[DataList]
+        self._sending_batches: SndBatches = deque([], maxlen=self._max)
+        self._active_batch: Optional[DataList] = None
         self._ender = self._loop.create_future()
-        self._timer = None  # type: Optional[asyncio.Future[Any]]
+        self._timer: Optional[asyncio.Future[Any]] = None
         self._sender_task = asyncio.ensure_future(
             self._sender_loop(), loop=self._loop)
 
@@ -125,7 +125,7 @@ class Transport(TransportABC):
                  send_timeout: Optional[aiohttp.ClientTimeout] = None
                  ) -> None:
         self._address = URL(address)
-        self._queue = []  # type: DataList
+        self._queue: DataList = []
         self._closing = False
         self._send_interval = send_interval
         self._loop = loop or asyncio.get_event_loop()
