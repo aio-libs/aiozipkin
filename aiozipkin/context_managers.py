@@ -23,15 +23,15 @@ class _ContextManager(_Base[T]):
 
     def __init__(self, coro: Awaitable[T]) -> None:
         super().__init__()
-        self._coro = coro  # type: Awaitable[T]
-        self._obj = None  # type: Optional[T]
+        self._coro: Awaitable[T] = coro
+        self._obj: Optional[T] = None
 
     def __await__(self) -> Generator[Any, None, T]:
         return self._coro.__await__()
 
     async def __aenter__(self) -> T:
         self._obj = await self._coro
-        t = await self._obj.__aenter__()  # type: T
+        t: T = await self._obj.__aenter__()
         return t
 
     async def __aexit__(self,

@@ -24,7 +24,7 @@ class Tracer(_Base):
                  sampler: SamplerABC,
                  local_endpoint: Endpoint) -> None:
         super().__init__()
-        self._records = {}  # type: Dict[TraceContext, Record]
+        self._records: Dict[TraceContext, Record] = {}
         self._transport = transport
         self._sampler = sampler
         self._local_endpoint = local_endpoint
@@ -122,5 +122,5 @@ def create_custom(local_endpoint: Endpoint,
     async def build_tracer() -> Tracer:
         return Tracer(t, s, local_endpoint)
 
-    result = _ContextManager(build_tracer())  # type: Awaitable[Tracer]
+    result: Awaitable[Tracer] = _ContextManager(build_tracer())
     return result

@@ -29,12 +29,12 @@ class Record:
         self._finished = False
 
         self._name = 'unknown'
-        self._kind = None  # type: OptStr
-        self._timestamp = None  # type: OptInt
-        self._duration = None  # type: OptInt
-        self._remote_endpoint = None  # type: Optional[Dict[str, Any]]
-        self._annotations = []  # type: List[Annotation]
-        self._tags = {}  # type: Dict[str, str]
+        self._kind: OptStr = None
+        self._timestamp: OptInt = None
+        self._duration: OptInt = None
+        self._remote_endpoint: Optional[Dict[str, Any]] = None
+        self._annotations: List[Annotation] = []
+        self._tags: Dict[str, str] = {}
 
     @property
     def context(self) -> TraceContext:

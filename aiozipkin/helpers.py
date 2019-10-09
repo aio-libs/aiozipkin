@@ -104,7 +104,7 @@ def make_single_header(context: TraceContext) -> Headers:
     else:
         sampled = '0'
 
-    params = [c.trace_id, c.span_id, sampled]  # type: List[str]
+    params: List[str] = [c.trace_id, c.span_id, sampled]
     if c.parent_id is not None:
         params.append(c.parent_id)
 
@@ -142,7 +142,7 @@ def _parse_debug(parts: List[str]) -> bool:
 
 def _parse_sampled(parts: List[str]) -> OptBool:
     # parse sampled part from zipkin single header propagation
-    sampled = None  # type: OptBool
+    sampled: OptBool = None
     if len(parts) >= 3:
         if parts[2] in ('1', '0'):
             sampled = bool(int(parts[2]))
@@ -157,7 +157,7 @@ def _parse_single_header(headers: Headers) -> Optional[TraceContext]:
     if headers[SINGLE_HEADER] == '0':
         return None
     payload = headers[SINGLE_HEADER].lower()
-    parts = payload.split(DELIMITER)  # type: List[str]
+    parts: List[str] = payload.split(DELIMITER)
     if len(parts) < 2:
         return None
 

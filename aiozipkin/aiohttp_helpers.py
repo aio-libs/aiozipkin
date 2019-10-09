@@ -39,7 +39,7 @@ Middleware = Callable[[Application, Handler], Awaitable[Handler]]
 def _set_remote_endpoint(span: SpanAbc, request: Request) -> None:
     peername = request.remote
     if peername is not None:
-        kwargs = {}  # type: Dict[str, Any]
+        kwargs: Dict[str, Any] = {}
         try:
             peer_ipaddress = ipaddress.ip_address(peername)
         except ValueError:
@@ -89,8 +89,8 @@ PY37 = sys.version_info >= (3, 7)
 if PY37:
     from contextvars import ContextVar
     OptTraceVar = ContextVar[Optional[TraceContext]]
-    zipkin_context = ContextVar(
-        'zipkin_context', default=None)  # type: OptTraceVar
+    zipkin_context: OptTraceVar = ContextVar(
+        'zipkin_context', default=None)
 
     @contextmanager
     def set_context_value(
@@ -108,9 +108,9 @@ def middleware_maker(skip_routes: Optional[AbstractRoute] = None,
                      tracer_key: str = APP_AIOZIPKIN_KEY,
                      request_key: str = REQUEST_AIOZIPKIN_KEY) -> Middleware:
     s = skip_routes
-    skip_routes_set = set(s) if s else set()  # type: Set[AbstractRoute]
+    skip_routes_set: Set[AbstractRoute] = set(s) if s else set()
 
-    _middleware = middleware  # type: Callable[[Middleware], Middleware]
+    _middleware: Callable[[Middleware], Middleware] = middleware
 
     @_middleware
     async def aiozipkin_middleware(
@@ -210,7 +210,7 @@ class ZipkinClientSignals:
         has_explicit_context = (isinstance(trace_request_ctx, dict) and
                                 'span_context' in trace_request_ctx)
         if has_explicit_context:
-            r = trace_request_ctx['span_context']  # type: TraceContext
+            r: TraceContext = trace_request_ctx['span_context']
             return r
 
         if PY37:
