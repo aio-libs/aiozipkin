@@ -177,7 +177,7 @@ google_ cloud documentation how to setup make zipkin collector:
 Requirements
 ------------
 
-* Python_ 3.5+
+* Python_ 3.6+
 * aiohttp_
 
 
