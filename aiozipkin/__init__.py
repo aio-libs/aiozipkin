@@ -29,7 +29,7 @@ from .sampler import Sampler
 from .tracer import Tracer, create, create_custom
 
 
-__version__ = '0.5.1a0'
+__version__ = '0.6.0'
 __all__ = (
     'Tracer',
     'Sampler',

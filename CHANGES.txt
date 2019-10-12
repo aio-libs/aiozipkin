@@ -1,6 +1,15 @@
 CHANGES
 =======
 
+0.6.0 (2019-10-12)
+------------------
+* Add context var support for python3.7 aiohttp instrumentation #187
+* Single header tracing support #189
+* Add retries and batches to transport (thanks @konstantin-stepanov)
+* Drop python3.5 support #238
+* Use new typing syntax in codebase #237
+
+
 0.5.0 (2018-12-25)
 ------------------
 * More strict typing configuration is used #147
