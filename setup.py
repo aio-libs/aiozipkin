@@ -4,8 +4,8 @@ import sys
 from setuptools import setup, find_packages
 
 
-if sys.version_info < (3, 5, 3):
-    raise RuntimeError('aiozipkin does not support Python earlier than 3.5.3')
+if sys.version_info < (3, 6, 0):
+    raise RuntimeError('aiozipkin does not support Python earlier than 3.6.0')
 
 
 def read(f):
