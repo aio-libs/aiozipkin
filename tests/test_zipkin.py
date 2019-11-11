@@ -113,7 +113,7 @@ async def test_leak_in_transport(zipkin_url, client, loop):
     gc.collect()
     snapshot1 = tracemalloc.take_snapshot()
 
-    await asyncio.sleep(10)
+    await asyncio.sleep(30)
     gc.collect()
     snapshot2 = tracemalloc.take_snapshot()
 
