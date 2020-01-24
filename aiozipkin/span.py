@@ -1,5 +1,5 @@
 from abc import ABCMeta, abstractmethod
-from typing import TYPE_CHECKING, TypeVar, Optional, Type
+from typing import TYPE_CHECKING, TypeVar, Optional, Type, List
 from types import TracebackType
 
 from .constants import ERROR
@@ -82,9 +82,13 @@ class SpanAbc(metaclass=ABCMeta):
 
 
 class NoopSpan(SpanAbc):
-    def __init__(self, tracer: 'Tracer', context: TraceContext) -> None:
+    def __init__(self, tracer: 'Tracer',
+                 context: TraceContext,
+                 ignored_exceptions: Optional[List[Type[Exception]]] = None
+                 ) -> None:
         self._context = context
         self._tracer = tracer
+        self._ignored_exceptions = ignored_exceptions or []
 
     @property
     def is_noop(self) -> bool:
@@ -134,10 +138,13 @@ class NoopSpan(SpanAbc):
 class Span(SpanAbc):
     def __init__(self, tracer: 'Tracer',
                  context: TraceContext,
-                 record: Record) -> None:
+                 record: Record,
+                 ignored_exceptions: Optional[List[Type[Exception]]] = None
+                 ) -> None:
         self._context = context
         self._tracer = tracer
         self._record = record
+        self._ignored_exceptions = ignored_exceptions
 
     @property
     def is_noop(self) -> bool:
@@ -159,7 +166,8 @@ class Span(SpanAbc):
     def finish(self, ts: OptTs = None,
                exception: Optional[Exception] = None) -> 'Span':
         if exception is not None:
-            self.tag(ERROR, str(exception))
+            if not isinstance(exception, tuple(self._ignored_exceptions)):
+                self.tag(ERROR, str(exception))
         ts = make_timestamp(ts)
         self._record.finish(ts)
         self._tracer._send(self._record)
