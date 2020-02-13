@@ -144,7 +144,7 @@ class Span(SpanAbc):
         self._context = context
         self._tracer = tracer
         self._record = record
-        self._ignored_exceptions = ignored_exceptions
+        self._ignored_exceptions = ignored_exceptions or []
 
     @property
     def is_noop(self) -> bool:
