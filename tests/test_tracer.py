@@ -148,6 +148,24 @@ def test_error(tracer, fake_transport):
     assert data['tags'] == {'error': 'boom'}
 
 
+def test_ignored_error(tracer, fake_transport):
+    tracer._ignored_exceptions.append(RuntimeError)
+
+    def func():
+        with tracer.new_trace() as span:
+            span.name('root_span')
+            raise RuntimeError('boom')
+
+    with pytest.raises(RuntimeError):
+        func()
+
+    assert len(fake_transport.records) == 1
+    record = fake_transport.records[0]
+
+    data = record.asdict()
+    assert data['tags'] == {}
+
+
 def test_null_annotation(tracer, fake_transport):
     with tracer.new_trace() as span:
         span.annotate(None, ts=1506970524)

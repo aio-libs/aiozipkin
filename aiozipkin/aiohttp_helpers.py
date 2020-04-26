@@ -1,7 +1,7 @@
 import sys
 import ipaddress
 from types import SimpleNamespace
-from typing import cast, Optional, Dict, Any, Set, Awaitable, Callable, Generator  # noqa
+from typing import cast, Optional, Dict, Any, Set, Awaitable, Callable, Generator, Iterable  # noqa
 from contextlib import contextmanager
 
 import aiohttp
@@ -104,7 +104,7 @@ if PY37:
             context_var.reset(token)
 
 
-def middleware_maker(skip_routes: Optional[AbstractRoute] = None,
+def middleware_maker(skip_routes: Optional[Iterable[AbstractRoute]] = None,
                      tracer_key: str = APP_AIOZIPKIN_KEY,
                      request_key: str = REQUEST_AIOZIPKIN_KEY) -> Middleware:
     s = skip_routes

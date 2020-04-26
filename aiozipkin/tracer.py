@@ -1,4 +1,4 @@
-from typing import Optional, Dict, Awaitable, Any, AsyncContextManager, TYPE_CHECKING  # noqa
+from typing import Optional, Dict, Awaitable, Any, AsyncContextManager, TYPE_CHECKING, List, Type  # noqa
 
 from .context_managers import _ContextManager
 from .helpers import TraceContext, Endpoint
@@ -22,12 +22,15 @@ class Tracer(_Base):
     def __init__(self,
                  transport: TransportABC,
                  sampler: SamplerABC,
-                 local_endpoint: Endpoint) -> None:
+                 local_endpoint: Endpoint,
+                 ignored_exceptions: Optional[List[Type[Exception]]] = None
+                 ) -> None:
         super().__init__()
         self._records: Dict[TraceContext, Record] = {}
         self._transport = transport
         self._sampler = sampler
         self._local_endpoint = local_endpoint
+        self._ignored_exceptions = ignored_exceptions or []
 
     def new_trace(self,
                   sampled: OptBool = None,
@@ -47,16 +50,16 @@ class Tracer(_Base):
     def new_child(self, context: TraceContext) -> SpanAbc:
         new_context = self._next_context(context)
         if not context.sampled:
-            return NoopSpan(self, new_context)
+            return NoopSpan(self, new_context, self._ignored_exceptions)
         return self.to_span(new_context)
 
     def to_span(self, context: TraceContext) -> SpanAbc:
         if not context.sampled:
-            return NoopSpan(self, context)
+            return NoopSpan(self, context, self._ignored_exceptions)
 
         record = Record(context, self._local_endpoint)
         self._records[context] = record
-        return Span(self, context, record)
+        return Span(self, context, record, self._ignored_exceptions)
 
     def _send(self, record: Record) -> None:
         self._records.pop(record.context, None)
@@ -101,26 +104,30 @@ def create(zipkin_address: str,
            local_endpoint: Endpoint, *,
            sample_rate: float = 0.01,
            send_interval: float = 5,
-           loop: OptLoop = None) -> Awaitable[Tracer]:
+           loop: OptLoop = None,
+           ignored_exceptions: Optional[List[Type[Exception]]] = None
+           ) -> Awaitable[Tracer]:
 
     async def build_tracer() -> Tracer:
         sampler = Sampler(sample_rate=sample_rate)
         transport = Transport(
             zipkin_address, send_interval=send_interval, loop=loop)
-        return Tracer(transport, sampler, local_endpoint)
+        return Tracer(transport, sampler, local_endpoint, ignored_exceptions)
     result = _ContextManager(build_tracer())
     return result
 
 
 def create_custom(local_endpoint: Endpoint,
                   transport: Optional[TransportABC] = None,
-                  sampler: Optional[SamplerABC] = None) -> Awaitable[Tracer]:
+                  sampler: Optional[SamplerABC] = None,
+                  ignored_exceptions: Optional[List[Type[Exception]]] = None
+                  ) -> Awaitable[Tracer]:
     t = transport or StubTransport()
     sample_rate = 1  # sample everything
     s = sampler or Sampler(sample_rate=sample_rate)
 
     async def build_tracer() -> Tracer:
-        return Tracer(t, s, local_endpoint)
+        return Tracer(t, s, local_endpoint, ignored_exceptions)
 
     result: Awaitable[Tracer] = _ContextManager(build_tracer())
     return result

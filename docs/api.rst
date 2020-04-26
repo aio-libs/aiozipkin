@@ -32,7 +32,7 @@ Core API Reference
     :param dict headers: hostname to serve monitor telnet server
     :returns: TraceContext object or None
 
-.. cofunction:: create(zipkin_address, local_endpoint, sample_rate, send_interval, loop)
+.. cofunction:: create(zipkin_address, local_endpoint, sample_rate, send_interval, loop, ignored_exceptions)
 
    Creates Tracer object
 
@@ -42,15 +42,19 @@ Core API Reference
    :param float sample_rate: hostname to serve monitor telnet server
    :param float send_inteval: hostname to serve monitor telnet server
    :param asyncio.EventLoop loop: hostname to serve monitor telnet server
+   :param Optional[List[Type[Exception]]]: ignored_exceptions list of exceptions \
+    which will not be labeled as error
    :returns: Tracer
 
-.. cofunction:: create_custom(transport, sampler, local_endpoint)
+.. cofunction:: create_custom(transport, sampler, local_endpoint, ignored_exceptions)
 
     Creates Tracer object with a custom Transport and Sampler implementation.
 
     :param TransportABC transport: custom transport implementation
     :param SamplerABC sampler: custom sampler implementation
     :param Endpoint local_endpoint: hostname to serve monitor telnet server
+    :param Optional[List[Type[Exception]]]: ignored_exceptions list of exceptions \
+     which will not be labeled as error
     :returns: Tracer
 
 .. class:: Endpoint(serviceName: str, ipv4=None, ipv6=None, port=None)
