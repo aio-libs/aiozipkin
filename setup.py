@@ -46,7 +46,7 @@ setup(name='aiozipkin',
       version=read_version(),
       description=('Distributed tracing instrumentation '
                    'for asyncio application with zipkin'),
-      long_description='\n\n'.join((read('README.rst'), read('CHANGES.txt'))),
+      long_description='\n\n'.join((read('README.rst'), read('CHANGES.rst'))),
       classifiers=classifiers,
       platforms=['POSIX'],
       author='Nikolay Novik',
