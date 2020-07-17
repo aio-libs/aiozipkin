@@ -2,6 +2,7 @@ import random
 import struct
 import time
 
+
 # https://github.com/Yelp/py_zipkin/blob/
 # 61f8aa3412f6c1b4e1218ed34cb117e97cc9a6cc/py_zipkin/util.py#L22-L75
 def generate_random_64bit_string() -> str:
