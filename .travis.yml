@@ -9,8 +9,7 @@ python:
 matrix:
   include:
     - python: '3.6'
-      env: AIOHTTP_MASTER="y"
-    - python: '3.6'
+    - python: '3.7'
       env: MYPY="y"
   allow_failures:
     - env: AIOHTTP_MASTER="y"
@@ -19,11 +18,6 @@ install:
     - pip install --upgrade setuptools
     - pip install codecov
     - pip install -r requirements-dev.txt
-    - |
-        if [ "$AIOHTTP_MASTER" = "y" ]; then
-            pip install cython
-            pip install git+https://github.com/aio-libs/aiohttp.git
-        fi;
     - |
         if [ "$MYPY" = "y" ]; then
             make mypy
@@ -44,4 +38,4 @@ deploy:
     tags: true
     repo: aio-libs/aiozipkin
     all_branches: true
-    python: 3.6
+    python: 3.7
