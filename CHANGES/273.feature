@@ -1,0 +1,1 @@
+Add support of AWS X-Ray trace id format.
