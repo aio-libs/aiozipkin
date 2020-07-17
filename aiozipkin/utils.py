@@ -14,6 +14,8 @@ def generate_random_64bit_string() -> str:
     return '{:016x}'.format(random.getrandbits(64))
 
 
+# https://github.com/Yelp/py_zipkin/blob/
+# 61f8aa3412f6c1b4e1218ed34cb117e97cc9a6cc/py_zipkin/util.py#L32
 def generate_random_128bit_string() -> str:
     """Returns a 128 bit UTF-8 encoded string. Follows the same conventions
     as generate_random_64bit_string().
