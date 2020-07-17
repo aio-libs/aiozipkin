@@ -16,7 +16,7 @@ aiozipkin
     :target: https://gitter.im/aio-libs/Lobby
     :alt: Chat on Gitter
 
-**aiozipkin** is Python 3.5+ module that adds distributed tracing capabilities
+**aiozipkin** is Python 3.6+ module that adds distributed tracing capabilities
 from asyncio_ applications with zipkin (http://zipkin.io) server instrumentation.
 
 zipkin_ is a distributed tracing system. It helps gather timing data needed

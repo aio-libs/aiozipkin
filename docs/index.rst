@@ -7,7 +7,7 @@ aiozipkin's documentation!
 ===========================
 
 
-**aiozipkin** is Python 3.5+ module that adds distributed tracing capabilities
+**aiozipkin** is Python 3.6+ module that adds distributed tracing capabilities
 for asyncio_ applications with zipkin (http://zipkin.io) server instrumentation.
 
 zipkin_ is a distributed tracing system. It helps gather timing data needed
@@ -32,7 +32,8 @@ Features
 * Supports zipkin_ ``v2`` protocol.
 * Easy to use API.
 * Explicit context handling, no thread local variables.
-* Can work with jaeger_ and stackdriver_ through zipkin compatible API.
+* Can work with jaeger_ and stackdriver_ (google_) through zipkin compatible API.
+* Can be integrated with AWS X-Ray by aws_ proxy.
 
 Contents
 --------
@@ -57,10 +58,11 @@ Indices and tables
 
 .. _PEP492: https://www.python.org/dev/peps/pep-0492/
 .. _Python: https://www.python.org
-.. _aiohttp: https://github.com/KeepSafe/aiohttp
-.. _asyncio: http://docs.python.org/3.5/library/asyncio.html
+.. _aiohttp: https://github.com/aio-libs/aiohttp
+.. _asyncio: http://docs.python.org/3/library/asyncio.html
 .. _uvloop: https://github.com/MagicStack/uvloop
 .. _zipkin: http://zipkin.io
 .. _jaeger: http://jaeger.readthedocs.io/en/latest/
 .. _stackdriver: https://cloud.google.com/stackdriver/
 .. _google: https://cloud.google.com/trace/docs/zipkin
+.. _aws: https://github.com/openzipkin/zipkin-aws

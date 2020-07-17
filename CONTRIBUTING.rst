@@ -10,18 +10,24 @@ Thanks for your interest in contributing to ``aiozipkin``, there are multiple
 ways and places you can contribute, help on on documentation and tests is very
 appreciated.
 
-To setup development environment, fist of all just clone repository::
+To setup development environment, fist of all just clone repository:
+
+.. code-block:: bash
 
     $ git clone git@github.com:aio-libs/aiozipkin.git
 
-Create virtualenv with python3.6 (python 3.5 also supported). For example
-using *virtualenvwrapper* commands could look like::
+Create virtualenv with python3.6+. For example
+using *virtualenvwrapper* commands could look like:
+
+.. code-block:: bash
 
    $ cd aiozipkin
    $ mkvirtualenv --python=`which python3.6` aiozipkin
 
 
-After that please install libraries required for development::
+After that please install libraries required for development:
+
+.. code-block:: bash
 
     $ pip install -r requirements-dev.txt
     $ pip install -e .
@@ -29,11 +35,15 @@ After that please install libraries required for development::
 
 Running Tests
 -------------
-Congratulations, you are ready to run the test suite::
+Congratulations, you are ready to run the test suite:
+
+.. code-block:: bash
 
     $ make cov
 
-To run individual test use following command::
+To run individual test use following command:
+
+.. code-block:: bash
 
     $ py.test -sv tests/test_tracer.py -k test_name
 
