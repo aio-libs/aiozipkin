@@ -1,17 +1,17 @@
 import asyncio
 
-import frontend
 import backend
+import frontend
 
 
 def run():
     loop = asyncio.get_event_loop()
     loop_run = loop.run_until_complete
-    host = '127.0.0.1'
+    host = "127.0.0.1"
     fe_port = 9010
     be_port = 9011
 
-    print('http://127.0.0.1:9010')
+    print("http://127.0.0.1:9010")
 
     fe_app = loop_run(frontend.make_app(host, fe_port))
     be_app = loop_run(backend.make_app(host, be_port))
@@ -32,5 +32,5 @@ def run():
             loop_run(handler.finish_connections())
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     run()

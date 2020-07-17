@@ -1,36 +1,37 @@
 import time
-from typing import NamedTuple, Optional, Dict, List, Any
+from typing import Any, Dict, List, NamedTuple, Optional
 
 from .mypy_types import Headers, OptBool, OptInt, OptStr, OptTs
 
 
 # possible span kinds
-CLIENT = 'CLIENT'
-SERVER = 'SERVER'
-PRODUCER = 'PRODUCER'
-CONSUMER = 'CONSUMER'
+CLIENT = "CLIENT"
+SERVER = "SERVER"
+PRODUCER = "PRODUCER"
+CONSUMER = "CONSUMER"
 
 # zipkin headers, for more information see:
 # https://github.com/openzipkin/b3-propagation
 
-TRACE_ID_HEADER = 'X-B3-TraceId'
-SPAN_ID_HEADER = 'X-B3-SpanId'
-PARENT_ID_HEADER = 'X-B3-ParentSpanId'
-FLAGS_HEADER = 'X-B3-Flags'
-SAMPLED_ID_HEADER = 'X-B3-Sampled'
-SINGLE_HEADER = 'b3'
-DELIMITER = '-'
-DEBUG_MARKER = 'd'
+TRACE_ID_HEADER = "X-B3-TraceId"
+SPAN_ID_HEADER = "X-B3-SpanId"
+PARENT_ID_HEADER = "X-B3-ParentSpanId"
+FLAGS_HEADER = "X-B3-Flags"
+SAMPLED_ID_HEADER = "X-B3-Sampled"
+SINGLE_HEADER = "b3"
+DELIMITER = "-"
+DEBUG_MARKER = "d"
 
 _TraceContext = NamedTuple(
-    'TraceContext', [
-        ('trace_id', str),
-        ('parent_id', OptStr),
-        ('span_id', str),
-        ('sampled', OptBool),
-        ('debug', bool),
-        ('shared', bool),
-    ]
+    "TraceContext",
+    [
+        ("trace_id", str),
+        ("parent_id", OptStr),
+        ("span_id", str),
+        ("sampled", OptBool),
+        ("debug", bool),
+        ("shared", bool),
+    ],
 )
 
 
@@ -52,17 +53,14 @@ class TraceContext(_TraceContext):
 
 
 Endpoint = NamedTuple(
-    'Endpoint', [('serviceName', OptStr),
-                 ('ipv4', OptStr),
-                 ('ipv6', OptStr),
-                 ('port', OptInt)]
+    "Endpoint",
+    [("serviceName", OptStr), ("ipv4", OptStr), ("ipv6", OptStr), ("port", OptInt)],
 )
 
 
-def create_endpoint(service_name: str, *,
-                    ipv4: OptStr = None,
-                    ipv6: OptStr = None,
-                    port: OptInt = None) -> Endpoint:
+def create_endpoint(
+    service_name: str, *, ipv4: OptStr = None, ipv6: OptStr = None, port: OptInt = None
+) -> Endpoint:
     """Factory function to create Endpoint object.
     """
     return Endpoint(service_name, ipv4, ipv6, port)
@@ -82,8 +80,8 @@ def make_headers(context: TraceContext) -> Headers:
     headers = {
         TRACE_ID_HEADER: context.trace_id,
         SPAN_ID_HEADER: context.span_id,
-        FLAGS_HEADER: '0',
-        SAMPLED_ID_HEADER: '1' if context.sampled else '0',
+        FLAGS_HEADER: "0",
+        SAMPLED_ID_HEADER: "1" if context.sampled else "0",
     }
     if context.parent_id is not None:
         headers[PARENT_ID_HEADER] = context.parent_id
@@ -98,11 +96,11 @@ def make_single_header(context: TraceContext) -> Headers:
 
     # encode sampled flag
     if c.debug:
-        sampled = 'd'
+        sampled = "d"
     elif c.sampled:
-        sampled = '1'
+        sampled = "1"
     else:
-        sampled = '0'
+        sampled = "0"
 
     params: List[str] = [c.trace_id, c.span_id, sampled]
     if c.parent_id is not None:
@@ -115,13 +113,13 @@ def make_single_header(context: TraceContext) -> Headers:
 
 def parse_sampled_header(headers: Headers) -> OptBool:
     sampled = headers.get(SAMPLED_ID_HEADER.lower(), None)
-    if sampled is None or sampled == '':
+    if sampled is None or sampled == "":
         return None
-    return True if sampled == '1' else False
+    return True if sampled == "1" else False
 
 
 def parse_debug_header(headers: Headers) -> bool:
-    return True if headers.get(FLAGS_HEADER, '0') == '1' else False
+    return True if headers.get(FLAGS_HEADER, "0") == "1" else False
 
 
 def _parse_parent_id(parts: List[str]) -> OptStr:
@@ -144,7 +142,7 @@ def _parse_sampled(parts: List[str]) -> OptBool:
     # parse sampled part from zipkin single header propagation
     sampled: OptBool = None
     if len(parts) >= 3:
-        if parts[2] in ('1', '0'):
+        if parts[2] in ("1", "0"):
             sampled = bool(int(parts[2]))
     return sampled
 
@@ -154,7 +152,7 @@ def _parse_single_header(headers: Headers) -> Optional[TraceContext]:
     # https://github.com/openzipkin/b3-propagation
 
     # b3={TraceId}-{SpanId}-{SamplingState}-{ParentSpanId}
-    if headers[SINGLE_HEADER] == '0':
+    if headers[SINGLE_HEADER] == "0":
         return None
     payload = headers[SINGLE_HEADER].lower()
     parts: List[str] = payload.split(DELIMITER)
@@ -170,7 +168,8 @@ def _parse_single_header(headers: Headers) -> Optional[TraceContext]:
         parent_id=_parse_parent_id(parts),
         sampled=sampled,
         debug=debug,
-        shared=False)
+        shared=False,
+    )
     return context
 
 
@@ -188,7 +187,7 @@ def make_context(headers: Headers) -> Optional[TraceContext]:
     has_b3 = all(h in headers for h in required)
     has_b3_single = SINGLE_HEADER in headers
 
-    if not(has_b3_single or has_b3):
+    if not (has_b3_single or has_b3):
         return None
 
     if has_b3:
@@ -209,8 +208,7 @@ def make_context(headers: Headers) -> Optional[TraceContext]:
 OptKeys = Optional[List[str]]
 
 
-def filter_none(data: Dict[str, Any],
-                keys: OptKeys = None) -> Dict[str, Any]:
+def filter_none(data: Dict[str, Any], keys: OptKeys = None) -> Dict[str, Any]:
     """Filter keys from dict with None values.
 
     Check occurs only on root level. If list of keys specified, filter

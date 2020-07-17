@@ -2,11 +2,19 @@
 
 FLAGS=
 
+FILES := aiozipkin tests setup.py examples
 
-flake: checkrst bandit
-	flake8 aiozipkin tests examples setup.py
+fmt:
+	isort ${FILES}
+	black ${FILES}
 
-test: flake
+lint: checkrst bandit
+	isort --check-only --diff ${FILES}
+	black --check $(FILES)
+	mypy --show-error-codes --strict $(FILES)
+	flake8 $(FILES)
+
+test: lint
 	py.test -s -v $(FLAGS) ./tests/
 
 vtest:
@@ -21,7 +29,7 @@ bandit:
 pyroma:
 	pyroma -d .
 mypy:
-	mypy aiozipkin --ignore-missing-imports --disallow-untyped-calls --no-site-packages --strict
+	mypy aiozipkin --strict
 
 testloop:
 	while true ; do \

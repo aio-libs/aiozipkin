@@ -1,5 +1,5 @@
 import asyncio  # flake8: noqa
-from typing import Optional, Mapping
+from typing import Mapping, Optional
 
 
 Headers = Mapping[str, str]

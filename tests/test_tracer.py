@@ -1,22 +1,23 @@
+from typing import Any
 from unittest import mock
 
 import pytest
-from aiozipkin.helpers import (
-    TraceContext, create_endpoint,
-)
-from aiozipkin.tracer import NoopSpan, Span, create_custom
-from aiozipkin.transport import StubTransport
+
+from aiozipkin.helpers import TraceContext, create_endpoint
 from aiozipkin.sampler import SamplerABC
+from aiozipkin.span import NoopSpan, Span
+from aiozipkin.tracer import Tracer, create_custom
+from aiozipkin.transport import StubTransport
 
 
-def test_basic(tracer, fake_transport):
+def test_basic(tracer: Tracer, fake_transport: Any) -> None:
     with tracer.new_trace() as span:
-        span.name('root_span')
-        span.tag('span_type', 'root')
-        span.kind('CLIENT')
-        span.annotate('start:sql', ts=1506970524)
-        span.annotate('end:sql', ts=1506970524)
-        span.remote_endpoint('service_a', ipv4='127.0.0.1', port=8080)
+        span.name("root_span")
+        span.tag("span_type", "root")
+        span.kind("CLIENT")
+        span.annotate("start:sql", ts=1506970524)
+        span.annotate("end:sql", ts=1506970524)
+        span.remote_endpoint("service_a", ipv4="127.0.0.1", port=8080)
 
     assert not span.is_noop
     assert span.tracer is tracer
@@ -25,46 +26,54 @@ def test_basic(tracer, fake_transport):
     assert len(fake_transport.records) == 1
     record = fake_transport.records[0]
     expected = {
-        'annotations': [{'timestamp': 1506970524000000, 'value': 'start:sql'},
-                        {'timestamp': 1506970524000000, 'value': 'end:sql'}],
-        'debug': False,
-        'duration': mock.ANY,
-        'id': mock.ANY,
-        'kind': 'CLIENT',
-        'localEndpoint': {'serviceName': 'test_service',
-                          'ipv4': '127.0.0.1',
-                          'port': 8080},
-        'name': 'root_span',
-        'parentId': None,
-        'remoteEndpoint': {'serviceName': 'service_a',
-                           'ipv4': '127.0.0.1',
-                           'port': 8080},
-        'shared': False,
-        'tags': {'span_type': 'root'},
-        'timestamp': mock.ANY,
-        'traceId': mock.ANY}
+        "annotations": [
+            {"timestamp": 1506970524000000, "value": "start:sql"},
+            {"timestamp": 1506970524000000, "value": "end:sql"},
+        ],
+        "debug": False,
+        "duration": mock.ANY,
+        "id": mock.ANY,
+        "kind": "CLIENT",
+        "localEndpoint": {
+            "serviceName": "test_service",
+            "ipv4": "127.0.0.1",
+            "port": 8080,
+        },
+        "name": "root_span",
+        "parentId": None,
+        "remoteEndpoint": {
+            "serviceName": "service_a",
+            "ipv4": "127.0.0.1",
+            "port": 8080,
+        },
+        "shared": False,
+        "tags": {"span_type": "root"},
+        "timestamp": mock.ANY,
+        "traceId": mock.ANY,
+    }
     assert record.asdict() == expected
     span.finish()
     # make sure double finish does not error
     span.finish()
 
 
-def test_noop_span_methods(tracer):
+def test_noop_span_methods(tracer: Tracer) -> Any:
     context = TraceContext(
-        trace_id='6f9a20b5092fa5e144fd15cc31141cd4',
+        trace_id="6f9a20b5092fa5e144fd15cc31141cd4",
         parent_id=None,
-        span_id='41baf1be2fb9bfc5',
+        span_id="41baf1be2fb9bfc5",
         sampled=False,
         debug=False,
-        shared=True)
+        shared=True,
+    )
 
     with tracer.new_child(context) as span:
-        span.name('root_span')
-        span.tag('span_type', 'root')
-        span.kind('CLIENT')
-        span.annotate('start:sql', ts=1506970524)
-        span.annotate('end:sql', ts=1506970524)
-        span.remote_endpoint('service_a', ipv4='127.0.0.1', port=8080)
+        span.name("root_span")
+        span.tag("span_type", "root")
+        span.kind("CLIENT")
+        span.annotate("start:sql", ts=1506970524)
+        span.annotate("end:sql", ts=1506970524)
+        span.remote_endpoint("service_a", ipv4="127.0.0.1", port=8080)
 
         with span.new_child() as child_span:
             pass
@@ -81,10 +90,10 @@ def test_noop_span_methods(tracer):
     assert isinstance(child_span, NoopSpan)
 
 
-def test_trace_join_span(tracer, context):
+def test_trace_join_span(tracer: Tracer, context: Any) -> None:
 
     with tracer.join_span(context) as span:
-        span.name('name')
+        span.name("name")
 
     assert span.context.trace_id == context.trace_id
     assert span.context.span_id == context.span_id
@@ -92,26 +101,26 @@ def test_trace_join_span(tracer, context):
 
     new_context = context._replace(sampled=None)
     with tracer.join_span(new_context) as span:
-        span.name('name')
+        span.name("name")
 
     assert span.context.sampled is not None
 
 
-def test_trace_new_child(tracer, context):
+def test_trace_new_child(tracer: Tracer, context: Any) -> None:
 
     with tracer.new_child(context) as span:
-        span.name('name')
+        span.name("name")
 
     assert span.context.trace_id == context.trace_id
     assert span.context.parent_id == context.span_id
     assert span.context.span_id is not None
 
 
-def test_span_new_child(tracer, context, fake_transport):
+def test_span_new_child(tracer: Tracer, context: Any, fake_transport: Any) -> None:
 
     with tracer.new_child(context) as span:
-        span.name('name')
-        with span.new_child('child', 'CLIENT') as child_span1:
+        span.name("name")
+        with span.new_child("child", "CLIENT") as child_span1:
             pass
         with span.new_child() as child_span2:
             pass
@@ -123,20 +132,20 @@ def test_span_new_child(tracer, context, fake_transport):
 
     record = fake_transport.records[0]
     data = record.asdict()
-    assert data['name'] == 'child'
-    assert data['kind'] == 'CLIENT'
+    assert data["name"] == "child"
+    assert data["kind"] == "CLIENT"
 
     record = fake_transport.records[1]
     data = record.asdict()
-    assert data['name'] == 'unknown'
-    assert 'kind' not in data
+    assert data["name"] == "unknown"
+    assert "kind" not in data
 
 
-def test_error(tracer, fake_transport):
-    def func():
+def test_error(tracer: Tracer, fake_transport: Any) -> None:
+    def func() -> None:
         with tracer.new_trace() as span:
-            span.name('root_span')
-            raise RuntimeError('boom')
+            span.name("root_span")
+            raise RuntimeError("boom")
 
     with pytest.raises(RuntimeError):
         func()
@@ -145,16 +154,16 @@ def test_error(tracer, fake_transport):
     record = fake_transport.records[0]
 
     data = record.asdict()
-    assert data['tags'] == {'error': 'boom'}
+    assert data["tags"] == {"error": "boom"}
 
 
-def test_ignored_error(tracer, fake_transport):
+def test_ignored_error(tracer: Tracer, fake_transport: Any) -> None:
     tracer._ignored_exceptions.append(RuntimeError)
 
-    def func():
+    def func() -> None:
         with tracer.new_trace() as span:
-            span.name('root_span')
-            raise RuntimeError('boom')
+            span.name("root_span")
+            raise RuntimeError("boom")
 
     with pytest.raises(RuntimeError):
         func()
@@ -163,29 +172,27 @@ def test_ignored_error(tracer, fake_transport):
     record = fake_transport.records[0]
 
     data = record.asdict()
-    assert data['tags'] == {}
+    assert data["tags"] == {}
 
 
-def test_null_annotation(tracer, fake_transport):
+def test_null_annotation(tracer: Tracer, fake_transport: Any) -> None:
     with tracer.new_trace() as span:
         span.annotate(None, ts=1506970524)
 
     assert len(fake_transport.records) == 1
     record = fake_transport.records[0]
-    assert record.asdict()['annotations'][0]['value'] == 'None'
+    assert record.asdict()["annotations"][0]["value"] == "None"
 
 
-@pytest.mark.asyncio
-async def test_create_custom(fake_transport):
-    endpoint = create_endpoint('test_service', ipv4='127.0.0.1', port=8080)
+@pytest.mark.asyncio  # type: ignore[misc]
+async def test_create_custom(fake_transport: Any) -> None:
+    endpoint = create_endpoint("test_service", ipv4="127.0.0.1", port=8080)
 
     class FakeSampler(SamplerABC):
-
-        def is_sampled(self, trace_id: str):
+        def is_sampled(self, trace_id: str) -> bool:
             return True
 
-    with mock.patch(
-            'aiozipkin.tracer.Tracer') as tracer_stub:  # type: mock.MagicMock
+    with mock.patch("aiozipkin.tracer.Tracer") as tracer_stub:  # type: mock.MagicMock
         await create_custom(endpoint, fake_transport, FakeSampler())
         assert isinstance(tracer_stub.call_args[0][0], StubTransport)
         assert isinstance(tracer_stub.call_args[0][1], FakeSampler)

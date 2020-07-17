@@ -1,13 +1,12 @@
 import asyncio
 import logging
 
-from aiohttp import web
-
 import service_a
 import service_b
 import service_c
 import service_d
 import service_e
+from aiohttp import web
 
 
 async def start_app(service, host, port):
@@ -20,7 +19,7 @@ async def start_app(service, host, port):
 
 
 def run():
-    host = '127.0.0.1'
+    host = "127.0.0.1"
     loop = asyncio.get_event_loop()
     services = [service_a, service_b, service_c, service_d, service_e]
     runners = []
@@ -29,7 +28,7 @@ def run():
         runner = loop.run_until_complete(start_app(service, host, port))
         runners.append(runner)
 
-    print('Open in browser: http://127.0.0.1:9001')
+    print("Open in browser: http://127.0.0.1:9001")
     try:
         loop.run_forever()
     except KeyboardInterrupt:
@@ -37,6 +36,6 @@ def run():
             loop.run_until_complete(runner.cleanup())
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
     run()

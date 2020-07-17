@@ -1,15 +1,16 @@
 import asyncio
 
-import aiozipkin as az
 from aiohttp import web
 
+import aiozipkin as az
 
-async def handle(request):
+
+async def handle(request: web.Request) -> web.StreamResponse:
     tracer = az.get_tracer(request.app)
     span = az.request_span(request)
 
     with tracer.new_child(span.context) as child_span:
-        child_span.name('mysql:select')
+        child_span.name("mysql:select")
         # call to external service like https://python.org
         # or database query
         await asyncio.sleep(0.01)
@@ -25,10 +26,10 @@ async def handle(request):
     </body>
     </html>
     """
-    return web.Response(text=text, content_type='text/html')
+    return web.Response(text=text, content_type="text/html")
 
 
-async def not_traced_handle(request):
+async def not_traced_handle(request: web.Request) -> web.StreamResponse:
     text = """
     <html lang="en">
     <head>
@@ -40,31 +41,31 @@ async def not_traced_handle(request):
     </body>
     </html>
     """
-    return web.Response(text=text, content_type='text/html')
+    return web.Response(text=text, content_type="text/html")
 
 
-async def make_app(host, port):
+async def make_app(host: str, port: int) -> web.Application:
     app = web.Application()
-    app.router.add_get('/', handle)
+    app.router.add_get("/", handle)
     # here we aquire reference to route, so later we can command
     # aiozipkin not to trace it
-    skip_route = app.router.add_get('/status', not_traced_handle)
+    skip_route = app.router.add_get("/status", not_traced_handle)
 
-    endpoint = az.create_endpoint('aiohttp_server', ipv4=host, port=port)
+    endpoint = az.create_endpoint("aiohttp_server", ipv4=host, port=port)
 
-    zipkin_address = 'http://127.0.0.1:9411/api/v2/spans'
+    zipkin_address = "http://127.0.0.1:9411/api/v2/spans"
     tracer = await az.create(zipkin_address, endpoint, sample_rate=1.0)
     az.setup(app, tracer, skip_routes=[skip_route])
     return app
 
 
-def run():
-    host = '127.0.0.1'
+def run() -> None:
+    host = "127.0.0.1"
     port = 9001
     loop = asyncio.get_event_loop()
     app = loop.run_until_complete(make_app(host, port))
     web.run_app(app, host=host, port=port)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     run()

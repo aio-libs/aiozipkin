@@ -12,7 +12,7 @@ def generate_random_64bit_string() -> str:
 
     :returns: random 16-character string
     """
-    return '{:016x}'.format(random.getrandbits(64))
+    return "{:016x}".format(random.getrandbits(64))
 
 
 # https://github.com/Yelp/py_zipkin/blob/
@@ -29,7 +29,7 @@ def generate_random_128bit_string() -> str:
     """
     t = int(time.time())
     lower_96 = random.getrandbits(96)
-    return '{:032x}'.format((t << 96) | lower_96)
+    return "{:032x}".format((t << 96) | lower_96)
 
 
 def unsigned_hex_to_signed_int(hex_string: str) -> int:
@@ -44,8 +44,7 @@ def unsigned_hex_to_signed_int(hex_string: str) -> int:
     :param hex_string: the string representation of a zipkin ID
     :returns: signed int representation
     """
-    v: int = struct.unpack(
-        'q', struct.pack('Q', int(hex_string, 16)))[0]
+    v: int = struct.unpack("q", struct.pack("Q", int(hex_string, 16)))[0]
     return v
 
 
@@ -59,7 +58,7 @@ def signed_int_to_unsigned_hex(signed_int: int) -> str:
     :param signed_int: an int to convert
     :returns: unsigned hex string
     """
-    hex_string = hex(struct.unpack('Q', struct.pack('q', signed_int))[0])[2:]
-    if hex_string.endswith('L'):
+    hex_string = hex(struct.unpack("Q", struct.pack("q", signed_int))[0])[2:]
+    if hex_string.endswith("L"):
         return hex_string[:-1]
     return hex_string

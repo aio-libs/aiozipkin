@@ -5,7 +5,6 @@ from .mypy_types import OptInt
 
 
 class SamplerABC(abc.ABC):
-
     @abc.abstractmethod
     def is_sampled(self, trace_id: str) -> bool:  # pragma: no cover
         """Defines if given trace should be recorded for further actions."""
@@ -13,9 +12,7 @@ class SamplerABC(abc.ABC):
 
 
 class Sampler(SamplerABC):
-
-    def __init__(
-            self, *, sample_rate: float = 1.0, seed: OptInt = None) -> None:
+    def __init__(self, *, sample_rate: float = 1.0, seed: OptInt = None) -> None:
         self._sample_rate = sample_rate
         self._rng = Random(seed)
 
@@ -25,5 +22,6 @@ class Sampler(SamplerABC):
         else:
             sampled = self._rng.random() <= self._sample_rate
         return sampled
+
 
 # TODO: implement other types of sampler for example hash trace_id
