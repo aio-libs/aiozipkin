@@ -11,7 +11,7 @@ def generate_random_64bit_string() -> str:
 
     :returns: random 16-character string
     """
-    return "{:016x}".format(random.getrandbits(64))
+    return '{:016x}'.format(random.getrandbits(64))
 
 
 def generate_random_128bit_string() -> str:
@@ -26,7 +26,7 @@ def generate_random_128bit_string() -> str:
     """
     t = int(time.time())
     lower_96 = random.getrandbits(96)
-    return "{:032x}".format((t << 96) | lower_96)
+    return '{:032x}'.format((t << 96) | lower_96)
 
 
 def unsigned_hex_to_signed_int(hex_string: str) -> int:
