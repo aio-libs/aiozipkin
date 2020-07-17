@@ -13,6 +13,18 @@ CHANGES
 
 .. towncrier release notes start
 
+0.7.0 (2020-07-17)
+==================
+
+Features
+--------
+
+- Add support of AWS X-Ray trace id format.
+  `#273 <https://github.com/aio-libs/aiohttp/issues/273>`_
+
+
+----
+
 
 0.6.0 (2019-10-12)
 ------------------
