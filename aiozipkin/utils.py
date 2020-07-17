@@ -1,10 +1,9 @@
-import binascii
-import os
+import random
 import struct
-
+import time
 
 # https://github.com/Yelp/py_zipkin/blob/
-# 7937ca859f8ae1f1009ab69fd1ddcd8fc33f1dad/py_zipkin/util.py#L1-L54
+# 61f8aa3412f6c1b4e1218ed34cb117e97cc9a6cc/py_zipkin/util.py#L22-L75
 def generate_random_64bit_string() -> str:
     """Returns a 64 bit UTF-8 encoded string. In the interests of simplicity,
     this is always cast to a `str` instead of (in py2 land) a unicode string.
@@ -12,16 +11,22 @@ def generate_random_64bit_string() -> str:
 
     :returns: random 16-character string
     """
-    return str(binascii.hexlify(os.urandom(8)).decode('utf-8'))
+    return "{:016x}".format(random.getrandbits(64))
 
 
 def generate_random_128bit_string() -> str:
     """Returns a 128 bit UTF-8 encoded string. Follows the same conventions
     as generate_random_64bit_string().
 
-    :returns: random 32-character string
+    The upper 32 bits are the current time in epoch seconds, and the
+    lower 96 bits are random. This allows for AWS X-Ray `interop
+    <https://github.com/openzipkin/zipkin/issues/1754>`_
+
+    :returns: 32-character hex string
     """
-    return str(binascii.hexlify(os.urandom(16)).decode('utf-8'))
+    t = int(time.time())
+    lower_96 = random.getrandbits(96)
+    return "{:032x}".format((t << 96) | lower_96)
 
 
 def unsigned_hex_to_signed_int(hex_string: str) -> int:
