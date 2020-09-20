@@ -13,6 +13,15 @@ CHANGES
 
 .. towncrier release notes start
 
+0.7.1 (2020-09-20)
+==================
+
+Bugfixes
+--------
+
+- Fix `Manifest.in` file; add `CHANGES.rst` to the Source Tarball.
+
+
 0.7.0 (2020-07-17)
 ==================
 
