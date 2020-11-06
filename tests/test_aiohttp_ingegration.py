@@ -31,7 +31,7 @@ async def error_handler(request: web.Request) -> web.StreamResponse:
 
 @pytest.fixture  # type: ignore[misc]
 @async_generator  # type: ignore[misc]
-async def client(test_client: Any, tracer: az.Tracer) -> Any:
+async def client(aiohttp_client: Any, tracer: az.Tracer) -> Any:
     app = web.Application()
     app.router.add_get("/simple", handler)
     app.router.add_get("/error", error_handler)
@@ -41,7 +41,7 @@ async def client(test_client: Any, tracer: az.Tracer) -> Any:
     app["session"] = session
 
     az.setup(app, tracer)
-    c = await test_client(app)
+    c = await aiohttp_client(app)
     await yield_(c)
 
     await session.close()

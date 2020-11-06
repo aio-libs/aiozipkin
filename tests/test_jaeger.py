@@ -17,7 +17,10 @@ async def test_basic(
     endpoint = az.create_endpoint("simple_service", ipv4="127.0.0.1", port=80)
     interval = 50
     tracer = await az.create(
-        jaeger_url, endpoint, sample_rate=1.0, send_interval=interval, loop=loop
+        jaeger_url,
+        endpoint,
+        sample_rate=1.0,
+        send_interval=interval,
     )
 
     with tracer.new_trace(sampled=True) as span:

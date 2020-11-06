@@ -5,16 +5,16 @@ FLAGS=
 FILES := aiozipkin tests setup.py examples
 
 fmt:
-	isort ${FILES}
-	black ${FILES}
+ifdef CI_LINT_RUN
+	pre-commit run --all-files --show-diff-on-failure
+else
+	pre-commit run --all-files
+endif
 
-lint: checkrst bandit
-	isort --check-only --diff ${FILES}
-	black --check $(FILES)
+lint: bandit fmt
 	mypy --show-error-codes --strict $(FILES)
-	flake8 $(FILES)
 
-test: lint
+test:
 	py.test -s -v $(FLAGS) ./tests/
 
 vtest:
@@ -28,8 +28,6 @@ bandit:
 
 pyroma:
 	pyroma -d .
-mypy:
-	mypy aiozipkin --strict
 
 testloop:
 	while true ; do \
@@ -40,9 +38,6 @@ cov cover coverage: flake checkrst
 	py.test -s -v --cov-report term --cov-report html --cov aiozipkin ./tests
 	@echo "open file://`pwd`/htmlcov/index.html"
 
-ci: flake mypy
-	py.test -s -v --cov-report term --cov-report html --cov aiozipkin ./tests
-	@echo "open file://`pwd`/htmlcov/index.html"
 
 clean:
 	rm -rf `find . -name __pycache__`
@@ -74,5 +69,10 @@ zipkin_stop:
 doc:
 	make -C docs html
 	@echo "open file://`pwd`/docs/_build/html/index.html"
+
+
+setup init:
+	pip install -r requirements-dev.txt -r requirements-doc.txt
+	pre-commit install
 
 .PHONY: all flake test vtest cov clean doc ci

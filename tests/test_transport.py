@@ -92,7 +92,7 @@ async def test_send_full_batch(
         span.name("root_span")
         span.kind(az.CLIENT)
 
-    await asyncio.sleep(1, loop=loop)
+    await asyncio.sleep(1)
 
     data = fake_zipkin.get_received_data()
     assert len(data) == 0
@@ -131,7 +131,7 @@ async def test_lost_spans(fake_zipkin: Any, loop: asyncio.AbstractEventLoop) -> 
         span.name("root_span")
         span.kind(az.CLIENT)
 
-    await asyncio.sleep(1, loop=loop)
+    await asyncio.sleep(1)
 
     await tracer.close()
 

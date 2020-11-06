@@ -40,22 +40,22 @@ async def wait_for_response(url: str, delay: float = 0.001) -> None:
                 await asyncio.sleep(delay)
                 delay *= 2
         else:
-            pytest.fail("Cannot start server: {}".format(last_error))
+            pytest.fail(f"Cannot start server: {last_error}")
 
 
 @pytest.fixture(scope="session")  # type: ignore[misc]
 @async_generator  # type: ignore[misc]
 async def zipkin_server(docker: Docker, docker_pull: bool) -> Any:
     tag = "2"
-    image = "openzipkin/zipkin:{}".format(tag)
+    image = f"openzipkin/zipkin:{tag}"
     host = "127.0.0.1"
 
     if docker_pull:
-        print("Pulling {} image".format(image))
+        print(f"Pulling {image} image")
         await docker.pull(image)
 
     container = await docker.containers.create_or_replace(
-        name="zipkin-server-{tag}".format(tag=tag),
+        name=f"zipkin-server-{tag}",
         config={
             "Image": image,
             "AttachStdout": False,
@@ -68,7 +68,7 @@ async def zipkin_server(docker: Docker, docker_pull: bool) -> Any:
 
     params = dict(host=host, port=port)
 
-    url = "http://{}:{}".format(host, port)
+    url = f"http://{host}:{port}"
     await wait_for_response(url)
 
     await yield_(params)
@@ -92,15 +92,15 @@ async def jaeger_server(docker: Docker, docker_pull: bool) -> Any:
     # -p9411:9411 jaegertracing/all-in-one:latest
 
     tag = "1.0.0"
-    image = "jaegertracing/all-in-one:{}".format(tag)
+    image = f"jaegertracing/all-in-one:{tag}"
     host = "127.0.0.1"
 
     if docker_pull:
-        print("Pulling {} image".format(image))
+        print(f"Pulling {image} image")
         await docker.pull(image)
 
     container = await docker.containers.create_or_replace(
-        name="jaegertracing-server-{tag}".format(tag=tag),
+        name=f"jaegertracing-server-{tag}",
         config={
             "Image": image,
             "AttachStdout": False,
@@ -124,7 +124,7 @@ async def jaeger_server(docker: Docker, docker_pull: bool) -> Any:
     jaeger_port = (await container.port(16686))[0]["HostPort"]
     params = dict(host=host, zipkin_port=zipkin_port, jaeger_port=jaeger_port)
 
-    url = "http://{}:{}".format(host, zipkin_port)
+    url = f"http://{host}:{zipkin_port}"
     await wait_for_response(url)
 
     await yield_(params)

@@ -36,7 +36,10 @@ async def test_basic(
     endpoint = az.create_endpoint("simple_service", ipv4="127.0.0.1", port=80)
     interval = 50
     tracer = await az.create(
-        zipkin_url, endpoint, sample_rate=1.0, send_interval=interval, loop=loop
+        zipkin_url,
+        endpoint,
+        sample_rate=1.0,
+        send_interval=interval,
     )
 
     with tracer.new_trace(sampled=True) as span:
@@ -82,7 +85,9 @@ async def test_exception_in_span(
     endpoint = az.create_endpoint("error_service", ipv4="127.0.0.1", port=80)
     interval = 50
     async with az.create(
-        zipkin_url, endpoint, send_interval=interval, loop=loop
+        zipkin_url,
+        endpoint,
+        send_interval=interval,
     ) as tracer:
 
         def func(span: az.SpanAbc) -> None:
@@ -107,7 +112,10 @@ async def test_zipkin_error(
     interval = 50
     zipkin_url = "https://httpbin.org/status/404"
     async with az.create(
-        zipkin_url, endpoint, sample_rate=1.0, send_interval=interval, loop=loop
+        zipkin_url,
+        endpoint,
+        sample_rate=1.0,
+        send_interval=interval,
     ) as tracer:
         with tracer.new_trace(sampled=True) as span:
             span.kind(az.CLIENT)
@@ -130,7 +138,10 @@ async def test_leak_in_transport(
 
     endpoint = az.create_endpoint("simple_service")
     tracer = await az.create(
-        zipkin_url, endpoint, sample_rate=1, send_interval=0.0001, loop=loop
+        zipkin_url,
+        endpoint,
+        sample_rate=1,
+        send_interval=0.0001,
     )
 
     await asyncio.sleep(5)

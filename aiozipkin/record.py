@@ -1,10 +1,12 @@
 from typing import Any, Dict, List, NamedTuple, Optional, TypeVar
 
 from .helpers import CONSUMER, PRODUCER, Endpoint, TraceContext, filter_none
-from .mypy_types import OptInt, OptStr  # flake8: noqa
+from .mypy_types import OptInt, OptStr
 
 
-Annotation = NamedTuple("Annotation", [("value", str), ("timestamp", int)])
+class Annotation(NamedTuple):
+    value: str
+    timestamp: int
 
 
 def _endpoint_asdict(endpoint: Endpoint) -> Dict[str, Any]:

@@ -1,0 +1,139 @@
+name: CI
+
+on:
+  push:
+    branches: [ master ]
+    tags: [ 'v*' ]
+  pull_request:
+    branches: [ master ]
+  schedule:
+    - cron:  '0 6 * * *'  # Daily 6AM UTC build
+
+
+jobs:
+
+  lint:
+    name: Linter
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Setup Python 3.7
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.7
+    - name: Cache PyPI
+      uses: actions/cache@v2
+      with:
+        key: pip-lint-${{ hashFiles('requirements/*.txt') }}
+        path: ~/.cache/pip
+        restore-keys: |
+            pip-lint-
+    - name: Install dependencies
+      uses: py-actions/py-dependency-install@v2
+      with:
+        path: requirements/lint.txt
+    - name: Install itself
+      run: |
+        pip install .
+    - name: Run linters
+      run: |
+        make lint
+      env:
+        CI_LINT_RUN: 1
+    - name: Install spell checker
+      run: |
+        sudo apt install libenchant-dev
+        pip install -r requirements/doc-spelling.txt
+    - name: Run docs spelling
+      run: |
+        # towncrier --yes  # uncomment me after publishing a release
+        make doc-spelling
+    - name: Prepare twine checker
+      run: |
+        pip install -U twine wheel
+        python setup.py sdist bdist_wheel
+    - name: Run twine checker
+      run: |
+        twine check dist/*
+    - name: Making sure that CONTRIBUTORS.txt remains sorted
+      run: |
+        LC_ALL=C sort -c CONTRIBUTORS.txt
+
+  unit:
+    name: Unit
+    needs: [lint]
+    strategy:
+      matrix:
+        python-version: [3.6, 3.7, 3.8, 3.9]
+        os: [ubuntu, macos, windows]
+        exclude:
+          - python-version: 3.7
+            os: macos
+          - python-version: 3.8
+            os: macos
+    runs-on: ${{ matrix.os }}-latest
+    timeout-minutes: 10
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Setup Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Get pip cache dir
+      id: pip-cache
+      run: |
+        echo "::set-output name=dir::$(pip cache dir)"    # - name: Cache
+    - name: Cache PyPI
+      uses: actions/cache@v2
+      with:
+        key: pip-ci-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('requirements/*.txt') }}
+        path: ${{ steps.pip-cache.outputs.dir }}
+        restore-keys: |
+            pip-ci-${{ runner.os }}-${{ matrix.python-version }}-
+    - name: Install dependencies
+      uses: py-actions/py-dependency-install@v2
+      with:
+        path: requirements/ci.txt
+    - name: Run unittests
+      env:
+        COLOR: 'yes'
+      run: |
+        make test
+    - name: Upload coverage
+      uses: codecov/codecov-action@v1
+      with:
+        file: ./coverage.xml
+        flags: unit
+        fail_ci_if_error: false
+
+  deploy:
+    name: Deploy on PyPI
+    needs: [lint, unit]
+    runs-on: ubuntu-latest
+    # Run only on pushing a tag
+    if: github.event_name == 'push' && contains(github.ref, 'refs/tags/')
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Setup Python 3.7
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.7
+    - name: Install dependencies
+      uses: py-actions/py-dependency-install@v2
+      with:
+        path: requirements/ci.txt
+    - name: Make dists
+      run:
+        python setup.py sdist bdist_wheel
+    - name: PyPI upload
+      env:
+        TWINE_USERNAME: __token__
+        TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
+      run: |
+        twine upload dist/*

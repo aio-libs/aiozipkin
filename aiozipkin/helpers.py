@@ -52,17 +52,17 @@ class TraceContext(_TraceContext):
         return make_single_header(self)
 
 
-Endpoint = NamedTuple(
-    "Endpoint",
-    [("serviceName", OptStr), ("ipv4", OptStr), ("ipv6", OptStr), ("port", OptInt)],
-)
+class Endpoint(NamedTuple):
+    serviceName: OptStr
+    ipv4: OptStr
+    ipv6: OptStr
+    port: OptInt
 
 
 def create_endpoint(
     service_name: str, *, ipv4: OptStr = None, ipv6: OptStr = None, port: OptInt = None
 ) -> Endpoint:
-    """Factory function to create Endpoint object.
-    """
+    """Factory function to create Endpoint object."""
     return Endpoint(service_name, ipv4, ipv6, port)
 
 
@@ -75,8 +75,7 @@ def make_timestamp(ts: OptTs = None) -> int:
 
 
 def make_headers(context: TraceContext) -> Headers:
-    """Creates dict with zipkin headers from supplied trace context.
-    """
+    """Creates dict with zipkin headers from supplied trace context."""
     headers = {
         TRACE_ID_HEADER: context.trace_id,
         SPAN_ID_HEADER: context.span_id,
@@ -89,8 +88,7 @@ def make_headers(context: TraceContext) -> Headers:
 
 
 def make_single_header(context: TraceContext) -> Headers:
-    """Creates dict with zipkin single header format.
-    """
+    """Creates dict with zipkin single header format."""
     # b3={TraceId}-{SpanId}-{SamplingState}-{ParentSpanId}
     c = context
 

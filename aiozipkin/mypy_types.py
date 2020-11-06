@@ -1,4 +1,4 @@
-import asyncio  # flake8: noqa
+import asyncio
 from typing import Mapping, Optional
 
 

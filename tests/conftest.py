@@ -58,17 +58,16 @@ def context() -> TraceContext:
 @pytest.fixture  # type: ignore[misc]
 @async_generator  # type: ignore[misc]
 async def client(loop: asyncio.AbstractEventLoop) -> Any:
-    async with aiohttp.ClientSession(loop=loop) as client:
+    async with aiohttp.ClientSession() as client:
         await yield_(client)
 
 
 class FakeZipkin:
-    def __init__(self, loop: asyncio.AbstractEventLoop) -> None:
+    def __init__(self) -> None:
         self.next_errors: List[Any] = []
         self.app = web.Application()
         self.app.router.add_post("/api/v2/spans", self.spans_handler)
         self.port = None
-        self._loop = loop
         self._received_data: List[Any] = []
         self._wait_count: Optional[int] = None
         self._wait_fut: Optional[asyncio.Future[None]] = None
@@ -83,9 +82,9 @@ class FakeZipkin:
             if err == "disconnect":
                 assert request.transport is not None
                 request.transport.close()
-                await asyncio.sleep(1, loop=self._loop)
+                await asyncio.sleep(1)
             elif err == "timeout":
-                await asyncio.sleep(60, loop=self._loop)
+                await asyncio.sleep(60)
             return web.HTTPInternalServerError()
 
         data = await request.json()
@@ -103,7 +102,7 @@ class FakeZipkin:
         return data
 
     def wait_data(self, count: int) -> "asyncio.Future[Any]":
-        self._wait_fut = asyncio.Future(loop=self._loop)
+        self._wait_fut = asyncio.Future()
         self._wait_count = count
         return self._wait_fut
 
@@ -111,9 +110,9 @@ class FakeZipkin:
 @pytest.fixture  # type: ignore[misc]
 @async_generator  # type: ignore[misc]
 async def fake_zipkin(loop: asyncio.AbstractEventLoop) -> None:
-    zipkin = FakeZipkin(loop=loop)
+    zipkin = FakeZipkin()
 
-    server = TestServer(zipkin.app, loop=loop)
+    server = TestServer(zipkin.app)
     await server.start_server()
     zipkin.port = server.port  # type: ignore[assignment]
 

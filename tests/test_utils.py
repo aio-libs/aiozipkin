@@ -1,4 +1,3 @@
-import sys
 from unittest import mock
 
 from aiozipkin import utils
@@ -36,10 +35,8 @@ def test_signed_int_to_unsigned_hex() -> None:
     assert utils.signed_int_to_unsigned_hex(1662740067609015813) == "17133d482ba4f605"
     assert utils.signed_int_to_unsigned_hex(-5270423489115668655) == "b6dbb1c2b362bf51"
 
-    if sys.version_info > (3,):
-        with mock.patch("builtins.hex") as mock_hex:
-            mock_hex.return_value = "0xb6dbb1c2b362bf51L"
-            assert (
-                utils.signed_int_to_unsigned_hex(-5270423489115668655)
-                == "b6dbb1c2b362bf51"
-            )
+    with mock.patch("builtins.hex") as mock_hex:
+        mock_hex.return_value = "0xb6dbb1c2b362bf51L"
+        assert (
+            utils.signed_int_to_unsigned_hex(-5270423489115668655) == "b6dbb1c2b362bf51"
+        )

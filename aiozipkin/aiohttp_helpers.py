@@ -92,7 +92,7 @@ def _get_span(request: Request, tracer: Tracer) -> SpanAbc:
 
 
 def _set_span_properties(span: SpanAbc, request: Request) -> None:
-    span_name = "{0} {1}".format(request.method.upper(), request.path)
+    span_name = f"{request.method.upper()} {request.path}"
     span.name(span_name)
     span.kind(SERVER)
     span.tag(HTTP_PATH, request.path)
@@ -181,7 +181,7 @@ def setup(
     *,
     skip_routes: Optional[Iterable[AbstractRoute]] = None,
     tracer_key: str = APP_AIOZIPKIN_KEY,
-    request_key: str = REQUEST_AIOZIPKIN_KEY
+    request_key: str = REQUEST_AIOZIPKIN_KEY,
 ) -> Application:
     """Sets required parameters in aiohttp applications for aiozipkin.
 
@@ -260,7 +260,7 @@ class ZipkinClientSignals:
         span = self._tracer.new_child(span_context)
         context._span = span
         span.start()
-        span_name = "client {0} {1}".format(p.method.upper(), p.url.path)
+        span_name = f"client {p.method.upper()} {p.url.path}"
         span.name(span_name)
         span.kind(CLIENT)
 

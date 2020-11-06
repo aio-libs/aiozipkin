@@ -1,3 +1,4 @@
+import warnings
 from typing import (  # noqa
     TYPE_CHECKING,
     Any,
@@ -123,9 +124,14 @@ def create(
     loop: OptLoop = None,
     ignored_exceptions: Optional[List[Type[Exception]]] = None
 ) -> _ContextManager[Tracer]:
+    if loop is not None:
+        warnings.warn(
+            "loop parameter is deprecated and ignored", DeprecationWarning, stacklevel=2
+        )
+
     async def build_tracer() -> Tracer:
         sampler = Sampler(sample_rate=sample_rate)
-        transport = Transport(zipkin_address, send_interval=send_interval, loop=loop)
+        transport = Transport(zipkin_address, send_interval=send_interval)
         return Tracer(transport, sampler, local_endpoint, ignored_exceptions)
 
     result = _ContextManager(build_tracer())

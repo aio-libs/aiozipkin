@@ -9,7 +9,7 @@ from .record import Record
 
 
 if TYPE_CHECKING:
-    from .tracer import Tracer  # flake8: noqa
+    from .tracer import Tracer
 
 
 T = TypeVar("T", bound="SpanAbc")
