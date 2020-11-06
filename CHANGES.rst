@@ -13,6 +13,19 @@ CHANGES
 
 .. towncrier release notes start
 
+1.0.0 (2020-11-06)
+==================
+
+Bugfixes
+--------
+
+- Support Python 3.8 and Python 3.9
+  `#259 <https://github.com/aio-libs/aiohttp/issues/259>`_
+
+
+----
+
+
 0.7.1 (2020-09-20)
 ==================
 

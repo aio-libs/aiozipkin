@@ -56,6 +56,7 @@ setup(
     download_url="https://pypi.python.org/pypi/aiozipkin",
     license="Apache 2",
     packages=find_packages(),
+    python_requires=">=3.6",
     install_requires=install_requires,
     keywords=["zipkin", "distributed-tracing", "tracing"],
     zip_safe=True,
