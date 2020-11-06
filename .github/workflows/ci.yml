@@ -59,9 +59,6 @@ jobs:
     - name: Run twine checker
       run: |
         twine check dist/*
-    - name: Making sure that CONTRIBUTORS.txt remains sorted
-      run: |
-        LC_ALL=C sort -c CONTRIBUTORS.txt
 
   unit:
     name: Unit
