@@ -7,7 +7,7 @@ from yarl import URL
 import aiozipkin as az
 
 
-@pytest.mark.asyncio  # type: ignore[misc]
+@pytest.mark.asyncio
 async def test_basic(
     jaeger_url: str,
     jaeger_api_url: str,

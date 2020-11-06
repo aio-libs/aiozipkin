@@ -3,7 +3,6 @@ from typing import Any
 import aiohttp
 import pytest
 from aiohttp import web
-from async_generator import async_generator, yield_
 
 import aiozipkin as az
 
@@ -29,8 +28,7 @@ async def error_handler(request: web.Request) -> web.StreamResponse:
     return web.Response(body=b"")
 
 
-@pytest.fixture  # type: ignore[misc]
-@async_generator  # type: ignore[misc]
+@pytest.fixture
 async def client(aiohttp_client: Any, tracer: az.Tracer) -> Any:
     app = web.Application()
     app.router.add_get("/simple", handler)
@@ -42,12 +40,12 @@ async def client(aiohttp_client: Any, tracer: az.Tracer) -> Any:
 
     az.setup(app, tracer)
     c = await aiohttp_client(app)
-    await yield_(c)
+    yield c
 
     await session.close()
 
 
-@pytest.mark.asyncio  # type: ignore[misc]
+@pytest.mark.asyncio
 async def test_handler_with_client_signals(
     client: aiohttp.ClientSession, fake_transport: Any
 ) -> None:
@@ -62,7 +60,7 @@ async def test_handler_with_client_signals(
     assert record2["tags"]["http.status_code"] == "200"
 
 
-@pytest.mark.asyncio  # type: ignore[misc]
+@pytest.mark.asyncio
 async def test_handler_with_client_signals_error(
     client: aiohttp.ClientSession, fake_transport: Any
 ) -> None:
@@ -78,7 +76,7 @@ async def test_handler_with_client_signals_error(
     assert msg in record1["tags"]["error"]
 
 
-@pytest.mark.asyncio  # type: ignore[misc]
+@pytest.mark.asyncio
 async def test_client_signals(tracer: az.Tracer, fake_transport: Any) -> None:
     trace_config = az.make_trace_config(tracer)
     session = aiohttp.ClientSession(trace_configs=[trace_config])
@@ -113,7 +111,7 @@ async def test_client_signals(tracer: az.Tracer, fake_transport: Any) -> None:
     assert record3["name"] == "client:signals"
 
 
-@pytest.mark.asyncio  # type: ignore[misc]
+@pytest.mark.asyncio
 async def test_client_signals_no_span(tracer: az.Tracer, fake_transport: Any) -> None:
     trace_config = az.make_trace_config(tracer)
     session = aiohttp.ClientSession(trace_configs=[trace_config])

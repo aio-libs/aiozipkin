@@ -29,7 +29,7 @@ async def _retry_zipkin_client(
     raise RuntimeError("Unreachable")
 
 
-@pytest.mark.asyncio  # type: ignore[misc]
+@pytest.mark.asyncio
 async def test_basic(
     zipkin_url: str, client: aiohttp.ClientSession, loop: asyncio.AbstractEventLoop
 ) -> None:
@@ -78,7 +78,7 @@ async def test_basic_context_manager(
     assert any(s["traceId"] == trace_id for trace in data for s in trace), data
 
 
-@pytest.mark.asyncio  # type: ignore[misc]
+@pytest.mark.asyncio
 async def test_exception_in_span(
     zipkin_url: str, client: aiohttp.ClientSession, loop: asyncio.AbstractEventLoop
 ) -> None:
@@ -104,7 +104,7 @@ async def test_exception_in_span(
     assert any({"error": "foo"} == s.get("tags", {}) for trace in data for s in trace)
 
 
-@pytest.mark.asyncio  # type: ignore[misc]
+@pytest.mark.asyncio
 async def test_zipkin_error(
     client: aiohttp.ClientSession, loop: asyncio.AbstractEventLoop, caplog: Any
 ) -> None:
@@ -129,7 +129,7 @@ async def test_zipkin_error(
     assert caplog.record_tuples == [t]
 
 
-@pytest.mark.asyncio  # type: ignore[misc]
+@pytest.mark.asyncio
 async def test_leak_in_transport(
     zipkin_url: str, client: aiohttp.ClientSession, loop: asyncio.AbstractEventLoop
 ) -> None:

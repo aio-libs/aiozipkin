@@ -4,7 +4,6 @@ from typing import Any
 import aiohttp
 import pytest
 from aiodocker import Docker
-from async_generator import async_generator, yield_
 
 
 def pytest_addoption(parser: Any) -> None:
@@ -13,16 +12,15 @@ def pytest_addoption(parser: Any) -> None:
     )
 
 
-@pytest.fixture(scope="session")  # type: ignore[misc]
+@pytest.fixture(scope="session")
 def docker_pull(request: Any) -> bool:
     return not request.config.getoption("--no-pull")
 
 
-@pytest.fixture(scope="session")  # type: ignore[misc]
-@async_generator  # type: ignore[misc]
+@pytest.fixture(scope="session")
 async def docker() -> Any:
     client = Docker()
-    await yield_(client)
+    yield client
     await client.close()
 
 
@@ -43,8 +41,7 @@ async def wait_for_response(url: str, delay: float = 0.001) -> None:
             pytest.fail(f"Cannot start server: {last_error}")
 
 
-@pytest.fixture(scope="session")  # type: ignore[misc]
-@async_generator  # type: ignore[misc]
+@pytest.fixture(scope="session")
 async def zipkin_server(docker: Docker, docker_pull: bool) -> Any:
     tag = "2"
     image = f"openzipkin/zipkin:{tag}"
@@ -54,7 +51,7 @@ async def zipkin_server(docker: Docker, docker_pull: bool) -> Any:
         print(f"Pulling {image} image")
         await docker.pull(image)
 
-    container = await docker.containers.create_or_replace(
+    container = await docker.containers.create_or_replace(  # type: ignore
         name=f"zipkin-server-{tag}",
         config={
             "Image": image,
@@ -71,20 +68,19 @@ async def zipkin_server(docker: Docker, docker_pull: bool) -> Any:
     url = f"http://{host}:{port}"
     await wait_for_response(url)
 
-    await yield_(params)
+    yield params
 
     await container.kill()
     await container.delete(force=True)
 
 
-@pytest.fixture  # type: ignore[misc]
+@pytest.fixture
 def zipkin_url(zipkin_server: Any) -> str:
     url = "http://{host}:{port}/api/v2/spans".format(**zipkin_server)
     return url
 
 
-@pytest.fixture(scope="session")  # type: ignore[misc]
-@async_generator  # type: ignore[misc]
+@pytest.fixture(scope="session")
 async def jaeger_server(docker: Docker, docker_pull: bool) -> Any:
     # docker run -d -e COLLECTOR_ZIPKIN_HTTP_PORT=9411 \
     # -p5775:5775/udp -p6831:6831/udp -p6832:6832/udp \
@@ -99,7 +95,7 @@ async def jaeger_server(docker: Docker, docker_pull: bool) -> Any:
         print(f"Pulling {image} image")
         await docker.pull(image)
 
-    container = await docker.containers.create_or_replace(
+    container = await docker.containers.create_or_replace(  # type: ignore
         name=f"jaegertracing-server-{tag}",
         config={
             "Image": image,
@@ -127,18 +123,18 @@ async def jaeger_server(docker: Docker, docker_pull: bool) -> Any:
     url = f"http://{host}:{zipkin_port}"
     await wait_for_response(url)
 
-    await yield_(params)
+    yield params
 
     await container.kill()
     await container.delete(force=True)
 
 
-@pytest.fixture  # type: ignore[misc]
+@pytest.fixture
 def jaeger_url(jaeger_server: Any) -> str:
     url = "http://{host}:{zipkin_port}/api/v2/spans".format(**jaeger_server)
     return url
 
 
-@pytest.fixture  # type: ignore[misc]
+@pytest.fixture
 def jaeger_api_url(jaeger_server: Any) -> str:
     return "http://{host}:{jaeger_port}".format(**jaeger_server)

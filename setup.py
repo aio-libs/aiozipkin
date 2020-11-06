@@ -13,7 +13,7 @@ def read(f: str) -> str:
     return open(os.path.join(os.path.dirname(__file__), f)).read().strip()
 
 
-install_requires = ["aiohttp>=3.0.0"]
+install_requires = ["aiohttp>=3.7.2"]
 
 
 def read_version() -> str:

@@ -12,7 +12,7 @@ from aiozipkin.helpers import (
 )
 
 
-@pytest.fixture  # type: ignore[misc]
+@pytest.fixture
 def trace_context() -> TraceContext:
     new_context = TraceContext(
         trace_id="6f9a20b5092fa5e144fd15cc31141cd4",
@@ -25,7 +25,7 @@ def trace_context() -> TraceContext:
     return new_context
 
 
-@pytest.fixture  # type: ignore[misc]
+@pytest.fixture
 def other_trace_context() -> TraceContext:
     context = TraceContext(
         trace_id="6f9a20b5092fa5e144fd15cc31141cd4",

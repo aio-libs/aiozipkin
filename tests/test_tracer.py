@@ -184,7 +184,7 @@ def test_null_annotation(tracer: Tracer, fake_transport: Any) -> None:
     assert record.asdict()["annotations"][0]["value"] == "None"
 
 
-@pytest.mark.asyncio  # type: ignore[misc]
+@pytest.mark.asyncio
 async def test_create_custom(fake_transport: Any) -> None:
     endpoint = create_endpoint("test_service", ipv4="127.0.0.1", port=8080)
 

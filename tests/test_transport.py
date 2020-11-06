@@ -8,7 +8,7 @@ import aiozipkin as az
 import aiozipkin.transport as azt
 
 
-@pytest.mark.asyncio  # type: ignore[misc]
+@pytest.mark.asyncio
 async def test_retry(fake_zipkin: Any, loop: asyncio.AbstractEventLoop) -> None:
     endpoint = az.create_endpoint("simple_service", ipv4="127.0.0.1", port=80)
 
@@ -38,7 +38,7 @@ async def test_retry(fake_zipkin: Any, loop: asyncio.AbstractEventLoop) -> None:
     assert any(s["traceId"] == trace_id for trace in data for s in trace), data
 
 
-@pytest.mark.asyncio  # type: ignore[misc]
+@pytest.mark.asyncio
 async def test_batches(fake_zipkin: Any, loop: asyncio.AbstractEventLoop) -> None:
     endpoint = az.create_endpoint("simple_service", ipv4="127.0.0.1", port=80)
 
@@ -72,7 +72,7 @@ async def test_batches(fake_zipkin: Any, loop: asyncio.AbstractEventLoop) -> Non
     assert any(s["traceId"] == trace_id for trace in data for s in trace), data
 
 
-@pytest.mark.asyncio  # type: ignore[misc]
+@pytest.mark.asyncio
 async def test_send_full_batch(
     fake_zipkin: Any, loop: asyncio.AbstractEventLoop
 ) -> None:
@@ -110,7 +110,7 @@ async def test_send_full_batch(
     await tracer.close()
 
 
-@pytest.mark.asyncio  # type: ignore[misc]
+@pytest.mark.asyncio
 async def test_lost_spans(fake_zipkin: Any, loop: asyncio.AbstractEventLoop) -> None:
     endpoint = az.create_endpoint("simple_service", ipv4="127.0.0.1", port=80)
 

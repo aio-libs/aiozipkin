@@ -99,10 +99,9 @@ def _set_span_properties(span: SpanAbc, request: Request) -> None:
     span.tag(HTTP_METHOD, request.method.upper())
 
     resource = request.match_info.route.resource
-    # available only in aiohttp >= 3.3.1
-    if getattr(resource, "canonical", None) is not None:
-        route = request.match_info.route.resource.canonical
-        span.tag(HTTP_ROUTE, route)
+    assert resource is not None
+    route = resource.canonical
+    span.tag(HTTP_ROUTE, route)
 
     _set_remote_endpoint(span, request)
 
@@ -306,7 +305,7 @@ def make_trace_config(tracer: Tracer) -> aiohttp.TraceConfig:
     trace_config = aiohttp.TraceConfig()
     zipkin = ZipkinClientSignals(tracer)
 
-    trace_config.on_request_start.append(zipkin.on_request_start)  # type: ignore
-    trace_config.on_request_end.append(zipkin.on_request_end)  # type: ignore
-    trace_config.on_request_exception.append(zipkin.on_request_exception)  # type: ignore  # noqa
+    trace_config.on_request_start.append(zipkin.on_request_start)
+    trace_config.on_request_end.append(zipkin.on_request_end)
+    trace_config.on_request_exception.append(zipkin.on_request_exception)
     return trace_config

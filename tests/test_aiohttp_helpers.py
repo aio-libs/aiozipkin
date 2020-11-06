@@ -20,7 +20,7 @@ def test_basic_setup(tracer: az.Tracer) -> None:
     assert tracer is fetched_tracer
 
 
-@pytest.mark.asyncio  # type: ignore[misc]
+@pytest.mark.asyncio
 async def test_middleware_with_default_transport(
     tracer: az.Tracer, fake_transport: Any
 ) -> None:
@@ -51,7 +51,7 @@ async def test_middleware_with_default_transport(
     assert len(fake_transport.records) == 1
 
 
-@pytest.mark.asyncio  # type: ignore[misc]
+@pytest.mark.asyncio
 async def test_middleware_with_not_skip_route(
     tracer: az.Tracer, fake_transport: Any
 ) -> None:
@@ -85,8 +85,8 @@ valid_ips = [
 ]
 
 
-@pytest.mark.asyncio  # type: ignore[misc]
-@pytest.mark.parametrize("version,address_in,address_out", valid_ips)  # type: ignore[misc]  # noqa
+@pytest.mark.asyncio
+@pytest.mark.parametrize("version,address_in,address_out", valid_ips)
 async def test_middleware_with_valid_ip(
     tracer: az.Tracer, version: str, address_in: str, address_out: Optional[str]
 ) -> None:
@@ -129,8 +129,8 @@ invalid_ips = [
 ]
 
 
-@pytest.mark.asyncio  # type: ignore[misc]
-@pytest.mark.parametrize("version,address", invalid_ips)  # type: ignore[misc]
+@pytest.mark.asyncio
+@pytest.mark.parametrize("version,address", invalid_ips)
 async def test_middleware_with_invalid_ip(
     tracer: az.Tracer, version: str, address: str
 ) -> None:
@@ -154,7 +154,7 @@ async def test_middleware_with_invalid_ip(
         assert mocked_remote_ep.call_count == 0
 
 
-@pytest.mark.asyncio  # type: ignore[misc]
+@pytest.mark.asyncio
 async def test_middleware_with_handler_404(tracer: az.Tracer) -> None:
     app = web.Application()
     az.setup(app, tracer)
@@ -170,7 +170,7 @@ async def test_middleware_with_handler_404(tracer: az.Tracer) -> None:
         await middleware(req, handler)
 
 
-@pytest.mark.asyncio  # type: ignore[misc]
+@pytest.mark.asyncio
 async def test_middleware_cleanup_app(tracer: az.Tracer) -> None:
     fut: asyncio.Future[None] = asyncio.Future()
     fut.set_result(None)

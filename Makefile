@@ -24,7 +24,7 @@ checkrst:
 	python setup.py check --restructuredtext
 
 bandit:
-	bandit -r ./aiozipkin
+	bandit -c .bandit.yml -r ./aiozipkin
 
 pyroma:
 	pyroma -d .

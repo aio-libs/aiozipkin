@@ -28,14 +28,14 @@ jobs:
     - name: Cache PyPI
       uses: actions/cache@v2
       with:
-        key: pip-lint-${{ hashFiles('requirements/*.txt') }}
+        key: pip-lint-${{ hashFiles('requirements*.txt') }}
         path: ~/.cache/pip
         restore-keys: |
             pip-lint-
     - name: Install dependencies
       uses: py-actions/py-dependency-install@v2
       with:
-        path: requirements/lint.txt
+        path: requirements-dev.txt
     - name: Install itself
       run: |
         pip install .
@@ -47,7 +47,7 @@ jobs:
     - name: Install spell checker
       run: |
         sudo apt install libenchant-dev
-        pip install -r requirements/doc-spelling.txt
+        pip install -r requirements-doc.txt
     - name: Run docs spelling
       run: |
         # towncrier --yes  # uncomment me after publishing a release
@@ -91,14 +91,14 @@ jobs:
     - name: Cache PyPI
       uses: actions/cache@v2
       with:
-        key: pip-ci-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('requirements/*.txt') }}
+        key: pip-ci-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('requirements*.txt') }}
         path: ${{ steps.pip-cache.outputs.dir }}
         restore-keys: |
             pip-ci-${{ runner.os }}-${{ matrix.python-version }}-
     - name: Install dependencies
       uses: py-actions/py-dependency-install@v2
       with:
-        path: requirements/ci.txt
+        path: requirements-dev.txt
     - name: Run unittests
       env:
         COLOR: 'yes'
@@ -127,7 +127,7 @@ jobs:
     - name: Install dependencies
       uses: py-actions/py-dependency-install@v2
       with:
-        path: requirements/ci.txt
+        path: requirements-dev.txt
     - name: Make dists
       run:
         python setup.py sdist bdist_wheel
