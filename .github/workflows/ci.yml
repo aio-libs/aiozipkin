@@ -66,13 +66,7 @@ jobs:
     strategy:
       matrix:
         python-version: [3.6, 3.7, 3.8, 3.9]
-        os: [ubuntu, macos, windows]
-        exclude:
-          - python-version: 3.7
-            os: macos
-          - python-version: 3.8
-            os: macos
-    runs-on: ${{ matrix.os }}-latest
+    runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
     - name: Checkout
@@ -88,10 +82,10 @@ jobs:
     - name: Cache PyPI
       uses: actions/cache@v2
       with:
-        key: pip-ci-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('requirements*.txt') }}
+        key: pip-ci-ubuntu-${{ matrix.python-version }}-${{ hashFiles('requirements*.txt') }}
         path: ${{ steps.pip-cache.outputs.dir }}
         restore-keys: |
-            pip-ci-${{ runner.os }}-${{ matrix.python-version }}-
+            pip-ci-ubuntu-${{ matrix.python-version }}-
     - name: Install dependencies
       uses: py-actions/py-dependency-install@v2
       with:
