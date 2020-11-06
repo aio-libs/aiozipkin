@@ -14,7 +14,7 @@ For more information see tests and jaeger_ documentation.
     :alt: jaeger ui animation
 
 
-Stackdriver support
+StackDriver support
 -------------------
 Google stackdriver_ supports zipkin_ span format as a result it is possible to
 use *aiozipkin* with this google_ service. In order to make this work you

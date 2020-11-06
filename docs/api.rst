@@ -18,11 +18,11 @@ Core API Reference
 
 .. data:: PRODUCER
 
-    Constant indicates that span has been created by messsage producer.
+    Constant indicates that span has been created by message producer.
 
 .. data:: CONSUMER
 
-    Constant indicates that span has been created by messsage consumer.
+    Constant indicates that span has been created by message consumer.
 
 .. function:: make_context(headers: Dict[str, str])
 
@@ -100,7 +100,7 @@ Core API Reference
 Aiohttp integration API
 -----------------------
 
-API for integration with *aiohttp.web*, just calling `setup` is enough for
+API for integration with :mod:`aiohttp.web`, just calling `setup` is enough for
 zipkin to start tracking requests. On high level attached plugin registers
 middleware that starts span on beginning of request and closes it on finish,
 saving important metadata, like route, status code etc.
@@ -125,12 +125,12 @@ saving important metadata, like route, status code etc.
    shutdown. You can provide custom tracer_key, if default name is not
    suitable.
 
-   :param aiottp.web.Application app: application for tracer to attach
+   :param aiohttp.web.Application app: application for tracer to attach
    :param Tracer tracer: aiozipkin tracer
    :param List skip_routes: list of routes not to be traced
    :param str tracer_key: key for aiozipkin state in aiohttp Application
    :param str request_key: key for Span in request object
-   :returns: aiottp.web.Application
+   :returns: :class:`aiohttp.web.Application`
 
 .. function:: get_tracer(app, tracer_key=APP_AIOZIPKIN_KEY)
 
@@ -140,7 +140,7 @@ saving important metadata, like route, status code etc.
    you can provide own key, if for some reason default one is not suitable.
 
    :param aiottp.web.Application app: application for tracer to attach
-   :param str tracer_key: key where tracerd stored in app
+   :param str tracer_key: key where tracer stored in app
 
 .. function:: request_span(request, request_key=REQUEST_AIOZIPKIN_KEY)
 
@@ -148,12 +148,12 @@ saving important metadata, like route, status code etc.
     as parent on next child span.
 
    :param aiottp.web.Request app: application for tracer to attach
-   :param str request_key: key where stpan stored in request
+   :param str request_key: key where span stored in request
 
 .. function:: make_trace_config(tracer)
 
     Creates configuration compatible with aiohttp client. It attaches to
-    reslevant hooks and annotates timing.
+    relevant hooks and annotates timing.
 
    :param Tracer tracer: to install in aiohttp tracer config
-   :returns: aiohttp.TraceConfig
+   :returns: :class:`aiohttp.TraceConfig`

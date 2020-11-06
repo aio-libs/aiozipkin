@@ -2,3 +2,4 @@ aiohttp-theme==0.1.6
 setuptools>=38.0.0
 sphinx==3.3.0
 sphinxcontrib-asyncio==0.3.0
+sphinxcontrib-spelling==7.0.0; platform_system!="Windows"

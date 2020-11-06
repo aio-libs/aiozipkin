@@ -70,6 +70,10 @@ doc:
 	make -C docs html
 	@echo "open file://`pwd`/docs/_build/html/index.html"
 
+.PHONY: doc-spelling
+doc-spelling:
+	@make -C docs spelling SPHINXOPTS="-W -E"
+
 
 setup init:
 	pip install -r requirements-dev.txt -r requirements-doc.txt
