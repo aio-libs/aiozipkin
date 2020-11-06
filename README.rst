@@ -1,7 +1,7 @@
 aiozipkin
 =========
-.. image:: https://travis-ci.com/aio-libs/aiozipkin.svg?branch=master
-    :target: https://travis-ci.com/aio-libs/aiozipkin
+.. image:: https://github.com/aio-libs/aiozipkin/workflows/CI/badge.svg
+    :target: https://github.com/aio-libs/aiozipkin/actions?query=workflow%3ACI
 .. image:: https://codecov.io/gh/aio-libs/aiozipkin/branch/master/graph/badge.svg
     :target: https://codecov.io/gh/aio-libs/aiozipkin
 .. image:: https://api.codeclimate.com/v1/badges/1ff813d5cad2d702cbf1/maintainability
