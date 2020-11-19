@@ -31,7 +31,8 @@ async def test_middleware_with_default_transport(
         return web.Response(body=b"data")
 
     req = make_mocked_request("GET", "/aa", headers={"token": "x"}, app=app)
-    req.match_info.route.resource.canonical = "/{pid}"
+    assert req.match_info.route.resource is not None
+    req.match_info.route.resource.canonical = "/{pid}"  # type: ignore[misc]
 
     middleware = middleware_maker()
     await middleware(req, handler)
