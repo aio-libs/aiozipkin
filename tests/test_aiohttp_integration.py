@@ -92,8 +92,8 @@ async def test_client_signals(tracer: az.Tracer, fake_transport: Any) -> None:
         assert len(data) > 0
         assert az.make_context(resp.request_info.headers) is None
 
-        ctx = SimpleNamespace(span_context=span.context, propagate_headers=False)
-        resp = await session.get(url, trace_request_ctx=ctx)
+        ctx_ns = SimpleNamespace(span_context=span.context, propagate_headers=False)
+        resp = await session.get(url, trace_request_ctx=ctx_ns)
         data = await resp.read()
         assert len(data) > 0
         assert az.make_context(resp.request_info.headers) is None
@@ -109,13 +109,15 @@ async def test_client_signals(tracer: az.Tracer, fake_transport: Any) -> None:
 
     await session.close()
 
-    assert len(fake_transport.records) == 3
+    assert len(fake_transport.records) == 4
     record1 = fake_transport.records[0].asdict()
     record2 = fake_transport.records[1].asdict()
     record3 = fake_transport.records[2].asdict()
-    assert record2["parentId"] == record3["id"]
-    assert record1["parentId"] == record3["id"]
-    assert record3["name"] == "client:signals"
+    record4 = fake_transport.records[3].asdict()
+    assert record3["parentId"] == record4["id"]
+    assert record2["parentId"] == record4["id"]
+    assert record1["parentId"] == record4["id"]
+    assert record4["name"] == "client:signals"
 
 
 @pytest.mark.asyncio

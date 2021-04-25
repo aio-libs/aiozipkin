@@ -230,12 +230,14 @@ class ZipkinClientSignals:
     def _get_span_context(
         self, trace_config_ctx: SimpleNamespace
     ) -> Optional[TraceContext]:
-        trace_request_ctx = trace_config_ctx.trace_request_ctx
-        has_explicit_context = (
-            isinstance(trace_request_ctx, dict) and "span_context" in trace_request_ctx
-        )
-        if has_explicit_context:
-            r: TraceContext = trace_request_ctx["span_context"]
+        ctx = trace_config_ctx.trace_request_ctx
+
+        if isinstance(ctx, dict) and "span_context" in ctx:
+            r: TraceContext = ctx["span_context"]
+            return r
+
+        if isinstance(ctx, SimpleNamespace) and hasattr(ctx, "span_context"):
+            r = ctx.span_context
             return r
 
         if PY37:
