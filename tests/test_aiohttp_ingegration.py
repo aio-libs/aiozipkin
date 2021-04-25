@@ -1,3 +1,4 @@
+from types import SimpleNamespace
 from typing import Any
 
 import aiohttp
@@ -86,6 +87,12 @@ async def test_client_signals(tracer: az.Tracer, fake_transport: Any) -> None:
         url = "https://httpbin.org/get"
         # do not propagate headers
         ctx = {"span_context": span.context, "propagate_headers": False}
+        resp = await session.get(url, trace_request_ctx=ctx)
+        data = await resp.read()
+        assert len(data) > 0
+        assert az.make_context(resp.request_info.headers) is None
+
+        ctx = SimpleNamespace(span_context=span.context, propagate_headers=False)
         resp = await session.get(url, trace_request_ctx=ctx)
         data = await resp.read()
         assert len(data) > 0

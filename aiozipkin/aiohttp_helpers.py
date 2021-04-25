@@ -264,7 +264,15 @@ class ZipkinClientSignals:
         span.kind(CLIENT)
 
         ctx = context.trace_request_ctx
-        propagate_headers = ctx is None or ctx.get("propagate_headers", True)
+        propagate_headers = True
+
+        if ctx is not None:
+            if isinstance(ctx, dict):
+                # Check ctx is dict to be compatible with old package versions
+                propagate_headers = ctx.get("propagate_headers", True)
+            if isinstance(ctx, SimpleNamespace):
+                propagate_headers = getattr(ctx, "propagate_headers", True)
+
         if propagate_headers:
             span_headers = span.context.make_headers()
             p.headers.update(span_headers)
