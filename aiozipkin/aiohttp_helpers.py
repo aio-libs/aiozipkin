@@ -233,10 +233,12 @@ class ZipkinClientSignals:
         ctx = trace_config_ctx.trace_request_ctx
 
         if isinstance(ctx, dict) and "span_context" in ctx:
-            return ctx["span_context"]
+            r: TraceContext = ctx["span_context"]
+            return r
 
         if isinstance(ctx, SimpleNamespace) and hasattr(ctx, "span_context"):
-            return ctx.span_context
+            r = ctx.span_context
+            return r
 
         if PY37:
             has_implicit_context = zipkin_context.get() is not None
