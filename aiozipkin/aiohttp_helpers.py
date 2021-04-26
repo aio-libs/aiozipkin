@@ -249,8 +249,8 @@ class ZipkinClientSignals:
     ) -> Optional[TraceContext]:
         ctx = trace_config_ctx.trace_request_ctx
 
-        if isinstance(ctx, dict) and "span_context" in ctx:
-            r: TraceContext = ctx["span_context"]
+        if isinstance(ctx, dict):
+            r: Optional[TraceContext] = ctx.get("span_context")
             return r
 
         return None
@@ -260,8 +260,8 @@ class ZipkinClientSignals:
     ) -> Optional[TraceContext]:
         ctx = trace_config_ctx.trace_request_ctx
 
-        if isinstance(ctx, SimpleNamespace) and hasattr(ctx, "span_context"):
-            r: TraceContext = ctx.span_context
+        if isinstance(ctx, SimpleNamespace):
+            r: Optional[TraceContext] = getattr(ctx, "span_context", None)
             return r
 
         return None
