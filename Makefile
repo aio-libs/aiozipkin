@@ -2,8 +2,6 @@
 
 FLAGS=
 
-FILES := aiozipkin tests setup.py examples
-
 fmt:
 ifdef CI_LINT_RUN
 	pre-commit run --all-files --show-diff-on-failure
@@ -12,7 +10,7 @@ else
 endif
 
 lint: bandit fmt
-	mypy --show-error-codes --strict $(FILES)
+	mypy --show-error-codes --strict aiozipkin tests setup.py
 
 test:
 	py.test -s -v $(FLAGS) ./tests/

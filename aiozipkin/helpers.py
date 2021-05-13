@@ -22,17 +22,14 @@ SINGLE_HEADER = "b3"
 DELIMITER = "-"
 DEBUG_MARKER = "d"
 
-_TraceContext = NamedTuple(
-    "TraceContext",
-    [
-        ("trace_id", str),
-        ("parent_id", OptStr),
-        ("span_id", str),
-        ("sampled", OptBool),
-        ("debug", bool),
-        ("shared", bool),
-    ],
-)
+
+class _TraceContext(NamedTuple):
+    trace_id: str
+    parent_id: OptStr
+    span_id: str
+    sampled: OptBool
+    debug: bool
+    shared: bool
 
 
 class TraceContext(_TraceContext):
