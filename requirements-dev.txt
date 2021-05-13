@@ -1,6 +1,6 @@
 -e .
 aiodocker==0.19.1
-aiohttp==3.7.4
+aiohttp==3.7.4.post0
 async-generator==1.10
 attrs==21.2.0
 bandit==1.7.0
