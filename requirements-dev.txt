@@ -4,7 +4,7 @@ aiohttp==3.7.4
 async-generator==1.10
 attrs==21.2.0
 bandit==1.7.0
-docutils==0.16
+docutils==0.17.1
 flake8==3.9.2
 flake8-bugbear==21.4.3
 mypy==0.812
