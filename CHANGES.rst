@@ -13,6 +13,19 @@ CHANGES
 
 .. towncrier release notes start
 
+1.1.0 (2021-05-17)
+==================
+
+Bugfixes
+--------
+
+- Expect trace request context to be of SimpleNamespace type.
+  `#385 <https://github.com/aio-libs/aiohttp/issues/385>`_
+
+
+----
+
+
 1.0.0 (2020-11-06)
 ==================
 
