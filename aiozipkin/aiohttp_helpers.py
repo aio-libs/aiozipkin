@@ -99,9 +99,9 @@ def _set_span_properties(span: SpanAbc, request: Request) -> None:
     span.tag(HTTP_METHOD, request.method.upper())
 
     resource = request.match_info.route.resource
-    assert resource is not None
-    route = resource.canonical
-    span.tag(HTTP_ROUTE, route)
+    if resource is not None:
+        route = resource.canonical
+        span.tag(HTTP_ROUTE, route)
 
     _set_remote_endpoint(span, request)
 
