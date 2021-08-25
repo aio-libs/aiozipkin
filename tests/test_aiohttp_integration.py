@@ -134,9 +134,7 @@ async def test_client_signals_no_span(tracer: az.Tracer, fake_transport: Any) ->
 
 
 @pytest.mark.asyncio
-async def test_no_resource(
-    client: aiohttp.ClientSession, fake_transport: Any
-) -> None:
+async def test_no_resource(client: aiohttp.ClientSession, fake_transport: Any) -> None:
     resp = await client.get("/404")
     assert resp.status == 404
     assert len(fake_transport.records) == 1
