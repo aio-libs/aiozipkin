@@ -12,7 +12,7 @@ def generate_random_64bit_string() -> str:
 
     :returns: random 16-character string
     """
-    return "{:016x}".format(random.getrandbits(64))
+    return f"{random.getrandbits(64):016x}"
 
 
 # https://github.com/Yelp/py_zipkin/blob/
@@ -29,7 +29,7 @@ def generate_random_128bit_string() -> str:
     """
     t = int(time.time())
     lower_96 = random.getrandbits(96)
-    return "{:032x}".format((t << 96) | lower_96)
+    return f"{(t << 96) | lower_96:032x}"
 
 
 def unsigned_hex_to_signed_int(hex_string: str) -> int:
