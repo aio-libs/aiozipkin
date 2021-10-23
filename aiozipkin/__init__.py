@@ -23,7 +23,7 @@ from .span import SpanAbc
 from .tracer import Tracer, create, create_custom
 
 
-__version__ = "1.1.1a0"
+__version__ = "1.1.1a1"
 __all__ = (
     "Tracer",
     "Sampler",

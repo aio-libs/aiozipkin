@@ -13,7 +13,7 @@ CHANGES
 
 .. towncrier release notes start
 
-1.1.1a0 (2021-10-23)
+1.1.1a1 (2021-10-23)
 ====================
 
 Bugfixes

@@ -113,7 +113,7 @@ jobs:
       uses: actions/setup-python@v2
     - name: Install dependencies
       run:
-        python -m pip install -U pip wheel build whine
+        python -m pip install -U pip wheel build twine
     - name: Make dists
       run:
         python -m build
