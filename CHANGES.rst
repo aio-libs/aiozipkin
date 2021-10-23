@@ -13,16 +13,16 @@ CHANGES
 
 .. towncrier release notes start
 
-1.1.1a1 (2021-10-23)
-====================
+1.1.1 (2021-10-23)
+==================
 
 Bugfixes
 --------
 
 - Fix unhandled AssertionError in aiohttp integration when unknown resource requested by the user.
-  `#400 <https://github.com/aio-libs/aiohttp/issues/400>`_
+  `#400 <https://github.com/aio-libs/aiozipkin/issues/400>`_
 - Fix ``NoneType`` error when using ``SystemRoute``.
-  `#410 <https://github.com/aio-libs/aiohttp/issues/410>`_
+  `#410 <https://github.com/aio-libs/aiozipkin/issues/410>`_
 
 ----
 
@@ -34,7 +34,7 @@ Bugfixes
 --------
 
 - Expect trace request context to be of SimpleNamespace type.
-  `#385 <https://github.com/aio-libs/aiohttp/issues/385>`_
+  `#385 <https://github.com/aio-libs/aiozipkin/issues/385>`_
 
 
 ----
@@ -47,7 +47,7 @@ Bugfixes
 --------
 
 - Support Python 3.8 and Python 3.9
-  `#259 <https://github.com/aio-libs/aiohttp/issues/259>`_
+  `#259 <https://github.com/aio-libs/aiozipkin/issues/259>`_
 
 
 ----
@@ -69,7 +69,7 @@ Features
 --------
 
 - Add support of AWS X-Ray trace id format.
-  `#273 <https://github.com/aio-libs/aiohttp/issues/273>`_
+  `#273 <https://github.com/aio-libs/aiozipkin/issues/273>`_
 
 
 ----
