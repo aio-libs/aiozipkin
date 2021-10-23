@@ -1,1 +1,0 @@
-Fix unhandled AssertionError in aiohttp integration when unknown resource requested by the user.

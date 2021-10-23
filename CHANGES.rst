@@ -13,6 +13,20 @@ CHANGES
 
 .. towncrier release notes start
 
+1.1.1a0 (2021-10-23)
+====================
+
+Bugfixes
+--------
+
+- Fix unhandled AssertionError in aiohttp integration when unknown resource requested by the user.
+  `#400 <https://github.com/aio-libs/aiohttp/issues/400>`_
+- Fix ``NoneType`` error when using ``SystemRoute``.
+  `#410 <https://github.com/aio-libs/aiohttp/issues/410>`_
+
+----
+
+
 1.1.0 (2021-05-17)
 ==================
 
