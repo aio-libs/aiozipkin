@@ -1,5 +1,5 @@
 -e .
-aiodocker==0.19.1
+aiodocker==0.21.0
 aiohttp==3.8.0
 async-generator==1.10
 attrs==21.2.0
