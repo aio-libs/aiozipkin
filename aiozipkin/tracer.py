@@ -25,7 +25,6 @@ if TYPE_CHECKING:
     class _Base(AsyncContextManager["Tracer"]):
         pass
 
-
 else:
 
     class _Base(AsyncContextManager):

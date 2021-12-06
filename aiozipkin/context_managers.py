@@ -21,7 +21,6 @@ if TYPE_CHECKING:
     class _Base(AsyncContextManager[T], AbcAwaitable[T]):
         pass
 
-
 else:
 
     class _Base(Generic[T], AsyncContextManager, AbcAwaitable):
