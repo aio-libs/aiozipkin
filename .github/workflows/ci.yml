@@ -31,7 +31,7 @@ jobs:
         restore-keys: |
             pip-lint-
     - name: Install dependencies
-      uses: py-actions/py-dependency-install@v2
+      uses: py-actions/py-dependency-install@v3
       with:
         path: requirements-dev.txt
     - name: Install itself
@@ -85,7 +85,7 @@ jobs:
         restore-keys: |
             pip-ci-ubuntu-${{ matrix.python-version }}-
     - name: Install dependencies
-      uses: py-actions/py-dependency-install@v2
+      uses: py-actions/py-dependency-install@v3
       with:
         path: requirements-dev.txt
     - name: Run unittests
