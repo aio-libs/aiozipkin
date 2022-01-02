@@ -40,3 +40,10 @@ updates:
   - dependency-name: mypy
     versions:
     - "0.800"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    labels:
+      - dependencies
+    schedule:
+      interval: "daily"
