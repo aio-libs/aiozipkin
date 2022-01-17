@@ -22,6 +22,12 @@ Full featured example with aiohttp application:
 .. literalinclude:: ../examples/aiohttp_example.py
 
 
+Fastapi
+-------
+
+Fastapi support can be found with the `starlette-zipkin<https://pypi.org/project/starlette-zipkin/>`_ package.
+
+
 Microservices Demo
 ------------------
 There is a larger micro services example, using aiohttp. This demo consists of
