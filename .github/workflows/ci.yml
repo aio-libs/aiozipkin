@@ -20,7 +20,7 @@ jobs:
       version: ${{ steps.version.outputs.version }}
     steps:
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
     - name: Setup Python
       uses: actions/setup-python@v3
     - name: Cache PyPI
@@ -68,7 +68,7 @@ jobs:
     timeout-minutes: 10
     steps:
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
     - name: Setup Python ${{ matrix.python-version }}
       uses: actions/setup-python@v3
       with:
@@ -108,7 +108,7 @@ jobs:
     if: github.event_name == 'push' && contains(github.ref, 'refs/tags/')
     steps:
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
     - name: Setup Python
       uses: actions/setup-python@v3
     - name: Install dependencies
