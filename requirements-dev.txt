@@ -14,4 +14,4 @@ pytest-aiohttp==1.0.4
 pytest-asyncio==0.18.3
 pytest-cov==3.0.0
 towncrier==21.9.0
-twine==3.8.0
+twine==4.0.0
