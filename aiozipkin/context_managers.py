@@ -28,7 +28,6 @@ else:
 
 
 class _ContextManager(_Base[T]):
-
     __slots__ = ("_coro", "_obj")
 
     def __init__(self, coro: Awaitable[T]) -> None:

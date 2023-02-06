@@ -317,7 +317,6 @@ class ZipkinClientSignals:
         context: SimpleNamespace,
         params: TraceRequestExceptionParams,
     ) -> None:
-
         span_context = self._get_span_context(context)
         if span_context is None:
             return

@@ -38,7 +38,6 @@ async def handler(request):
 
 
 async def make_app():
-
     app = web.Application()
     app.router.add_get("/api/v1/data", handler)
     app.router.add_get("/", handler)

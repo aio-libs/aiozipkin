@@ -91,7 +91,6 @@ def test_noop_span_methods(tracer: Tracer) -> Any:
 
 
 def test_trace_join_span(tracer: Tracer, context: Any) -> None:
-
     with tracer.join_span(context) as span:
         span.name("name")
 
@@ -107,7 +106,6 @@ def test_trace_join_span(tracer: Tracer, context: Any) -> None:
 
 
 def test_trace_new_child(tracer: Tracer, context: Any) -> None:
-
     with tracer.new_child(context) as span:
         span.name("name")
 
@@ -117,7 +115,6 @@ def test_trace_new_child(tracer: Tracer, context: Any) -> None:
 
 
 def test_span_new_child(tracer: Tracer, context: Any, fake_transport: Any) -> None:
-
     with tracer.new_child(context) as span:
         span.name("name")
         with span.new_child("child", "CLIENT") as child_span1:

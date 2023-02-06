@@ -14,7 +14,7 @@ from .record import Record
 
 
 DEFAULT_TIMEOUT = aiohttp.ClientTimeout(total=5 * 60)
-BATCHES_MAX_COUNT = 10 ** 4
+BATCHES_MAX_COUNT = 10**4
 
 DataList = List[Dict[str, Any]]
 SndBatches = Deque[Tuple[int, DataList]]
@@ -157,7 +157,6 @@ class Transport(TransportABC):
 
     async def _send_data(self, data: DataList) -> bool:
         try:
-
             async with self._session.post(self._address, json=data) as resp:
                 body = await resp.text()
                 if resp.status >= 300:

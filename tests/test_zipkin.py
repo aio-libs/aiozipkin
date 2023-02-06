@@ -133,7 +133,6 @@ async def test_zipkin_error(
 async def test_leak_in_transport(
     zipkin_url: str, client: aiohttp.ClientSession, loop: asyncio.AbstractEventLoop
 ) -> None:
-
     tracemalloc.start()
 
     endpoint = az.create_endpoint("simple_service")
