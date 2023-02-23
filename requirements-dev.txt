@@ -7,7 +7,7 @@ bandit==1.7.4
 flake8==4.0.1
 flake8-bugbear==22.6.22
 mypy==0.961
-pre-commit==2.19.0
+pre-commit==3.1.0
 pyroma==4.0
 pytest==7.1.2
 pytest-aiohttp==1.0.4
