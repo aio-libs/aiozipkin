@@ -5,10 +5,6 @@ import sys
 from setuptools import find_packages, setup  # type: ignore
 
 
-if sys.version_info < (3, 6, 0):
-    raise RuntimeError("aiozipkin does not support Python earlier than 3.6.0")
-
-
 def read(f: str) -> str:
     return open(os.path.join(os.path.dirname(__file__), f)).read().strip()
 

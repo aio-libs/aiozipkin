@@ -14,7 +14,7 @@ from .record import Record
 
 
 DEFAULT_TIMEOUT = aiohttp.ClientTimeout(total=5 * 60)
-BATCHES_MAX_COUNT = 10 ** 4
+BATCHES_MAX_COUNT = 10**4
 
 DataList = List[Dict[str, Any]]
 SndBatches = Deque[Tuple[int, DataList]]
