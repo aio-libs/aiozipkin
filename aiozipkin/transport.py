@@ -12,7 +12,6 @@ from .log import logger
 from .mypy_types import OptLoop
 from .record import Record
 
-
 DEFAULT_TIMEOUT = aiohttp.ClientTimeout(total=5 * 60)
 BATCHES_MAX_COUNT = 10**4
 

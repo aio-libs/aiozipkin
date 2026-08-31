@@ -1,7 +1,6 @@
 import asyncio
 from typing import Mapping, Optional
 
-
 Headers = Mapping[str, str]
 OptStr = Optional[str]
 OptTs = Optional[float]
