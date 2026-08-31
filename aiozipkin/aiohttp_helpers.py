@@ -41,7 +41,6 @@ from .helpers import (
 from .span import SpanAbc
 from .tracer import Tracer
 
-
 APP_AIOZIPKIN_KEY = "aiozipkin_tracer"
 REQUEST_AIOZIPKIN_KEY = "aiozipkin_span"
 
