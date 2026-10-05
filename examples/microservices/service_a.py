@@ -8,7 +8,6 @@ from aiohttp import web
 
 import aiozipkin as az
 
-
 service_b_api = "http://127.0.0.1:9002/api/v1/data"
 service_e_api = "http://127.0.0.1:9005/api/v1/data"
 host = "127.0.0.1"

@@ -5,7 +5,6 @@ from aiohttp import web
 
 import aiozipkin as az
 
-
 page = """
 <html lang="en">
 <head>
