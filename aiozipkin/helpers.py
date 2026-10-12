@@ -3,7 +3,6 @@ from typing import Any, Dict, List, NamedTuple, Optional
 
 from .mypy_types import Headers, OptBool, OptInt, OptStr, OptTs
 
-
 # possible span kinds
 CLIENT = "CLIENT"
 SERVER = "SERVER"
