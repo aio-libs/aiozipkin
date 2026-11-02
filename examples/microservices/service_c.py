@@ -4,7 +4,6 @@ from aiohttp import web
 
 import aiozipkin as az
 
-
 host = "127.0.0.1"
 port = 9003
 
