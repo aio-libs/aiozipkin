@@ -7,7 +7,6 @@ from .helpers import Endpoint, TraceContext, make_timestamp
 from .mypy_types import OptInt, OptStr, OptTs
 from .record import Record
 
-
 if TYPE_CHECKING:
     from .tracer import Tracer
 

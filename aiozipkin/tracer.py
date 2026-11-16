@@ -19,7 +19,6 @@ from .span import NoopSpan, Span, SpanAbc
 from .transport import StubTransport, Transport, TransportABC
 from .utils import generate_random_64bit_string, generate_random_128bit_string
 
-
 if TYPE_CHECKING:
 
     class _Base(AsyncContextManager["Tracer"]):
